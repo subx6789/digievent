@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EventPulse
 
-## Getting Started
+EventPulse is an event hosting and booking platform designed specifically for college communities. The platform allows students and event organizers to create, manage, and book events seamlessly. Built with a focus on simplicity and responsiveness, EventPulse provides an intuitive user experience, allowing users to easily browse, register, and participate in college events.
 
-First, run the development server:
+## Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Next.js:** React-based framework for building the frontend of the application.
+- **Tanstack Query:** For data fetching and state management.
+- **TypeScript:** Ensures type safety and a better developer experience.
+- **Tailwind CSS:** Utility-first CSS framework for fast, responsive design.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To get started with the project locally:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Clone the repository:**
 
-## Learn More
+  ```bash
+   git clone https://github.com/subx6789/eventpulse-client.git
+   cd eventpulse-client
+  ```
 
-To learn more about Next.js, take a look at the following resources:
+- **Install dependencies:**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+  ```bash
+   npm install
+  ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Run the development server:**
 
-## Deploy on Vercel
+  ```bash
+   npm run dev
+  ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Open your browser and go to `http://localhost:3000` to view the app.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contributing
+
+If you'd like to contribute to the project, feel free to fork the repository and create a pull request. We welcome bug fixes, new features, and improvements.
+
+## Fork the repository
+
+- Create a new branch
+- Commit your changes
+- Open a pull request with a detailed description of your changes
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+
+## Contact
+
+For any inquiries, please reach out to:
+
+**Email:** subhajits956@gmail.com

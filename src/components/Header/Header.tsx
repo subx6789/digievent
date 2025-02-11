@@ -1,0 +1,42 @@
+"use client";
+import { Plus } from "lucide-react";
+import { Button } from "../ui/button";
+import { SidebarTrigger } from "../ui/sidebar";
+import { usePathname } from "next/navigation";
+import { ModeToggle } from "../ThemeToggler/ThemeToggler";
+
+const Header = () => {
+  const pathname = usePathname();
+
+  // Extract the title from the pathname
+  const getTitleFromPathname = (path: string) => {
+    const segments = path.split("/").filter(Boolean); // Filter out empty segments
+    const lastSegment = segments[segments.length - 1] || "Dashboard"; // Default to "Dashboard" if no segment
+
+    // Capitalize each word and replace "-" or "_" with a space
+    return lastSegment
+      .replace(/[-_]/g, " ") // Replace dashes/underscores with spaces
+      .split(" ") // Split words for capitalization
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+      .join(" "); // Join words with spaces
+  };
+
+  const title = getTitleFromPathname(pathname);
+
+  return (
+    <header className="flex h-16 items-center justify-between">
+      <div className="flex gap-2 items-center">
+        <SidebarTrigger className="-ml-1" />
+        <ModeToggle />
+      </div>
+
+      <h1 className="text-lg font-semibold">{title}</h1>
+      <Button className="hover:scale-105 transition-all duration-150 bg-blue-600 text-white hover:bg-blue-800">
+        <Plus />
+        Add Organiser
+      </Button>
+    </header>
+  );
+};
+
+export default Header;
