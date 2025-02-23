@@ -30,11 +30,10 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
-  const { logout } = useAuth(); // Get logout function from AuthContext
+  const { logout } = useAuth();
 
   const handleLogout = () => {
     logout();
-    // Optional: Add any additional cleanup or redirect logic here
   };
 
   return (
@@ -48,7 +47,12 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">TIU</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {user.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>

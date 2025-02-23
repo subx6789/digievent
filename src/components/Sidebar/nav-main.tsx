@@ -7,7 +7,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { usePathname } from "next/navigation"; // Correct hook for determining the current route
+import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import Link from "next/link";
 
@@ -20,7 +20,7 @@ export function NavMain({
     icon: LucideIcon;
   }[];
 }) {
-  const pathname = usePathname(); // Get the current route
+  const pathname = usePathname();
 
   return (
     <SidebarGroup>
@@ -32,7 +32,7 @@ export function NavMain({
               tooltip={item.title}
               className={clsx(
                 "hover:bg-blue-600 hover:text-white transition-all duration-150 hover:scale-105 py-5",
-                pathname === item.url && "bg-blue-600 text-white" // Highlight the active item
+                pathname === item.url && "bg-blue-600 text-white"
               )}
             >
               <Link href={item.url}>

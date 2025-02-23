@@ -6,7 +6,7 @@ import { organizers } from "@/utils/data/organizers";
 export default async function OrganizersPage() {
   return (
     <ProtectedRoute requiredRole="admin">
-      <Sidebar>
+      <Sidebar role="admin">
         <div className="p-6">
           <OrganizerTable organizers={organizers} />
         </div>

@@ -6,7 +6,7 @@ import React from "react";
 const page = () => {
   return (
     <ProtectedRoute requiredRole="admin">
-      <Sidebar>
+      <Sidebar role="admin">
         <div className="min-h-screen bg-white dark:bg-transparent flex flex-col items-center justify-center p-4">
           {/* Construction Icon with Animation */}
           <div className="mb-8 relative">

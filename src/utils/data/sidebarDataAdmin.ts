@@ -2,7 +2,7 @@ export const sidebarDataAdmin = {
   user: {
     name: "Techno India University",
     email: "tiu@gmail.com",
-    role: "Admin", // Ensure the role matches the defined type
+    role: "Admin",
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [

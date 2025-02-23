@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-// src/context/AuthProvider.tsx
 "use client";
 
 import { createContext, useContext, useEffect, useState, useMemo } from "react";

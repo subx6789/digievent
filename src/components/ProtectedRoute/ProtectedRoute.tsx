@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-// src/components/ProtectedRoute.tsx
 "use client";
 
 import { useAuth } from "@/context/AuthProvider";

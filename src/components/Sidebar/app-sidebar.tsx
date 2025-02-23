@@ -8,6 +8,7 @@ import {
   TicketCheck,
   Users,
   LucideIcon,
+  Building2Icon,
 } from "lucide-react";
 
 import { NavMain } from "@/components/Sidebar/nav-main";
@@ -23,12 +24,17 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { sidebarDataAdmin } from "@/utils/data/sidebarDataAdmin";
+import { sidebarDataSuperAdmin } from "@/utils/data/sidebarDataSuperAdmin";
 
 // Define valid roles
-type Role = "Admin" | "Organiser";
+type Role = "SuperAdmin" | "Admin" | "Organiser";
 
 // Define role-based icons explicitly as LucideIcon
 const roleIcons: Record<Role, Record<string, LucideIcon>> = {
+  SuperAdmin: {
+    Overview: LayoutDashboard,
+    "Manage Colleges": Building2Icon,
+  },
   Admin: {
     Overview: LayoutDashboard,
     "Event Requests": CalendarDays,
@@ -44,9 +50,9 @@ const roleIcons: Record<Role, Record<string, LucideIcon>> = {
 
 // Mock user data
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ role }: { role: string }) {
   return (
-    <Sidebar variant="inset" {...props}>
+    <Sidebar variant="inset">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -62,7 +68,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">Digievent</span>
                   <span className="truncate text-xs">
-                    {sidebarDataAdmin.user.role}
+                    {role === "admin"
+                      ? sidebarDataAdmin.user.role
+                      : sidebarDataSuperAdmin.user.role}
                   </span>
                 </div>
               </Link>
@@ -72,16 +80,33 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain
-          items={sidebarDataAdmin.navMain.map((item) => ({
-            ...item,
-            icon:
-              roleIcons[sidebarDataAdmin.user.role as Role]?.[item.title] ||
-              LayoutDashboard, // Default icon
-          }))}
+          items={
+            role === "admin"
+              ? sidebarDataAdmin.navMain.map((item) => ({
+                  ...item,
+                  icon:
+                    roleIcons[sidebarDataAdmin.user.role as Role]?.[
+                      item.title
+                    ] || LayoutDashboard, // Default icon
+                }))
+              : sidebarDataSuperAdmin.navMain.map((item) => ({
+                  ...item,
+                  icon:
+                    roleIcons[sidebarDataSuperAdmin.user.role as Role]?.[
+                      item.title
+                    ] || LayoutDashboard, // Default icon
+                }))
+          }
         />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={sidebarDataAdmin.user} />
+        <NavUser
+          user={
+            role === "admin"
+              ? sidebarDataAdmin.user
+              : sidebarDataSuperAdmin.user
+          }
+        />
       </SidebarFooter>
     </Sidebar>
   );

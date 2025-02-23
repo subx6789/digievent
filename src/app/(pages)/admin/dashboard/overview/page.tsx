@@ -14,7 +14,7 @@ import { upcomingEvents } from "@/utils/data/upcomingEvents";
 export default function Overview() {
   return (
     <ProtectedRoute requiredRole="admin">
-      <Sidebar>
+      <Sidebar role="admin">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 my-5">
           {statCardData.map((data, index) => (
             <div

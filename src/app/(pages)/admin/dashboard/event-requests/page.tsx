@@ -6,7 +6,7 @@ import { eventRequests } from "@/utils/data/eventRequests";
 const Page = () => {
   return (
     <ProtectedRoute requiredRole="admin">
-      <Sidebar>
+      <Sidebar role="admin">
         <div className="p-5">
           <h1 className="mb-5 text-xl font-semibold">Upcoming Events</h1>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
