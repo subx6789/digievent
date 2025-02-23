@@ -1,9 +1,11 @@
 "use client";
-import { Plus } from "lucide-react";
+import { DownloadIcon, Plus } from "lucide-react";
 import { Button } from "../ui/button";
 import { SidebarTrigger } from "../ui/sidebar";
 import { usePathname } from "next/navigation";
 import { ModeToggle } from "../ThemeToggler/ThemeToggler";
+import { sidebarDataSuperAdmin } from "@/utils/data/sidebarDataSuperAdmin";
+import clsx from "clsx";
 
 const Header = () => {
   const pathname = usePathname();
@@ -23,6 +25,8 @@ const Header = () => {
 
   const title = getTitleFromPathname(pathname);
 
+  const role = pathname.split("/")[1];
+
   return (
     <header className="flex h-16 items-center justify-between">
       <div className="flex gap-2 items-center">
@@ -30,10 +34,29 @@ const Header = () => {
         <ModeToggle />
       </div>
 
-      <h1 className="text-lg font-semibold">{title}</h1>
-      <Button className="hover:scale-105 transition-all duration-150 bg-blue-600 text-white hover:bg-blue-800">
-        <Plus />
-        Add Organiser
+      <h1 className="text-lg font-semibold">
+        {role === "admin"
+          ? title
+          : `Welcome Back, ${sidebarDataSuperAdmin.user.name.split(" ")[0]}`}
+      </h1>
+      <Button
+        className={clsx(
+          `hover:scale-105 transition-all duration-150 hover:bg-blue-700 dark:hover:bg-blue-700`,
+          role === "admin"
+            ? `bg-blue-600 text-white `
+            : `bg-transparent border border-gray-400 text-black hover:text-white dark:border-gray-800 dark:text-white`
+        )}
+      >
+        {role === "admin" ? (
+          <>
+            <Plus /> Add Organiser
+          </>
+        ) : (
+          <>
+            <DownloadIcon />
+            Export Report
+          </>
+        )}
       </Button>
     </header>
   );

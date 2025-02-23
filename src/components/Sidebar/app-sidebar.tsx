@@ -8,7 +8,7 @@ import {
   TicketCheck,
   Users,
   LucideIcon,
-  Building2Icon,
+  Building2,
 } from "lucide-react";
 
 import { NavMain } from "@/components/Sidebar/nav-main";
@@ -27,13 +27,13 @@ import { sidebarDataAdmin } from "@/utils/data/sidebarDataAdmin";
 import { sidebarDataSuperAdmin } from "@/utils/data/sidebarDataSuperAdmin";
 
 // Define valid roles
-type Role = "SuperAdmin" | "Admin" | "Organiser";
+type Role = "Super Admin" | "Admin" | "Organiser";
 
 // Define role-based icons explicitly as LucideIcon
 const roleIcons: Record<Role, Record<string, LucideIcon>> = {
-  SuperAdmin: {
+  "Super Admin": {
     Overview: LayoutDashboard,
-    "Manage Colleges": Building2Icon,
+    "Manage Colleges": Building2,
   },
   Admin: {
     Overview: LayoutDashboard,
@@ -61,7 +61,13 @@ export function AppSidebar({ role }: { role: string }) {
               asChild
               className="hover:scale-105 transition-all duration-150"
             >
-              <Link href="/admin/dashboard/overview">
+              <Link
+                href={
+                  role === "admin"
+                    ? `/admin/dashboard/overview`
+                    : `/super-admin/dashboard/overview`
+                }
+              >
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-blue-600 text-white">
                   <TicketCheck className="size-4" />
                 </div>
