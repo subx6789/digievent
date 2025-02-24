@@ -41,7 +41,7 @@ const Header = () => {
       </h1>
       <Button
         className={clsx(
-          `hover:scale-105 transition-all duration-150 hover:bg-blue-700 dark:hover:bg-blue-700`,
+          `hover:scale-105 transition-all duration-150 hover:bg-blue-700 dark:hover:bg-blue-700 h-11`,
           role === "admin"
             ? `bg-blue-600 text-white `
             : `bg-transparent border border-gray-400 text-black hover:text-white dark:border-gray-800 dark:text-white`

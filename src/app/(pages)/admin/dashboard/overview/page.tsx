@@ -1,4 +1,4 @@
-import StatsCard from "@/components/Card/StatsCard";
+import { StatsCard } from "@/components/Card/StatsCard";
 import EngagementChart from "@/components/EngagementChart/EngagementChart";
 import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import Sidebar from "@/components/Sidebar/Sidebar";
@@ -7,7 +7,7 @@ import TicketSalesChart from "@/components/TicketSalesChart/TicketSalesChart";
 import { currentEvents } from "@/utils/data/currentEvents";
 import { engagementdata } from "@/utils/data/engagementData";
 import { pastEvents } from "@/utils/data/pastEvents";
-import { statCardData } from "@/utils/data/statCardData";
+import { statCardDataAdmin } from "@/utils/data/statCardDataAdmin";
 import { ticketSalesData } from "@/utils/data/ticketSalesData";
 import { upcomingEvents } from "@/utils/data/upcomingEvents";
 
@@ -16,17 +16,9 @@ export default function Overview() {
     <ProtectedRoute requiredRole="admin">
       <Sidebar role="admin">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 my-5">
-          {statCardData.map((data, index) => (
-            <div
-              key={index}
-              className="hover:scale-105 transition-all duration-150 cursor-pointer"
-            >
-              <StatsCard
-                title={data.title}
-                amount={data.amount}
-                icon={data.icon}
-                currency={data.currency}
-              />
+          {statCardDataAdmin.map((data, index) => (
+            <div key={index} className="cursor-pointer">
+              <StatsCard {...data} />
             </div>
           ))}
         </div>
