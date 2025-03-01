@@ -1,6 +1,5 @@
 import { StatsCard } from "@/components/Card/StatsCard";
 import Sidebar from "@/components/Sidebar/Sidebar";
-import TitleAndDescription from "@/components/TitleAndDescription/TitleAndDescription";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -17,16 +16,12 @@ const Overview = () => {
   return (
     <Sidebar role="super-admin">
       <div className="my-5 space-y-6">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between w-full">
-          {/* Title & Description */}
-          <TitleAndDescription description="Overall weekly performance" />
-
+        <div className="w-full">
           {/* Filters Section */}
-          <div className="flex md:flex-row flex-col items-center gap-4 mt-4 md:mt-0">
+          <div className="flex flex-col md:flex-row md:justify-end items-center gap-4 mt-4 md:mt-0">
             {/* College Filter */}
             <Select defaultValue="techno-india-uni-kol">
-              <SelectTrigger className="md:w-[320px] overflow-hidden w-full bg-white dark:bg-gray-800 h-11 px-4 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <SelectTrigger className="md:w-[320px] w-full bg-white dark:bg-gray-800 h-11 px-4 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <div className="flex items-center gap-3">
                   <Building2 className="h-[18px] w-[18px] text-gray-400" />
                   <SelectValue
@@ -46,7 +41,7 @@ const Overview = () => {
 
             {/* Time Period Filter */}
             <Select defaultValue="30-days">
-              <SelectTrigger className="md:w-[320px] overflow-hidden w-full bg-white dark:bg-gray-800 h-11 px-4 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <SelectTrigger className="md:w-[320px] w-full bg-white dark:bg-gray-800 h-11 px-4 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <div className="flex items-center gap-3">
                   <Calendar className="h-[18px] w-[18px] text-gray-400" />
                   <SelectValue

@@ -4,11 +4,12 @@ import * as React from "react";
 import {
   CalendarDays,
   LayoutDashboard,
-  Settings2,
   TicketCheck,
   Users,
   LucideIcon,
   Building2,
+  CalendarCheck,
+  ChartNoAxesCombined,
 } from "lucide-react";
 
 import { NavMain } from "@/components/Sidebar/nav-main";
@@ -25,9 +26,10 @@ import {
 import Link from "next/link";
 import { sidebarDataAdmin } from "@/utils/data/sidebarDataAdmin";
 import { sidebarDataSuperAdmin } from "@/utils/data/sidebarDataSuperAdmin";
+import { sidebarDataOrganizer } from "@/utils/data/sidebarDataOrganizer";
 
 // Define valid roles
-type Role = "Super Admin" | "Admin" | "Organiser";
+type Role = "Super Admin" | "Admin" | "Organizer";
 
 // Define role-based icons explicitly as LucideIcon
 const roleIcons: Record<Role, Record<string, LucideIcon>> = {
@@ -38,13 +40,11 @@ const roleIcons: Record<Role, Record<string, LucideIcon>> = {
   Admin: {
     Overview: LayoutDashboard,
     "Event Requests": CalendarDays,
-    Organisers: Users,
-    Settings: Settings2,
+    Organizers: Users,
   },
-  Organiser: {
-    Dashboard: LayoutDashboard,
-    "My Events": TicketCheck,
-    Settings: Settings2,
+  Organizer: {
+    Events: CalendarCheck,
+    Metrics: ChartNoAxesCombined,
   },
 };
 
@@ -65,7 +65,9 @@ export function AppSidebar({ role }: { role: string }) {
                 href={
                   role === "admin"
                     ? `/admin/dashboard/overview`
-                    : `/super-admin/dashboard/overview`
+                    : role === "super-admin"
+                    ? `/super-admin/dashboard/overview`
+                    : `/organizer/dashboard/events`
                 }
               >
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-blue-600 text-white">
@@ -76,7 +78,9 @@ export function AppSidebar({ role }: { role: string }) {
                   <span className="truncate text-xs">
                     {role === "admin"
                       ? sidebarDataAdmin.user.role
-                      : sidebarDataSuperAdmin.user.role}
+                      : role === "super-admin"
+                      ? sidebarDataSuperAdmin.user.role
+                      : sidebarDataOrganizer.user.role}
                   </span>
                 </div>
               </Link>
@@ -95,10 +99,18 @@ export function AppSidebar({ role }: { role: string }) {
                       item.title
                     ] || LayoutDashboard, // Default icon
                 }))
-              : sidebarDataSuperAdmin.navMain.map((item) => ({
+              : role === "super-admin"
+              ? sidebarDataSuperAdmin.navMain.map((item) => ({
                   ...item,
                   icon:
                     roleIcons[sidebarDataSuperAdmin.user.role as Role]?.[
+                      item.title
+                    ] || LayoutDashboard, // Default icon
+                }))
+              : sidebarDataOrganizer.navMain.map((item) => ({
+                  ...item,
+                  icon:
+                    roleIcons[sidebarDataOrganizer.user.role as Role]?.[
                       item.title
                     ] || LayoutDashboard, // Default icon
                 }))
@@ -110,7 +122,9 @@ export function AppSidebar({ role }: { role: string }) {
           user={
             role === "admin"
               ? sidebarDataAdmin.user
-              : sidebarDataSuperAdmin.user
+              : role === "super-admin"
+              ? sidebarDataSuperAdmin.user
+              : sidebarDataOrganizer.user
           }
         />
       </SidebarFooter>

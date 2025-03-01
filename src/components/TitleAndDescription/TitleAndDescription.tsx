@@ -1,7 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 
-const TitleAndDescription = ({ description }: { description: string }) => {
+const TitleAndDescription = () => {
   const pathname = usePathname();
 
   // Extract the title from the pathname
@@ -19,13 +19,24 @@ const TitleAndDescription = ({ description }: { description: string }) => {
 
   const title = getTitleFromPathname(pathname);
 
+  const descriptions: Record<string, string> = {
+    "/admin/dashboard/overview": "Overview of admin dashboard",
+    "/admin/dashboard/event-requests": "Event-req of admin dashboard",
+    "/admin/dashboard/organizers": "Oragnisers of admin dashboard",
+    "/super-admin/dashboard/overview": "Overview of super admin dashboard",
+    "/super-admin/dashboard/manage-colleges":
+      "Manage colleges of super admin dashboard",
+    "/organizer/dashboard/events": "Events of organizers dashboard",
+    "/organizer/dashboard/metrics": "Metrics of organizer dashboard",
+  };
+
   return (
     <div className="space-y-1 w-1/2">
       <h1 className="text-3xl font-semibold text-gray-900 dark:text-white">
         {title}
       </h1>
       <p className="text-base text-gray-500 dark:text-gray-400">
-        {description}
+        {descriptions[pathname] ?? "Welcome to dashboard description"}
       </p>
     </div>
   );

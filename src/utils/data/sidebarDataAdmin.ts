@@ -8,7 +8,6 @@ export const sidebarDataAdmin = {
   navMain: [
     { title: "Overview", url: "/admin/dashboard/overview" },
     { title: "Event Requests", url: "/admin/dashboard/event-requests" },
-    { title: "Organisers", url: "/admin/dashboard/organisers" },
-    { title: "Settings", url: "/admin/dashboard/settings" },
+    { title: "Organizers", url: "/admin/dashboard/organizers" },
   ],
 };
