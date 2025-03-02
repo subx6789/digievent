@@ -1,12 +1,11 @@
 import { StatData } from "@/components/Card/StatsCard";
-import { DollarSign, UserPlus, Users } from "lucide-react";
 
 export const StatCardDataSuperAdmin: StatData[] = [
   {
     id: "total-bookings",
     title: "Total Bookings",
     value: 1986,
-    icon: Users,
+    type: "bookings",
     growth: {
       value: 38,
       label: "From last month",
@@ -18,7 +17,7 @@ export const StatCardDataSuperAdmin: StatData[] = [
     id: "new-signups",
     title: "New Signups",
     value: 40,
-    icon: UserPlus,
+    type: "signups",
     growth: {
       value: 38,
       label: "From last month",
@@ -29,9 +28,9 @@ export const StatCardDataSuperAdmin: StatData[] = [
   {
     id: "revenue",
     title: "Revenue Generated",
-    value: 160,
-    currency: "$",
-    icon: DollarSign,
+    value: 1603567,
+    currency: "₹",
+    type: "revenue",
     date: `${new Date().toLocaleString("default", {
       month: "long",
     })}, ${new Date().getUTCFullYear()}`,

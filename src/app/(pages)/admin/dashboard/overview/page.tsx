@@ -4,12 +4,10 @@ import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import EventsTable from "@/components/Table/EventsTable";
 import TicketSalesChart from "@/components/TicketSalesChart/TicketSalesChart";
-import { currentEvents } from "@/utils/data/currentEvents";
+import { allEvents } from "@/utils/data/allEvents";
 import { engagementdata } from "@/utils/data/engagementData";
-import { pastEvents } from "@/utils/data/pastEvents";
 import { statCardDataAdmin } from "@/utils/data/statCardDataAdmin";
 import { ticketSalesData } from "@/utils/data/ticketSalesData";
-import { upcomingEvents } from "@/utils/data/upcomingEvents";
 
 export default function Overview() {
   return (
@@ -26,11 +24,7 @@ export default function Overview() {
         <div className="my-5">
           <h1 className="text-xl font-semibold">Event Insights</h1>
           <div className="mt-5">
-            <EventsTable
-              currentEvents={currentEvents}
-              upcomingEvents={upcomingEvents}
-              pastEvents={pastEvents}
-            />
+            <EventsTable events={allEvents} />
           </div>
         </div>
 

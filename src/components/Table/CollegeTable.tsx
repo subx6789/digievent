@@ -15,7 +15,6 @@ import { Avatar } from "@radix-ui/react-avatar";
 import { AvatarFallback, AvatarImage } from "../ui/avatar";
 import clsx from "clsx";
 
-// Types for the college data
 export type College = {
   id: string;
   name: string;
@@ -27,30 +26,28 @@ export type College = {
 };
 
 type CollegeTableProps = {
-  colleges: College[]; // ManageColleges will pass this
+  colleges: College[];
 };
 
 export const CollegeTable = ({ colleges }: CollegeTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [collegeData, setCollegeData] = useState(colleges); // Stores mutable data for toggling status
+  const [collegeData, setCollegeData] = useState(colleges);
   const itemsPerPage = 5;
 
-  // Handle search filter
+  // Handle search filter across all fields
   const filteredColleges = collegeData.filter((college) =>
-    college.name.toLowerCase().includes(searchQuery.toLowerCase())
+    Object.values(college).some((value) =>
+      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+    )
   );
 
-  // Calculate total pages based on filtered data
   const totalPages = Math.ceil(filteredColleges.length / itemsPerPage);
-
-  // Slice the colleges array based on pagination
   const displayedColleges = filteredColleges.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  // Toggle active/suspended status
   const toggleStatus = (id: string) => {
     setCollegeData((prev) =>
       prev.map((college) =>
@@ -65,21 +62,19 @@ export const CollegeTable = ({ colleges }: CollegeTableProps) => {
   };
 
   return (
-    <div className="w-full p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
-      {/* Search Bar */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+    <div className="w-full bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+      <div className="p-4 pb-4 border-b border-gray-200 dark:border-gray-700">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
-            placeholder="Search by college name..."
+            placeholder="Search colleges..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-transparent border-gray-200 dark:border-gray-700 h-10"
+            className="pl-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 py-5"
           />
         </div>
       </div>
 
-      {/* Table */}
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent border-gray-200 dark:border-gray-800">
@@ -100,14 +95,16 @@ export const CollegeTable = ({ colleges }: CollegeTableProps) => {
                 key={college.id}
                 className={clsx(
                   "hover:bg-gray-50 dark:hover:bg-gray-800/50 border-gray-200 dark:border-gray-800",
-                  { "opacity-50": college.status === "suspended" } // Grayish effect
+                  {
+                    "opacity-50": college.status === "suspended",
+                  }
                 )}
               >
                 <TableCell className="w-[50px]">
-                  <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <Avatar className="h-8 w-8 rounded-lg">
+                  <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
+                    <Avatar className="h-10 w-10 rounded-lg">
                       <AvatarImage src={college.logo} alt={college.name} />
-                      <AvatarFallback className="rounded-lg">
+                      <AvatarFallback className="rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-200">
                         {college.name
                           .toUpperCase()
                           .split(" ")
@@ -177,14 +174,12 @@ export const CollegeTable = ({ colleges }: CollegeTableProps) => {
         </TableBody>
       </Table>
 
-      {/* Pagination */}
       <div className="flex items-center justify-center space-x-2 py-4 border-t border-gray-200 dark:border-gray-800">
         <Button
           variant="outline"
           size="sm"
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
-          className="border-gray-200 dark:border-gray-700"
         >
           Previous
         </Button>
@@ -194,11 +189,6 @@ export const CollegeTable = ({ colleges }: CollegeTableProps) => {
             variant={currentPage === page ? "default" : "outline"}
             size="sm"
             onClick={() => setCurrentPage(page)}
-            className={
-              currentPage === page
-                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "border-gray-200 dark:border-gray-700"
-            }
           >
             {page}
           </Button>
@@ -210,7 +200,6 @@ export const CollegeTable = ({ colleges }: CollegeTableProps) => {
             setCurrentPage((prev) => Math.min(prev + 1, totalPages))
           }
           disabled={currentPage === totalPages}
-          className="border-gray-200 dark:border-gray-700"
         >
           Next
         </Button>

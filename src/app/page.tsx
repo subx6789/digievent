@@ -9,7 +9,7 @@ export default function Home() {
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-start">
           <Link href="#" className="flex items-center gap-2 font-semibold">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-600 text-white">
+            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-blue-600 text-white">
               <TicketCheck className="size-4" />
             </div>
             Digievent

@@ -1,5 +1,5 @@
 "use client";
-import { DownloadIcon } from "lucide-react";
+import { CalendarPlus, DownloadIcon, SquarePlus, UserPlus } from "lucide-react";
 import { Button } from "../ui/button";
 import { SidebarTrigger } from "../ui/sidebar";
 import { usePathname } from "next/navigation";
@@ -36,14 +36,13 @@ const Header = () => {
         </h1>
         <Button
           className={clsx(
-            `hover:scale-105 transition-all duration-150 hover:bg-blue-700 dark:hover:bg-blue-700 h-11`,
-            role === "admin"
-              ? `bg-blue-600 text-white `
-              : `bg-transparent border border-gray-400 text-black hover:text-white dark:border-gray-800 dark:text-white`
+            "hover:scale-105 px-8 transition-all duration-150 hover:bg-blue-700 dark:hover:bg-blue-700 h-11 bg-blue-600 text-white"
           )}
         >
-          <DownloadIcon />
-          Export Report
+          <span className="flex items-center gap-2">
+            <DownloadIcon />
+            Export Report
+          </span>
         </Button>
       </header>
 
@@ -53,12 +52,23 @@ const Header = () => {
           {(pathname === "/admin/dashboard/organizers" ||
             pathname === "/super-admin/dashboard/manage-colleges" ||
             pathname === "/organizer/dashboard/events") && (
-            <Button className="bg-blue-600 h-11 hover:bg-blue-700 text-white px-8 font-medium transition-all duration-150 hover:scale-105">
-              {role === "admin"
-                ? "+ Add Organizer"
-                : role === "organizer"
-                ? "+ Add Event"
-                : "+ Add College"}
+            <Button className="bg-blue-600 h-11 hover:bg-blue-700 text-white px-6 font-medium transition-all duration-150 hover:scale-105">
+              {role === "admin" ? (
+                <span className="flex items-center gap-2">
+                  <UserPlus />
+                  Add Organizer
+                </span>
+              ) : role === "organizer" ? (
+                <span className="flex items-center gap-2">
+                  <CalendarPlus />
+                  Add Event
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <SquarePlus />
+                  Add College
+                </span>
+              )}
             </Button>
           )}
         </div>

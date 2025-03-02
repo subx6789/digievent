@@ -6,21 +6,72 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  LucideIcon,
   HelpCircle,
   ArrowUp,
   ArrowDown,
   MinusCircle,
   Calendar,
+  DollarSign,
+  Users,
+  UserPlus,
+  Ticket,
+  CalendarDays,
+  BarChart,
+  ShoppingCart,
+  Clock,
+  TrendingUp,
+  Star,
+  Globe,
+  Mail,
+  Activity,
+  CheckCircle,
+  AlertCircle,
+  LucideIcon,
 } from "lucide-react";
 import clsx from "clsx";
+
+// Icon mapping by type
+const ICON_MAP: Record<string, LucideIcon> = {
+  // Financial
+  revenue: DollarSign,
+  sales: ShoppingCart,
+  profit: TrendingUp,
+
+  // Users
+  users: Users,
+  signups: UserPlus,
+  visitors: Globe,
+
+  // Events
+  events: CalendarDays,
+  bookings: Ticket,
+  organisers: Users,
+
+  // Performance
+  performance: BarChart,
+  engagement: Activity,
+  ratings: Star,
+
+  // Time
+  time: Clock,
+
+  // Communication
+  messages: Mail,
+
+  // Status
+  success: CheckCircle,
+  warning: AlertCircle,
+
+  // Default
+  default: BarChart,
+};
 
 // Type Definition
 export type StatData = {
   id: string;
   title: string;
   value: string | number;
-  icon: LucideIcon;
+  type: string; // Instead of direct icon reference
   growth?: {
     value: number;
     label: string;
@@ -38,18 +89,21 @@ type StatCardProps = StatData & {
 export const StatsCard = ({
   title,
   value,
-  icon: Icon,
+  type,
   growth,
   date,
   currency,
   tooltipContent,
   className,
 }: StatCardProps) => {
+  // Get icon from map or use default
+  const Icon = ICON_MAP[type] || ICON_MAP.default;
+
   return (
     <Card
       className={clsx(
         "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800",
-        "rounded-xl shadow-sm p-6 w-auto h-[165px] flex flex-col justify-between",
+        "rounded-lg shadow-sm p-6 w-auto h-[165px] flex flex-col justify-between",
         className
       )}
     >

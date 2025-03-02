@@ -41,7 +41,7 @@ const TicketSalesChart = ({ data }: TicketSalesChartProp) => {
         {payload.map((entry: any, index: number) => (
           <div key={index} className="flex items-center gap-2">
             <div
-              className="w-3 h-3 rounded-full"
+              className="w-3 h-3 rounded-lg"
               style={{ backgroundColor: entry.color }}
             />
             <span className="text-sm text-gray-600 dark:text-gray-300">

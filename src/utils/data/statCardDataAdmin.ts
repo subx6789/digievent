@@ -1,5 +1,4 @@
 import { StatData } from "@/components/Card/StatsCard";
-import { CalendarDays, DollarSign, Ticket, Users } from "lucide-react";
 
 export const statCardDataAdmin: StatData[] = [
   {
@@ -7,7 +6,7 @@ export const statCardDataAdmin: StatData[] = [
     title: "Total Revenue",
     value: 345090,
     currency: "₹",
-    icon: DollarSign,
+    type: "revenue",
     growth: {
       value: 20.5,
       label: "From last year",
@@ -19,7 +18,7 @@ export const statCardDataAdmin: StatData[] = [
     id: "events-completed",
     title: "Events Completed",
     value: 65,
-    icon: CalendarDays,
+    type: "events",
     growth: {
       value: 5.1,
       label: "From last year",
@@ -31,7 +30,7 @@ export const statCardDataAdmin: StatData[] = [
     id: "total-bookings",
     title: "Total Bookings",
     value: 3229,
-    icon: Ticket,
+    type: "bookings",
     growth: {
       value: 15.6,
       label: "From last year",
@@ -43,7 +42,7 @@ export const statCardDataAdmin: StatData[] = [
     id: "total-organisers",
     title: "Total Organisers",
     value: 5,
-    icon: Users,
+    type: "organisers",
     date: `${new Date().toLocaleString("default", {
       month: "long",
     })}, ${new Date().getUTCFullYear()}`,
