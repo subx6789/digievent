@@ -5,7 +5,7 @@ import Sidebar from "@/components/Sidebar/Sidebar";
 import OrganizerTable from "@/components/Table/OrganiserTable";
 import { organizers } from "@/utils/data/organizers";
 
-export default async function OrganizersPage() {
+export default function OrganizersPage() {
   return (
     <ProtectedRoute requiredRole="admin">
       <Sidebar role="admin">
