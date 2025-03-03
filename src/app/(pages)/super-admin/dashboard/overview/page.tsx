@@ -1,4 +1,8 @@
+"use client";
 import { StatsCard } from "@/components/Card/StatsCard";
+import EventBookingChart from "@/components/EventBookingChart/EventBookingChart";
+import EventBookingsBarChart from "@/components/EventBookingsBarChart/EventBookingsBarChart";
+import Header from "@/components/Header/Header";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,13 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { eventsBookingsPerWeek } from "@/utils/data/eventsBookingsPerWeek";
 import { StatCardDataSuperAdmin } from "@/utils/data/statCardDataSuperAdmin";
+import { superAdminBookedandNonBookedData } from "@/utils/data/superAdminBookedandNonBookedData";
 import { colleges, timePeriods } from "@/utils/data/superAdminOverviewFilters";
 import { Building2, Calendar } from "lucide-react";
 
 const Overview = () => {
   return (
     <Sidebar role="super-admin">
+      <Header onAddClick={() => {}} />
       <div className="my-5 space-y-6">
         <div className="w-full">
           {/* Filters Section */}
@@ -71,6 +78,22 @@ const Overview = () => {
           {StatCardDataSuperAdmin.map((stat) => (
             <StatsCard key={stat.id} {...stat} />
           ))}
+        </div>
+
+        <div className="my-5 grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div>
+            <EventBookingChart
+              title={"% of Event Bookings per month"}
+              data={superAdminBookedandNonBookedData}
+            />
+          </div>
+
+          <div>
+            <EventBookingsBarChart
+              title="Event Bookings per month"
+              data={eventsBookingsPerWeek}
+            />
+          </div>
         </div>
       </div>
     </Sidebar>

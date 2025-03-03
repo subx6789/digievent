@@ -1,6 +1,6 @@
 import { CategoryData } from "@/types/categoryData";
 
-export const ticketSalesData: CategoryData[] = [
+export const eventBookingData: CategoryData[] = [
   { name: "Business", value: 15, color: "#818cf8" },
   { name: "Fun", value: 45, color: "#4ade80" },
   { name: "Educational", value: 10, color: "#fbbf24" },

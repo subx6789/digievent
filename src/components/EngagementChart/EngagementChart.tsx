@@ -37,7 +37,7 @@ const EngagementChart = ({ data }: EngagementChartProps) => {
   };
 
   return (
-    <Card className="w-full p-3 bg-white dark:bg-gray-900 shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-700">
+    <Card className="w-full p-3 bg-white dark:bg-gray-900 hover:drop-shadow-md border border-gray-200 dark:border-gray-700">
       <CardHeader>
         <CardTitle className="text-xl font-semibold pb-5 text-gray-900 dark:text-white">
           Engagement Trend

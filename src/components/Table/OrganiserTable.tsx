@@ -115,8 +115,8 @@ export default function OrganizerTable({ organizers }: OrganizerTableProps) {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden">
+    <div className="space-y-4 hover:drop-shadow-md">
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden">
         {/* Integrated header with search and actions */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-2 flex-1">

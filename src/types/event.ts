@@ -1,3 +1,5 @@
+// File: @/types/event.ts
+
 export interface Event {
   id: string;
   title: string;
@@ -5,8 +7,12 @@ export interface Event {
   date: string;
   time: string;
   location: string;
-  price: string;
   organiser: string;
+  price: string;
   category: string;
   image: string;
+  status: "pending" | "approved" | "rejected";
+  capacity: string;
+  eventType: "physical" | "virtual";
+  pdfDetails?: string | null;
 }

@@ -1,4 +1,7 @@
+"use client";
 import EventCard from "@/components/Card/EventCard";
+import Header from "@/components/Header/Header";
+import AddEventModal from "@/components/Modals/AddEventModal";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,14 +11,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Event } from "@/types/event";
 import { eventStates } from "@/utils/data/eventStates";
 import { organizerEvents } from "@/utils/data/organizerEvents";
 import { Calendar } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 
 const OrganizerEvents = () => {
+  const [events, setEvents] = useState<Event[]>(organizerEvents);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  // Add a new event to the list
+  const handleAddEvent = (newEvent: Event) => {
+    setEvents([newEvent, ...events]);
+  };
+
   return (
     <Sidebar role="organizer">
+      <Header onAddClick={handleOpenModal} />
       <div className="my-5 space-y-6">
         <div className="w-full">
           {/* Filters Section */}
@@ -50,7 +71,7 @@ const OrganizerEvents = () => {
         {/* Events Section */}
 
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {organizerEvents.map((event) => (
+          {events.map((event) => (
             <div
               key={event.id}
               className="p-1 hover:drop-shadow-lg transition-all duration-150"
@@ -59,6 +80,12 @@ const OrganizerEvents = () => {
             </div>
           ))}
         </div>
+
+        <AddEventModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onAddEvent={handleAddEvent}
+        />
       </div>
     </Sidebar>
   );

@@ -14,6 +14,9 @@ export const organizerEvents: Event[] = [
     category: "Fun",
     organiser: "Vivarta",
     image: getRandomImage("Fun") || "/Placeholder/event-placeholder.jpg",
+    capacity: "300",
+    eventType: "physical",
+    status: "approved",
   },
   {
     id: "2",
@@ -27,6 +30,9 @@ export const organizerEvents: Event[] = [
     category: "Fun",
     organiser: "Sanskaran",
     image: getRandomImage("Fun") || "/Placeholder/event-placeholder.jpg",
+    capacity: "300",
+    eventType: "physical",
+    status: "approved",
   },
   {
     id: "3",
@@ -41,6 +47,9 @@ export const organizerEvents: Event[] = [
     organiser: "Takshila",
     image:
       getRandomImage("Educational") || "/Placeholder/event-placeholder.jpg",
+    capacity: "300",
+    eventType: "physical",
+    status: "approved",
   },
   {
     id: "4",
@@ -54,6 +63,9 @@ export const organizerEvents: Event[] = [
     category: "Fun",
     organiser: "Alpha Dancers",
     image: getRandomImage("Fun") || "/Placeholder/event-placeholder.jpg",
+    capacity: "300",
+    eventType: "physical",
+    status: "approved",
   },
   {
     id: "5",
@@ -68,6 +80,9 @@ export const organizerEvents: Event[] = [
     organiser: "GDSC",
     image:
       getRandomImage("Educational") || "/Placeholder/event-placeholder.jpg",
+    capacity: "300",
+    eventType: "physical",
+    status: "approved",
   },
   {
     id: "6",
@@ -81,5 +96,8 @@ export const organizerEvents: Event[] = [
     category: "Fun",
     organiser: "Vivarta",
     image: getRandomImage("Fun") || "/Placeholder/event-placeholder.jpg",
+    capacity: "300",
+    eventType: "physical",
+    status: "approved",
   },
 ];

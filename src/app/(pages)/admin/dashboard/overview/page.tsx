@@ -1,18 +1,21 @@
+"use client";
 import { StatsCard } from "@/components/Card/StatsCard";
 import EngagementChart from "@/components/EngagementChart/EngagementChart";
 import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import EventsTable from "@/components/Table/EventsTable";
-import TicketSalesChart from "@/components/TicketSalesChart/TicketSalesChart";
+import EventBookingChart from "@/components/EventBookingChart/EventBookingChart";
 import { allEvents } from "@/utils/data/allEvents";
 import { engagementdata } from "@/utils/data/engagementData";
 import { statCardDataAdmin } from "@/utils/data/statCardDataAdmin";
-import { ticketSalesData } from "@/utils/data/ticketSalesData";
+import { eventBookingData } from "@/utils/data/eventBookingData";
+import Header from "@/components/Header/Header";
 
 export default function Overview() {
   return (
     <ProtectedRoute requiredRole="admin">
       <Sidebar role="admin">
+        <Header onAddClick={() => {}} />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 my-5">
           {statCardDataAdmin.map((data, index) => (
             <div key={index} className="cursor-pointer">
@@ -33,7 +36,10 @@ export default function Overview() {
             <EngagementChart data={engagementdata} />
           </div>
           <div>
-            <TicketSalesChart data={ticketSalesData} />
+            <EventBookingChart
+              title={"Ticket Bookings by Category"}
+              data={eventBookingData}
+            />
           </div>
         </div>
       </Sidebar>

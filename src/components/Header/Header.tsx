@@ -10,7 +10,11 @@ import { sidebarDataOrganizer } from "@/utils/data/sidebarDataOrganizer";
 import { sidebarDataAdmin } from "@/utils/data/sidebarDataAdmin";
 import TitleAndDescription from "../TitleAndDescription/TitleAndDescription";
 
-const Header = () => {
+interface HeaderProps {
+  onAddClick?: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ onAddClick }) => {
   const pathname = usePathname();
 
   const role = pathname.split("/")[1];
@@ -52,7 +56,10 @@ const Header = () => {
           {(pathname === "/admin/dashboard/organizers" ||
             pathname === "/super-admin/dashboard/manage-colleges" ||
             pathname === "/organizer/dashboard/events") && (
-            <Button className="bg-blue-600 h-11 hover:bg-blue-700 text-white px-6 font-medium transition-all duration-150 hover:scale-105">
+            <Button
+              className="bg-blue-600 h-11 hover:bg-blue-700 text-white px-6 font-medium transition-all duration-150 hover:scale-105"
+              onClick={onAddClick}
+            >
               {role === "admin" ? (
                 <span className="flex items-center gap-2">
                   <UserPlus />

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,17 +11,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Search } from "lucide-react";
-import { Avatar } from "@radix-ui/react-avatar";
+import { Avatar } from "../ui/avatar";
 import { AvatarFallback, AvatarImage } from "../ui/avatar";
 import clsx from "clsx";
 
 export type College = {
   id: string;
+  logo: string;
   name: string;
   phone: string;
   email: string;
-  logo: string;
-  location: string;
+  password?: string;
+  city: string;
+  state?: string;
   status: "active" | "suspended";
 };
 
@@ -61,8 +63,12 @@ export const CollegeTable = ({ colleges }: CollegeTableProps) => {
     );
   };
 
+  useEffect(() => {
+    setCollegeData(colleges); // Ensure table updates when colleges state changes
+  }, [colleges]);
+
   return (
-    <div className="w-full bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+    <div className="w-full bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 hover:drop-shadow-md">
       <div className="p-4 pb-4 border-b border-gray-200 dark:border-gray-700">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -126,7 +132,7 @@ export const CollegeTable = ({ colleges }: CollegeTableProps) => {
                     "text-gray-400": college.status === "suspended",
                   })}
                 >
-                  {college.location}
+                  {college.city}
                 </TableCell>
                 <TableCell
                   className={clsx({

@@ -1,7 +1,7 @@
+"use client";
 import { AppSidebar } from "./app-sidebar";
 import { SidebarInset, SidebarProvider } from "../ui/sidebar";
 import React from "react";
-import Header from "../Header/Header";
 
 const Sidebar = ({
   children,
@@ -13,10 +13,7 @@ const Sidebar = ({
   return (
     <SidebarProvider>
       <AppSidebar role={role} />
-      <SidebarInset className="px-4">
-        <Header />
-        {children}
-      </SidebarInset>
+      <SidebarInset className="px-4">{children}</SidebarInset>
     </SidebarProvider>
   );
 };

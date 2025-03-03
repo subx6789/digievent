@@ -144,7 +144,7 @@ const EventsTable = ({ events }: TableProps) => {
   };
 
   return (
-    <Card className="w-full bg-white dark:bg-gray-900 shadow-lg dark:shadow-xl">
+    <Card className="w-full bg-white dark:bg-gray-900 hover:drop-shadow-md">
       <div className="p-4 pb-4 border-b border-gray-200 dark:border-gray-700">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">

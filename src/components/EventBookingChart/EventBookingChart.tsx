@@ -12,11 +12,12 @@ import {
 } from "recharts";
 import { CategoryData } from "@/types/categoryData";
 
-type TicketSalesChartProp = {
+type EventBookingChartProp = {
   data: CategoryData[];
+  title: string;
 };
 
-const TicketSalesChart = ({ data }: TicketSalesChartProp) => {
+const EventBookingChart = ({ data, title }: EventBookingChartProp) => {
   // Custom tooltip component
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -26,7 +27,7 @@ const TicketSalesChart = ({ data }: TicketSalesChartProp) => {
             {payload[0].name}
           </p>
           <p className="text-sm text-blue-600 dark:text-blue-400">
-            {payload[0].value}% of total sales
+            {payload[0].value}% of total bookings
           </p>
         </div>
       );
@@ -54,10 +55,10 @@ const TicketSalesChart = ({ data }: TicketSalesChartProp) => {
   };
 
   return (
-    <Card className="w-full p-3 bg-white dark:bg-gray-900 shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-700">
+    <Card className="w-full p-3 bg-white dark:bg-gray-900 hover:drop-shadow-md border border-gray-200 dark:border-gray-700">
       <CardHeader>
         <CardTitle className="text-xl font-semibold pb-5 text-gray-900 dark:text-white">
-          Ticket Sales by Category
+          {title}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -97,4 +98,4 @@ const TicketSalesChart = ({ data }: TicketSalesChartProp) => {
   );
 };
 
-export default TicketSalesChart;
+export default EventBookingChart;

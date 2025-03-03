@@ -102,7 +102,7 @@ export const StatsCard = ({
   return (
     <Card
       className={clsx(
-        "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800",
+        "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:drop-shadow-md",
         "rounded-lg shadow-sm p-6 w-auto h-[165px] flex flex-col justify-between",
         className
       )}
