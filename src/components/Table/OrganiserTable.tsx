@@ -249,11 +249,11 @@ export default function OrganizerTable({ organizers }: OrganizerTableProps) {
         {/* Pagination inside the card */}
         {totalPages > 1 && (
           <div className="flex justify-between items-center p-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
               {Math.min(currentPage * itemsPerPage, filteredOrganizers.length)}{" "}
               of {filteredOrganizers.length} organizers
-            </div>
+            </span>
             <Pagination>
               <PaginationContent>
                 <PaginationItem>

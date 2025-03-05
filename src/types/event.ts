@@ -5,10 +5,11 @@ export interface Event {
   title: string;
   description: string;
   date: string;
+  type: "free" | "paid";
   time: string;
-  location: string;
+  location?: string;
   organiser: string;
-  price: string;
+  price?: string;
   category: string;
   image: string;
   status: "pending" | "approved" | "rejected";

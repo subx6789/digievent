@@ -8,6 +8,7 @@ export const organizerEvents: Event[] = [
     description:
       "A vibrant fest featuring games, music, and cultural activities, organized by Vivarta.",
     date: "Mar 22, 2025",
+    type: "free",
     time: "10:00 AM IST",
     location: "Techno India University, Salt Lake, Kolkata",
     price: "Free", // Free event
@@ -24,6 +25,7 @@ export const organizerEvents: Event[] = [
     description:
       "A music event featuring performances by local artists, organized by Sanskaran.",
     date: "Apr 10, 2025",
+    type: "free",
     time: "6:00 PM IST",
     location: "Salt Lake Stadium Area, Kolkata",
     price: "Free", // Free event
@@ -40,6 +42,7 @@ export const organizerEvents: Event[] = [
     description:
       "A 48-hour hackathon where tech enthusiasts will solve real-world problems, organized by Takshila.",
     date: "May 18, 2025",
+    type: "free",
     time: "9:00 AM IST",
     location: "Techno India University, Salt Lake, Kolkata",
     price: "Free", // Free event
@@ -57,6 +60,7 @@ export const organizerEvents: Event[] = [
     description:
       "An exciting dance battle where participants show off their best moves, hosted by Alpha Dancers.",
     date: "Jun 5, 2025",
+    type: "paid",
     time: "4:00 PM IST",
     location: "Salt Lake Sector V, Kolkata",
     price: "489", // Paid event
@@ -73,6 +77,7 @@ export const organizerEvents: Event[] = [
     description:
       "A tech meetup with workshops and networking for developers, organized by GDSC.",
     date: "Jul 20, 2025",
+    type: "paid",
     time: "11:00 AM IST",
     location: "Techno India University, Salt Lake, Kolkata",
     price: "429", // Paid event
@@ -90,6 +95,7 @@ export const organizerEvents: Event[] = [
     description:
       "The biggest college fest of the year, filled with music, games, and fun activities, organized by Vivarta.",
     date: "Aug 12, 2025",
+    type: "paid",
     time: "2:00 PM IST",
     location: "Techno India University, Salt Lake, Kolkata",
     price: "599", // Paid event

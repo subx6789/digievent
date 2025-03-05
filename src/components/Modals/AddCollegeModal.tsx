@@ -40,9 +40,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { Avatar, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { College } from "../Table/CollegeTable";
 import { getCitiesForState, STATES } from "@/utils/data/statesAndCities";
+import { Label } from "../ui/label";
 
 interface AddCollegeModalProps {
   isOpen: boolean;
@@ -68,7 +69,7 @@ const formSchema = z.object({
   email: z.string().email({ message: "Must be a valid email" }),
   password: z
     .string()
-    .min(8)
+    .min(8, { message: "Password must be between 8-12 characters" })
     .max(12, { message: "Password must be 8-12 characters" }),
   logo: z.string().optional(),
 });
@@ -116,8 +117,7 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
     if (!name || !state) return;
 
     // Generate a random 8+ character password
-    const chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+    const chars = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()${name}${state}`;
     let generatedPassword = "";
 
     for (let i = 0; i < 11; i++) {
@@ -202,32 +202,27 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
             className="space-y-4 mt-4"
           >
             {/* Logo Upload */}
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-4">
               <div className="relative">
-                <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600">
-                  {logoFile ? (
-                    <Avatar className="w-28 h-28">
-                      <AvatarImage
-                        src={logoFile}
-                        alt="College logo"
-                        className="w-full h-full object-cover"
-                      />
-                    </Avatar>
-                  ) : (
-                    <Upload className="h-8 w-8 text-gray-400 dark:text-gray-300" />
-                  )}
-                </div>
-                <input
+                <Input
                   type="file"
                   accept="image/*"
+                  className="hidden"
+                  id="avatarUrl-upload"
                   onChange={handleLogoUpload}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
-                {!logoFile && (
-                  <p className="text-xs text-center mt-2 text-gray-500 dark:text-gray-400">
-                    Logo (Optional)
-                  </p>
-                )}
+                <Label htmlFor="avatarUrl-upload" className="cursor-pointer">
+                  <Avatar className="w-24 h-24 border-2 border-gray-300 hover:border-blue-500 transition-all">
+                    <AvatarImage
+                      src={logoFile || "/placeholder-avatar.jpg"}
+                      alt="Organizer AvatavatarUrl"
+                      className="object-cover"
+                    />
+                    <AvatarFallback>
+                      <Upload />
+                    </AvatarFallback>
+                  </Avatar>
+                </Label>
               </div>
             </div>
 
@@ -267,7 +262,7 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                       required
                     >
                       <FormControl>
-                        <SelectTrigger className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <SelectTrigger className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white cursor-pointer">
                           <SelectValue placeholder="Select state" />
                         </SelectTrigger>
                       </FormControl>
@@ -276,7 +271,7 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                           <SelectItem
                             key={state}
                             value={state}
-                            className="dark:text-white dark:focus:bg-gray-700"
+                            className="dark:text-white dark:focus:bg-gray-700 cursor-pointer"
                           >
                             {state}
                           </SelectItem>
@@ -303,7 +298,7 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                       required
                     >
                       <FormControl>
-                        <SelectTrigger className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <SelectTrigger className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white cursor-pointer">
                           <SelectValue
                             placeholder={
                               state ? "Select city" : "Select state first"
@@ -316,7 +311,7 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                           <SelectItem
                             key={city}
                             value={city}
-                            className="dark:text-white dark:focus:bg-gray-700"
+                            className="dark:text-white dark:focus:bg-gray-700 cursor-pointer"
                           >
                             {city}
                           </SelectItem>

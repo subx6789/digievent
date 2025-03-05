@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,15 +11,16 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
-  Calendar,
-  Clock,
+  FileText,
   Upload,
-  MapPin,
-  Users,
   Tag,
-  DollarSign,
+  Calendar,
+  MapPin,
+  IndianRupee,
+  Sofa,
+  Clock,
 } from "lucide-react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -31,6 +33,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Select,
   SelectContent,
@@ -38,501 +41,515 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { format } from "date-fns";
 import { Event } from "@/types/event";
-import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
+import { Textarea } from "../ui/textarea";
 import Image from "next/image";
+import { Checkbox } from "../ui/checkbox";
+import { cn } from "@/lib/utils";
+import {
+  CustomDatePicker,
+  CustomTimePicker,
+} from "../Customs/DateAndTimePicker";
 
-interface AddEventModalProps {
+const eventCategories = [
+  { id: "edu", name: "Educational" },
+  { id: "gam", name: "Gaming" },
+  { id: "bus", name: "Business" },
+  { id: "fun", name: "Fun" },
+];
+
+// Updated form schema with conditional location requirement
+const formSchema = z
+  .object({
+    title: z
+      .string()
+      .min(2, { message: "Event title must be at least 2 characters" }),
+    description: z
+      .string()
+      .min(10, { message: "Description must be at least 10 characters" }),
+    date: z.string(),
+    time: z.string(),
+    location: z.string().optional(),
+    category: z.string().min(1, { message: "Category is required" }),
+    capacity: z
+      .string()
+      .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+        message: "Capacity must be a positive number",
+      }),
+    eventType: z.enum(["physical", "virtual"]),
+    price: z.string().optional(),
+    image: z.string(),
+    pdfDetails: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.eventType === "physical") {
+        return data.location !== undefined && data.location.trim().length >= 2;
+      }
+      return true;
+    },
+    {
+      message: "Location is required for physical events",
+      path: ["location"],
+    }
+  );
+
+const AddEventModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
   onAddEvent: (newEvent: Event) => void;
-}
-
-// Mock categories for events
-const EVENT_CATEGORIES = [
-  "Technology",
-  "Business",
-  "Education",
-  "Sports",
-  "Entertainment",
-  "Health",
-  "Arts",
-  "Science",
-  "Other",
-];
-
-// Form validation schema with conditional validation for venue
-const formSchema = z.object({
-  title: z.string().min(5, { message: "Title must be at least 5 characters" }),
-  description: z
-    .string()
-    .min(20, { message: "Please provide a detailed description" }),
-  category: z.string().min(1, { message: "Category is required" }),
-  eventType: z.enum(["physical", "virtual"]),
-  venue: z.string().optional(),
-  date: z.string().min(1, { message: "Date is required" }),
-  time: z.string().min(1, { message: "Time is required" }),
-  capacity: z.string().min(1, { message: "Capacity is required" }),
-  price: z.string().optional(),
-  image: z.string().optional(),
-});
-
-const AddEventModal: React.FC<AddEventModalProps> = ({
-  isOpen,
-  onClose,
-  onAddEvent,
-}) => {
+}> = ({ isOpen, onClose, onAddEvent }) => {
   const { toast } = useToast();
-  const [coverImage, setCoverImage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"free" | "paid">("free");
-  const [isPhysical, setIsPhysical] = useState(true);
+  const [eventType, setEventType] = useState<"free" | "paid">("free");
+  const [selectedEventType, setSelectedEventType] = useState<
+    "physical" | "virtual"
+  >("physical");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [pdfPreview, setPdfPreview] = useState<string | null>(null);
+  const [pdfFileName, setPdfFileName] = useState<string | null>(null);
 
-  // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       title: "",
       description: "",
+      date: "",
+      time: "",
+      location: "",
       category: "",
-      eventType: "physical",
-      venue: "",
-      date: format(new Date(), "yyyy-MM-dd"),
-      time: format(new Date(), "HH:mm"),
       capacity: "",
-      price: "0",
+      eventType: "physical",
+      price: "",
       image: "",
+      pdfDetails: undefined,
     },
   });
 
-  // Watch form values
-  const { eventType } = form.watch();
-
-  // Update isPhysical state when eventType changes
-  useEffect(() => {
-    setIsPhysical(eventType === "physical");
-  }, [eventType]);
-
-  // Handle image upload
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
+  // Updated handlers now accept an optional file (for drag & drop)
+  const handleImageUpload = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    file?: File
+  ) => {
+    const fileToProcess = file || event.target.files?.[0];
+    if (fileToProcess) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setCoverImage(e.target.result as string);
-        }
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+        form.setValue("image", reader.result as string);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(fileToProcess);
     }
   };
 
-  // Reset form when modal closes
-  useEffect(() => {
-    if (!isOpen) {
-      form.reset();
-      setCoverImage(null);
-      setActiveTab("free");
+  const handlePdfUpload = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    file?: File
+  ) => {
+    const fileToProcess = file || event.target.files?.[0];
+    if (fileToProcess) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPdfPreview(reader.result as string);
+        setPdfFileName(fileToProcess.name);
+        form.setValue("pdfDetails", reader.result as string);
+      };
+      reader.readAsDataURL(fileToProcess);
     }
-  }, [isOpen, form]);
-
-  // Handle tab change
-  const handleTabChange = (value: string) => {
-    setActiveTab(value as "free" | "paid");
-    form.setValue("price", value === "free" ? "Free" : "");
   };
 
-  // Submit handler
+  const handleCheckboxChange = (type: "physical" | "virtual") => {
+    setSelectedEventType(type);
+    form.setValue("eventType", type);
+  };
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    try {
-      // Create new event object
-      const newEvent: Event = {
-        id: `event-${Date.now()}`,
-        title: values.title,
-        description: values.description,
-        category: values.category,
-        date: values.date,
-        time: values.time,
-        location: isPhysical ? values.venue || "TBA" : "Virtual Event",
-        price: activeTab === "free" ? "Free" : values.price || "0",
-        image: coverImage || "/placeholder-event.jpg",
-        organiser: "Your Organization", // This would be dynamic in a real app
-        status: "pending", // Default status for new events
-        capacity: values.capacity,
-        eventType: values.eventType,
-      };
+    const newEvent: Event = {
+      id: `event-${Date.now()}`,
+      ...values,
+      type: eventType,
+      date: values.date,
+      location: values.location || "Virtual",
+      organiser: "Your Organization",
+      status: "pending",
+      eventType: selectedEventType,
+      image: values.image || "/placeholder-event.jpg",
+    };
 
-      // Add the new event
-      onAddEvent(newEvent);
+    onAddEvent(newEvent);
 
-      // Show success toast
-      toast({
-        title: "Event Created",
-        description: `${values.title} has been successfully created.`,
-        variant: "default",
-      });
+    toast({
+      title: "Event Added",
+      description: `${values.title} has been successfully created.`,
+      variant: "default",
+    });
 
-      // Reset form and close modal
-      form.reset();
-      setCoverImage(null);
-      onClose();
-    } catch (error) {
-      console.error("Error creating event:", error);
-      toast({
-        title: "Error",
-        description: "Failed to create event. Please try again.",
-        variant: "destructive",
-      });
-    }
+    form.reset();
+    setImagePreview(null);
+    setPdfPreview(null);
+    onClose();
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[650px] p-0 bg-white dark:bg-gray-800 overflow-hidden">
-        <DialogHeader className="px-6 pt-6 pb-2">
+      <DialogContent className="sm:max-w-[550px] p-6 max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
             Create New Event
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs
-          defaultValue="free"
-          value={activeTab}
-          onValueChange={handleTabChange}
-          className="w-full"
-        >
-          <TabsList className="grid grid-cols-2 mx-6">
-            <TabsTrigger value="free" className="text-sm">
-              Free Event
-            </TabsTrigger>
-            <TabsTrigger value="paid" className="text-sm">
-              Paid Event
-            </TabsTrigger>
-          </TabsList>
-
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4 px-6 py-4 max-h-[70vh] overflow-y-auto"
-            >
-              {/* Cover Image Upload */}
-              <div className="w-full">
-                <FormLabel className="block mb-2 text-gray-700 dark:text-gray-300">
-                  Event Cover Image
-                </FormLabel>
-                <div className="relative w-full h-48 bg-gray-100 dark:bg-gray-700 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden">
-                  {coverImage ? (
-                    <div className="absolute inset-0">
-                      <Image
-                        src={coverImage}
-                        alt="Event cover"
-                        width={300}
-                        height={200}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setCoverImage(null)}
-                          className="text-white border-white hover:bg-white hover:text-black"
-                        >
-                          Change Image
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <Upload className="h-10 w-10 text-gray-400 dark:text-gray-500 mb-2" />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        required
-                      />
-                    </>
-                  )}
-                </div>
-                {!coverImage && (
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Click to upload or drag and drop (max 5MB)
-                  </p>
-                )}
-              </div>
-
-              {/* Event Title */}
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700 dark:text-gray-300">
-                      Event Title
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter event title"
-                        {...field}
-                        className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        required
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                )}
-              />
-
-              {/* Event Description */}
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700 dark:text-gray-300">
-                      Description
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Describe your event..."
-                        {...field}
-                        className="min-h-24 resize-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        required
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                )}
-              />
-
-              {/* Event Category */}
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                      <Tag className="h-4 w-4" /> Category{" "}
-                    </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      required
-                    >
-                      <FormControl>
-                        <SelectTrigger className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                        {EVENT_CATEGORIES.map((category) => (
-                          <SelectItem
-                            key={category}
-                            value={category}
-                            className="dark:text-white dark:focus:bg-gray-700"
-                          >
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                )}
-              />
-
-              {/* Event Type Selection */}
-              <div className="space-y-2">
-                <FormLabel className="text-gray-700 dark:text-gray-300">
-                  Event Type
-                </FormLabel>
-                <div className="flex gap-4">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="physical"
-                      checked={form.watch("eventType") === "physical"}
-                      onCheckedChange={() =>
-                        form.setValue("eventType", "physical")
-                      }
-                      className="dark:border-gray-500"
-                    />
-                    <label
-                      htmlFor="physical"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-gray-300"
-                    >
-                      Physical
-                    </label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="virtual"
-                      checked={form.watch("eventType") === "virtual"}
-                      onCheckedChange={() =>
-                        form.setValue("eventType", "virtual")
-                      }
-                      className="dark:border-gray-500"
-                    />
-                    <label
-                      htmlFor="virtual"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-gray-300"
-                    >
-                      Virtual
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Conditional Venue Input */}
-              {isPhysical && (
-                <FormField
-                  control={form.control}
-                  name="venue"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        <MapPin className="h-4 w-4" /> Venue{" "}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter venue location"
-                          {...field}
-                          className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                          required
-                        />
-                      </FormControl>
-                      <FormMessage className="text-red-500" />
-                    </FormItem>
-                  )}
-                />
+        {/* Free/Paid Tabs */}
+        <div className="w-full mb-4 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+          <div className="grid grid-cols-2 gap-1">
+            <button
+              type="button"
+              onClick={() => setEventType("free")}
+              className={cn(
+                "py-2 rounded-md text-sm font-medium transition-all duration-200",
+                eventType === "free"
+                  ? "bg-white dark:bg-gray-700 text-blue-600 shadow-sm"
+                  : "text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700"
               )}
+            >
+              Free Event
+            </button>
+            <button
+              type="button"
+              onClick={() => setEventType("paid")}
+              className={cn(
+                "py-2 rounded-md text-sm font-medium transition-all duration-200",
+                eventType === "paid"
+                  ? "bg-white dark:bg-gray-700 text-blue-600 shadow-sm"
+                  : "text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700"
+              )}
+            >
+              Paid Event
+            </button>
+          </div>
+        </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                {/* Event Date */}
-                <FormField
-                  control={form.control}
-                  name="date"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        <Calendar className="h-4 w-4" /> Date{" "}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="date"
-                          {...field}
-                          className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                          required
-                        />
-                      </FormControl>
-                      <FormMessage className="text-red-500" />
-                    </FormItem>
-                  )}
-                />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Image Upload */}
+            <div>
+              <Label className="flex items-center gap-2 mb-2">
+                <FileText className="h-4 w-4" /> Event Cover Image
+              </Label>
+              <Input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                id="image-upload"
+                onChange={(e) => handleImageUpload(e)}
+              />
+              <Label
+                htmlFor="image-upload"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const file = e.dataTransfer.files[0];
+                  if (file) {
+                    handleImageUpload(e as any, file);
+                  }
+                }}
+                className={cn(
+                  "flex items-center justify-center border-2 p-5 border-dashed rounded-lg cursor-pointer hover:border-blue-500 transition-colors",
+                  imagePreview && "p-0 border-none"
+                )}
+              >
+                {imagePreview ? (
+                  <Image
+                    src={imagePreview}
+                    alt="Event Cover Image"
+                    width={400}
+                    height={160}
+                    className="w-full h-40 object-cover rounded-lg"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center">
+                    <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                    <span className="text-sm text-gray-600">
+                      Drag & drop or click to upload cover image
+                    </span>
+                  </div>
+                )}
+              </Label>
+            </div>
 
-                {/* Event Time */}
-                <FormField
-                  control={form.control}
-                  name="time"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        <Clock className="h-4 w-4" /> Time{" "}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="time"
-                          {...field}
-                          className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                          required
-                        />
-                      </FormControl>
-                      <FormMessage className="text-red-500" />
-                    </FormItem>
-                  )}
-                />
-              </div>
+            {/* Event Title */}
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2">
+                    <Tag className="h-4 w-4" /> Event Title
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter event title"
+                      {...field}
+                      className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              {/* Event Capacity */}
+            {/* Event Description */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" /> Event Description
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Describe your event"
+                      {...field}
+                      className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Event Category */}
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2">
+                    <Tag className="h-4 w-4" /> Event Category
+                  </FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white cursor-pointer">
+                        <SelectValue placeholder="Select event category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {eventCategories.map((category) => (
+                        <SelectItem
+                          key={category.id}
+                          value={category.name}
+                          className="cursor-pointer"
+                        >
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Date and Time */}
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="capacity"
+                name="date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                      <Users className="h-4 w-4" /> Capacity{" "}
+                    <FormLabel className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" /> Event Date
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Number of attendees"
-                        {...field}
-                        className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        required
-                      />
+                      <div className="relative">
+                        <CustomDatePicker
+                          value={field.value}
+                          onChange={(date) => field.onChange(date)}
+                        />
+                      </div>
                     </FormControl>
-                    <FormMessage className="text-red-500" />
+                    <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* Paid Event Price (Only show in paid tab) */}
-              <TabsContent value="paid" className="p-0 mt-0">
-                <FormField
-                  control={form.control}
-                  name="price"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        <DollarSign className="h-4 w-4" /> Price{" "}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Enter price in ₹"
-                          {...field}
-                          className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                          required
+              <FormField
+                control={form.control}
+                name="time"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" /> Event Time
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <CustomTimePicker
+                          value={field.value}
+                          onChange={(time) => field.onChange(time)}
                         />
-                      </FormControl>
-                      <FormMessage className="text-red-500" />
-                    </FormItem>
-                  )}
-                />
-              </TabsContent>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-              <TabsContent value="free" className="p-0 mt-0">
-                {/* Hidden field for free price */}
-                <input type="hidden" {...form.register("price")} value="Free" />
-              </TabsContent>
+            {/* Event Format Checkboxes - Single Selection */}
+            <div className="flex flex-col gap-4">
+              <FormLabel className="flex items-center gap-2">
+                <Tag className="h-4 w-4" /> Event Type
+              </FormLabel>
+              {["physical", "virtual"].map((option) => (
+                <div key={option} className="flex items-center gap-1 text-sm">
+                  <Checkbox
+                    checked={selectedEventType === option}
+                    onCheckedChange={() =>
+                      handleCheckboxChange(option as "physical" | "virtual")
+                    }
+                  />
+                  <label className="cursor-pointer">
+                    {option.charAt(0).toUpperCase() + option.slice(1)}
+                  </label>
+                </div>
+              ))}
+            </div>
 
-              <DialogFooter className="pt-4 pb-2 px-0 flex gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onClose}
-                  className="h-11 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={
-                    !form.formState.isValid || form.formState.isSubmitting
+            {/* Venue (for physical events) */}
+            {selectedEventType === "physical" && (
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4" /> Venue Details
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter specific venue address"
+                        {...field}
+                        className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {/* Capacity */}
+            <FormField
+              control={form.control}
+              name="capacity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2">
+                    <Sofa className="h-4 w-4" /> Seat Capacity
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Enter total seats/capacity"
+                      {...field}
+                      className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Price (for paid events) */}
+            {eventType === "paid" && (
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <IndianRupee className="h-4 w-4" /> Ticket Price
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Enter ticket price"
+                        {...field}
+                        className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {/* Details PDF Upload */}
+            <div>
+              <Label className="flex items-center gap-2 mb-2">
+                <FileText className="h-4 w-4" /> Event Details PDF (Optional)
+              </Label>
+              <Input
+                type="file"
+                accept=".pdf"
+                className="hidden"
+                id="details-pdf-upload"
+                onChange={(e) => handlePdfUpload(e)}
+              />
+              <Label
+                htmlFor="details-pdf-upload"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const file = e.dataTransfer.files[0];
+                  if (file) {
+                    handlePdfUpload(e as any, file);
                   }
-                  className={cn(
-                    "h-11 text-white px-6 font-medium transition-all duration-150 hover:scale-105 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
-                  )}
-                >
-                  Create Event
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </Tabs>
+                }}
+                className="flex items-center justify-center border-2 border-dashed rounded-lg p-5 cursor-pointer hover:border-blue-500 transition-colors"
+              >
+                {pdfPreview ? (
+                  <span className="text-sm text-gray-600">
+                    PDF Uploaded: {pdfFileName}
+                  </span>
+                ) : (
+                  <div className="flex flex-col items-center">
+                    <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                    <span className="text-sm text-gray-600">
+                      Drag & drop or click to upload PDF
+                    </span>
+                  </div>
+                )}
+              </Label>
+            </div>
+
+            <DialogFooter className="mt-6 flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="h-11"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={
+                  !form.formState.isValid ||
+                  form.formState.isSubmitting ||
+                  (eventType === "paid" && !form.getValues("price")?.trim())
+                }
+                className="h-11 bg-blue-600 hover:bg-blue-700 text-white px-6 font-medium transition-all duration-150 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Request Event
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
