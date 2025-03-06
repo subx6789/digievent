@@ -3,6 +3,7 @@ import { StatsCard } from "@/components/Card/StatsCard";
 import EventBookingChart from "@/components/EventBookingChart/EventBookingChart";
 import EventBookingsBarChart from "@/components/EventBookingsBarChart/EventBookingsBarChart";
 import Header from "@/components/Header/Header";
+// import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +21,7 @@ import { Building2, Calendar } from "lucide-react";
 
 const Overview = () => {
   return (
+    //  <ProtectedRoute requiredRole="super-admin"></ProtectedRoute>
     <Sidebar role="super-admin">
       <Header onAddClick={() => {}} />
       <div className="my-5 space-y-6">

@@ -2,7 +2,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, useMemo } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface User {
   id: string;
@@ -25,7 +25,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -55,11 +54,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const storage = remember ? localStorage : sessionStorage;
     const userData = {
       ...data,
+      // Calculate the absolute expiration time in milliseconds
       expiresIn: Date.now() + data.expiresIn * 1000,
     };
     storage.setItem("auth", JSON.stringify(userData));
     setUser(userData);
-    router.push("/admin/dashboard/overview");
+
+    // Redirect based on user role
+    if (data.role === "admin") {
+      router.push("/admin/dashboard/overview");
+    } else if (data.role === "super-admin") {
+      router.push("/super-admin/dashboard/overview");
+    } else if (data.role === "organizer") {
+      router.push("/organizer/dashboard/events");
+    }
   };
 
   const logout = () => {
@@ -68,12 +76,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     router.push("/");
   };
-
-  useEffect(() => {
-    if (isInitialized && !user && pathname.startsWith("/admin/dashboard")) {
-      router.replace("/");
-    }
-  }, [user, pathname, isInitialized]);
 
   const value = useMemo(
     () => ({

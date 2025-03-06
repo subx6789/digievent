@@ -11,8 +11,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Eventpulse",
-  description: "Every event is a adventure",
+  title: "Digievent",
+  description: "Every event is an adventure",
 };
 
 export default function RootLayout({

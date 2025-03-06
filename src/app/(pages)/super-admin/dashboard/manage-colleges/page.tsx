@@ -5,6 +5,7 @@ import { mockColleges } from "@/utils/data/mockColleges";
 import React, { useState } from "react";
 import AddCollegeModal from "@/components/Modals/AddCollegeModal";
 import Header from "@/components/Header/Header";
+// import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 
 const ManageColleges = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,6 +28,7 @@ const ManageColleges = () => {
   };
 
   return (
+    //  <ProtectedRoute requiredRole="super-admin"></ProtectedRoute>
     <Sidebar role="super-admin">
       {/* Pass the handleOpenModal function to the Header component */}
       <Header onAddClick={handleOpenModal} />

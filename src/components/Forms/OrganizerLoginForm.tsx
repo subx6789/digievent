@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
@@ -14,7 +14,7 @@ import { useAuth } from "@/context/AuthProvider";
 import { useRouter } from "next/navigation";
 import Loading from "../Loading/Loading";
 import { z } from "zod";
-import { AdminLoginFormData } from "@/types/LoginFormData";
+import { OrganizerLoginFormData } from "@/types/LoginFormData";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -41,7 +41,7 @@ const decodeJwt = (token: string) => {
   }
 };
 
-export function AdminLoginForm({
+export function OrganizerLoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
@@ -52,7 +52,7 @@ export function AdminLoginForm({
 
   useEffect(() => {
     if (isInitialized && user) {
-      router.replace("/admin/dashboard/overview");
+      router.replace("/organizer/dashboard/events");
     }
   }, [user, isInitialized, router]);
 
@@ -66,9 +66,9 @@ export function AdminLoginForm({
   });
 
   const loginMutation = useMutation({
-    mutationFn: async (data: AdminLoginFormData) => {
+    mutationFn: async (data: OrganizerLoginFormData) => {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/admin/login`,
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/organizer/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

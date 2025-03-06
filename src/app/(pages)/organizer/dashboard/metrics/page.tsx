@@ -3,6 +3,7 @@ import { StatsCard } from "@/components/Card/StatsCard";
 import EventBookingChart from "@/components/EventBookingChart/EventBookingChart";
 import EventBookingsBarChart from "@/components/EventBookingsBarChart/EventBookingsBarChart";
 import Header from "@/components/Header/Header";
+// import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import { eventsBookingsPerWeek } from "@/utils/data/eventsBookingsPerWeek";
 import { statCardDataOrganizer } from "@/utils/data/statCardDataOrganizer";
@@ -11,6 +12,7 @@ import React from "react";
 
 const OrganizerMetrics = () => {
   return (
+    //  <ProtectedRoute requiredRole="organizer"></ProtectedRoute>
     <Sidebar role="organizer">
       <Header onAddClick={() => {}} />
       <div className="my-5 space-y-6">
