@@ -71,10 +71,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
+    const currentUser = user;
     localStorage.removeItem("auth");
     sessionStorage.removeItem("auth");
     setUser(null);
-    router.push("/");
+    // Redirect based on user role
+    if (currentUser) {
+      if (currentUser.role === "admin") {
+        router.push("/admin/auth/login");
+      } else if (currentUser.role === "super-admin") {
+        router.push("/super-admin/auth/login");
+      } else if (currentUser.role === "organizer") {
+        router.push("/organizer/auth/login");
+      } else {
+        router.push("/");
+      }
+    } else {
+      router.push("/");
+    }
   };
 
   const value = useMemo(
