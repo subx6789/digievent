@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -94,11 +94,21 @@ const formSchema = z
     }
   );
 
-const AddEventModal: React.FC<{
+interface AddEventModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddEvent: (newEvent: Event) => void;
-}> = ({ isOpen, onClose, onAddEvent }) => {
+  editEvent?: Event | null;
+  isEditMode?: boolean;
+}
+
+const AddEventModal: React.FC<AddEventModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  onAddEvent, 
+  editEvent = null, 
+  isEditMode = false 
+}) => {
   const { toast } = useToast();
   const [eventType, setEventType] = useState<"free" | "paid">("free");
   const [selectedEventType, setSelectedEventType] = useState<
@@ -125,6 +135,63 @@ const AddEventModal: React.FC<{
       pdfDetails: undefined,
     },
   });
+
+  // Populate form with event data when in edit mode
+  useEffect(() => {
+    if (isEditMode && editEvent) {
+      // Set event type (free/paid)
+      setEventType(editEvent.price && editEvent.price !== "Free" && editEvent.price !== "0" ? "paid" : "free");
+      
+      // Set event location type
+      setSelectedEventType(editEvent.eventType || "physical");
+      
+      // Set image preview if available
+      if (editEvent.image && editEvent.image !== "/placeholder-event.jpg") {
+        setImagePreview(editEvent.image);
+      }
+      
+      // Set PDF preview if available
+      if (editEvent.pdfDetails) {
+        setPdfPreview(editEvent.pdfDetails);
+        setPdfFileName("Event Details.pdf");
+      }
+      
+      // Reset form with event values, handling all possible undefined cases
+      form.reset({
+        title: editEvent.title ?? "",
+        description: editEvent.description ?? "",
+        date: editEvent.date ?? "",
+        time: editEvent.time ?? "",
+        location: editEvent.location === "Virtual" ? "" : editEvent.location ?? "",
+        category: editEvent.category ?? "",
+        capacity: editEvent.capacity?.toString() ?? "",
+        eventType: editEvent.eventType ?? "physical",
+        price: editEvent.price === "Free" || !editEvent.price ? "" : editEvent.price,
+        image: editEvent.image ?? "",
+        pdfDetails: editEvent.pdfDetails ?? undefined,
+      });
+    } else {
+      // Reset to default values when not in edit mode
+      form.reset({
+        title: "",
+        description: "",
+        date: "",
+        time: "",
+        location: "",
+        category: "",
+        capacity: "",
+        eventType: "physical",
+        price: "",
+        image: "",
+        pdfDetails: undefined,
+      });
+      setEventType("free");
+      setSelectedEventType("physical");
+      setImagePreview(null);
+      setPdfPreview(null);
+      setPdfFileName(null);
+    }
+  }, [isEditMode, editEvent, form]);
 
   // Updated handlers now accept an optional file (for drag & drop)
   const handleImageUpload = (
@@ -165,22 +232,27 @@ const AddEventModal: React.FC<{
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     const newEvent: Event = {
-      id: `event-${Date.now()}`,
+      id: isEditMode && editEvent ? editEvent.id : `event-${Date.now()}`,
       ...values,
       type: eventType,
       date: values.date,
       location: values.location || "Virtual",
-      organiser: "Your Organization",
-      status: "pending",
+      organiser: isEditMode && editEvent ? editEvent.organiser : "Your Organization",
+      status: isEditMode && editEvent ? editEvent.status : "pending",
       eventType: selectedEventType,
       image: values.image || "/placeholder-event.jpg",
     };
 
+    // If in edit mode, preserve the original capacity
+    if (isEditMode && editEvent) {
+      newEvent.capacity = editEvent.capacity;
+    }
+
     onAddEvent(newEvent);
 
     toast({
-      title: "Event Added",
-      description: `${values.title} has been successfully created.`,
+      title: isEditMode ? "Event Updated" : "Event Added",
+      description: `${values.title} has been successfully ${isEditMode ? "updated" : "created"}.`,
       variant: "default",
     });
 
@@ -195,7 +267,7 @@ const AddEventModal: React.FC<{
       <DialogContent className="sm:max-w-[550px] p-6 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-            Create New Event
+            {isEditMode ? "Edit Event" : "Create New Event"}
           </DialogTitle>
         </DialogHeader>
 
@@ -311,7 +383,7 @@ const AddEventModal: React.FC<{
                     <Textarea
                       placeholder="Describe your event"
                       {...field}
-                      className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="min-h-24 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     />
                   </FormControl>
                   <FormMessage />
@@ -331,6 +403,7 @@ const AddEventModal: React.FC<{
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white cursor-pointer">
@@ -457,8 +530,14 @@ const AddEventModal: React.FC<{
                       placeholder="Enter total seats/capacity"
                       {...field}
                       className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      disabled={isEditMode} // Disable in edit mode
                     />
                   </FormControl>
+                  {isEditMode && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Seat capacity cannot be modified after creation
+                    </p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -545,7 +624,7 @@ const AddEventModal: React.FC<{
                 }
                 className="h-11 bg-blue-600 hover:bg-blue-700 text-white px-6 font-medium transition-all duration-150 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Request Event
+                {isEditMode ? "Update Event" : "Request Event"}
               </Button>
             </DialogFooter>
           </form>

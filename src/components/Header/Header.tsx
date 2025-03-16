@@ -54,6 +54,8 @@ const Header: React.FC<HeaderProps> = ({ onAddClick }) => {
         <div className="flex flex-col md:flex-row md:items-center justify-between w-full">
           <TitleAndDescription />
           {(pathname === "/admin/dashboard/organizers" ||
+            pathname === "/admin/dashboard/students" ||
+            pathname === "/admin/dashboard/courses" ||
             pathname === "/super-admin/dashboard/manage-colleges" ||
             pathname === "/organizer/dashboard/events") && (
             <Button
@@ -63,7 +65,12 @@ const Header: React.FC<HeaderProps> = ({ onAddClick }) => {
               {role === "admin" ? (
                 <span className="flex items-center gap-2">
                   <UserPlus />
-                  Add Organizer
+                  Add{" "}
+                  {pathname === "/admin/dashboard/students"
+                    ? `Student`
+                    : pathname === "/admin/dashboard/courses"
+                    ? `Course`
+                    : `Organizer`}
                 </span>
               ) : role === "organizer" ? (
                 <span className="flex items-center gap-2">

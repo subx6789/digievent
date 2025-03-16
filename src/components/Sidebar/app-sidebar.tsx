@@ -10,6 +10,8 @@ import {
   Building2,
   CalendarCheck,
   ChartNoAxesCombined,
+  SquareUserRound,
+  BookOpen,
 } from "lucide-react";
 
 import { NavMain } from "@/components/Sidebar/nav-main";
@@ -41,6 +43,8 @@ const roleIcons: Record<Role, Record<string, LucideIcon>> = {
     Overview: LayoutDashboard,
     "Event Requests": CalendarDays,
     Organizers: Users,
+    Courses: BookOpen,
+    Students: SquareUserRound,
   },
   Organizer: {
     Events: CalendarCheck,

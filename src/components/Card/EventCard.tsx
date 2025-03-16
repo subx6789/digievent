@@ -15,6 +15,7 @@ import {
   Eye,
   CheckCircle,
   XCircle,
+  Pencil,
 } from "lucide-react";
 import Image from "next/image";
 import { Event } from "@/types/event";
@@ -26,9 +27,11 @@ import { getCategoryColor } from "../Table/EventsTable";
 interface EventCardProps {
   event: Event;
   className?: string;
+  onEdit?: (event: Event) => void;
+  onView?: (eventId: string) => void;
 }
 
-const EventCard = ({ event, className }: EventCardProps) => {
+const EventCard = ({ event, className, onEdit, onView }: EventCardProps) => {
   const pathname = usePathname();
   const isAdmin = pathname?.includes("/admin");
   const isOrganizer = pathname?.includes("/organizer");
@@ -42,7 +45,11 @@ const EventCard = ({ event, className }: EventCardProps) => {
   };
 
   const handleViewDetails = (id: string) => {
-    console.log(`Viewing details for Event with ID: ${id}`);
+    onView?.(id);
+  };
+
+  const handleEdit = () => {
+    onEdit?.(event);
   };
 
   return (
@@ -92,10 +99,12 @@ const EventCard = ({ event, className }: EventCardProps) => {
           </p>
 
           <div className="space-y-2 text-sm mb-3">
-            <div className="flex items-center text-gray-600 dark:text-gray-400">
-              <Users className="h-4 w-4 mr-2 flex-shrink-0" />
-              <span className="truncate">{event.organiser}</span>
-            </div>
+            {!isOrganizer && (
+              <div className="flex items-center text-gray-600 dark:text-gray-400">
+                <Users className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="truncate">{event.organiser}</span>
+              </div>
+            )}
 
             <div className="flex items-center text-gray-600 dark:text-gray-400">
               <CalendarIcon className="h-4 w-4 mr-2 flex-shrink-0" />
@@ -150,15 +159,22 @@ const EventCard = ({ event, className }: EventCardProps) => {
           )}
 
           {isOrganizer && (
-            <Button
-              size="sm"
-              variant="default"
-              className="w-full hover:scale-105 duration-150 transition-all bg-blue-600 hover:bg-blue-700 text-white h-11 font-medium text-base"
-              onClick={() => handleViewDetails(event.id)}
-            >
-              <Eye className="h-4 w-4 mr-1" />
-              View Details
-            </Button>
+            <div className="flex items-center justify-between gap-3 w-full">
+              <Button
+                className="flex-1 h-11 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 shadow-sm hover:shadow transition-all duration-150 hover:scale-[1.02]"
+                onClick={() => handleViewDetails(event.id)}
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                View Event
+              </Button>
+              <Button
+                className="h-11 w-11 rounded-lg text-sm font-medium text-white bg-gray-500 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-800 shadow-sm hover:shadow transition-all duration-150 hover:scale-[1.02] flex items-center justify-center"
+                onClick={handleEdit}
+                variant="default"
+              >
+                <Pencil className="w-4 h-4" />
+              </Button>
+            </div>
           )}
 
           {!isAdmin && !isOrganizer && (
