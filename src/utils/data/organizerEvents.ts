@@ -106,4 +106,55 @@ export const organizerEvents: Event[] = [
     eventType: "physical",
     status: "approved",
   },
+  {
+    id: "7",
+    title: "Prom Night",
+    description:
+      "The biggest college fest of the year, filled with music, games, and fun activities, organized by Vivarta.",
+    date: "Aug 12, 2025",
+    type: "paid",
+    time: "2:00 PM IST",
+    location: "Techno India University, Salt Lake, Kolkata",
+    price: "599", // Paid event
+    category: "Fun",
+    organiser: "Vivarta",
+    image: getRandomImage("Fun") || "/Placeholder/event-placeholder.jpg",
+    capacity: "300",
+    eventType: "physical",
+    status: "pending",
+  },
+  {
+    id: "8",
+    title: "AI Workshop Gemini 2.0",
+    description:
+      "The biggest college fest of the year, filled with music, games, and fun activities, organized by Vivarta.",
+    date: "Aug 12, 2025",
+    type: "paid",
+    time: "2:00 PM IST",
+    location: "Techno India University, Salt Lake, Kolkata",
+    price: "599", // Paid event
+    category: "Fun",
+    organiser: "Vivarta",
+    image: getRandomImage("Fun") || "/Placeholder/event-placeholder.jpg",
+    capacity: "300",
+    eventType: "physical",
+    status: "rejected",
+  },
+  {
+    id: "9",
+    title: "Core Software Engineering Seminar",
+    description:
+      "The biggest college fest of the year, filled with music, games, and fun activities, organized by Vivarta.",
+    date: "Aug 12, 2025",
+    type: "paid",
+    time: "2:00 PM IST",
+    location: "Techno India University, Salt Lake, Kolkata",
+    price: "599", // Paid event
+    category: "Fun",
+    organiser: "Vivarta",
+    image: getRandomImage("Fun") || "/Placeholder/event-placeholder.jpg",
+    capacity: "300",
+    eventType: "physical",
+    status: "rejected",
+  },
 ];

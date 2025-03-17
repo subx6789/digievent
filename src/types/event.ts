@@ -15,5 +15,8 @@ export interface Event {
   status: "pending" | "approved" | "rejected";
   capacity: string;
   eventType: "physical" | "virtual";
-  pdfDetails?: string | null;
+  createdAt?: string;
+  bankAccount?: string;
+  ifscCode?: string;
+  virtualLink?: string;
 }

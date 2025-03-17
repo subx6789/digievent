@@ -24,6 +24,8 @@ import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
 import { getCategoryColor } from "../Table/EventsTable";
 
+import { Clock, AlertCircle } from "lucide-react";
+
 interface EventCardProps {
   event: Event;
   className?: string;
@@ -52,10 +54,21 @@ const EventCard = ({ event, className, onEdit, onView }: EventCardProps) => {
     onEdit?.(event);
   };
 
+  // Add this near the other handler functions
+  const handleReRequest = () => {
+    console.log(`Re-requesting event: ${event.id}`);
+  };
+
   return (
     <Card
       className={cn(
         "flex flex-col overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900 h-full",
+        isOrganizer &&
+          event.status === "pending" &&
+          "opacity-85 grayscale-[30%]",
+        isOrganizer &&
+          event.status === "rejected" &&
+          "opacity-80 grayscale-[40%] border-red-200 dark:border-red-900",
         className
       )}
     >
@@ -134,6 +147,7 @@ const EventCard = ({ event, className, onEdit, onView }: EventCardProps) => {
           </div>
         </CardContent>
 
+        {/* Replace the existing organizer section in CardFooter with this conditional rendering */}
         <CardFooter className="p-4 pt-2 mt-auto">
           {isAdmin && (
             <div className="grid grid-cols-2 gap-2 w-full">
@@ -159,22 +173,62 @@ const EventCard = ({ event, className, onEdit, onView }: EventCardProps) => {
           )}
 
           {isOrganizer && (
-            <div className="flex items-center justify-between gap-3 w-full">
-              <Button
-                className="flex-1 h-11 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 shadow-sm hover:shadow transition-all duration-150 hover:scale-[1.02]"
-                onClick={() => handleViewDetails(event.id)}
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                View Event
-              </Button>
-              <Button
-                className="h-11 w-11 rounded-lg text-sm font-medium text-white bg-gray-500 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-800 shadow-sm hover:shadow transition-all duration-150 hover:scale-[1.02] flex items-center justify-center"
-                onClick={handleEdit}
-                variant="default"
-              >
-                <Pencil className="w-4 h-4" />
-              </Button>
-            </div>
+            <>
+              {event.status === "approved" && (
+                <div className="flex items-center justify-between gap-3 w-full">
+                  <Button
+                    className="flex-1 h-11 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 shadow-sm hover:shadow transition-all duration-150 hover:scale-[1.02]"
+                    onClick={() => handleViewDetails(event.id)}
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Event
+                  </Button>
+                  <Button
+                    className="h-11 w-11 rounded-lg text-sm font-medium text-white bg-gray-500 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-800 shadow-sm hover:shadow transition-all duration-150 hover:scale-[1.02] flex items-center justify-center"
+                    onClick={handleEdit}
+                    variant="default"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+
+              {event.status === "pending" && (
+                <div className="w-full">
+                  <div className="flex items-center justify-center gap-2 text-yellow-600 dark:text-yellow-500 bg-yellow-50 dark:bg-yellow-950/30 py-2 rounded-md h-11">
+                    <Clock className="h-5 w-5 animate-pulse" />
+                    <span className="text-sm font-medium">
+                      Awaiting Approval
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {event.status === "rejected" && (
+                <div className="w-full">
+                  <div className="flex items-center justify-center gap-2 mb-3 text-red-600 dark:text-red-500 bg-red-50 dark:bg-red-950/30 py-2 rounded-md h-11">
+                    <AlertCircle className="h-5 w-5" />
+                    <span className="text-sm font-medium">Event Rejected</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 w-full">
+                    <Button
+                      className="flex-1 h-11 rounded-lg text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-800 shadow-sm hover:shadow transition-all duration-150 hover:scale-[1.02]"
+                      onClick={handleReRequest}
+                    >
+                      <Clock className="w-4 h-4 mr-2" />
+                      Re-request
+                    </Button>
+                    <Button
+                      className="h-11 w-11 rounded-lg text-sm font-medium text-white bg-gray-500 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-800 shadow-sm hover:shadow transition-all duration-150 hover:scale-[1.02] flex items-center justify-center"
+                      onClick={handleEdit}
+                      variant="default"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           {!isAdmin && !isOrganizer && (

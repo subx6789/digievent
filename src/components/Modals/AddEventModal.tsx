@@ -21,6 +21,9 @@ import {
   IndianRupee,
   Sofa,
   Clock,
+  Globe,
+  CreditCard,
+  Building,
 } from "lucide-react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -58,7 +61,8 @@ const eventCategories = [
   { id: "fun", name: "Fun" },
 ];
 
-// Updated form schema with conditional location requirement
+// Update the form schema
+// Update the formSchema with regex validations
 const formSchema = z
   .object({
     title: z
@@ -70,6 +74,7 @@ const formSchema = z
     date: z.string(),
     time: z.string(),
     location: z.string().optional(),
+    virtualLink: z.string().optional(),
     category: z.string().min(1, { message: "Category is required" }),
     capacity: z
       .string()
@@ -79,17 +84,21 @@ const formSchema = z
     eventType: z.enum(["physical", "virtual"]),
     price: z.string().optional(),
     image: z.string(),
-    pdfDetails: z.string().optional(),
+    bankAccount: z.string().optional(),
+    ifscCode: z.string().optional(),
   })
   .refine(
     (data) => {
       if (data.eventType === "physical") {
         return data.location !== undefined && data.location.trim().length >= 2;
       }
+      if (data.eventType === "virtual") {
+        return data.virtualLink !== undefined && data.virtualLink.trim().length > 0;
+      }
       return true;
     },
     {
-      message: "Location is required for physical events",
+      message: "Location or virtual link is required based on event type",
       path: ["location"],
     }
   );
@@ -102,37 +111,38 @@ interface AddEventModalProps {
   isEditMode?: boolean;
 }
 
-const AddEventModal: React.FC<AddEventModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  onAddEvent, 
-  editEvent = null, 
-  isEditMode = false 
-}) => {
+const AddEventModal = ({
+  isOpen,
+  onClose,
+  onAddEvent,
+  editEvent = null,
+  isEditMode = false,
+}: AddEventModalProps) => {
   const { toast } = useToast();
   const [eventType, setEventType] = useState<"free" | "paid">("free");
   const [selectedEventType, setSelectedEventType] = useState<
     "physical" | "virtual"
   >("physical");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [pdfPreview, setPdfPreview] = useState<string | null>(null);
-  const [pdfFileName, setPdfFileName] = useState<string | null>(null);
 
+  // Add these to form default values
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    mode: "onChange",
+    mode: "onChange", // This enables real-time validation
     defaultValues: {
       title: "",
       description: "",
       date: "",
       time: "",
       location: "",
+      virtualLink: "",
       category: "",
       capacity: "",
       eventType: "physical",
       price: "",
       image: "",
-      pdfDetails: undefined,
+      bankAccount: "",
+      ifscCode: "",
     },
   });
 
@@ -140,35 +150,34 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
   useEffect(() => {
     if (isEditMode && editEvent) {
       // Set event type (free/paid)
-      setEventType(editEvent.price && editEvent.price !== "Free" && editEvent.price !== "0" ? "paid" : "free");
-      
+      setEventType(
+        editEvent.price && editEvent.price !== "Free" && editEvent.price !== "0"
+          ? "paid"
+          : "free"
+      );
+
       // Set event location type
       setSelectedEventType(editEvent.eventType || "physical");
-      
+
       // Set image preview if available
       if (editEvent.image && editEvent.image !== "/placeholder-event.jpg") {
         setImagePreview(editEvent.image);
       }
-      
-      // Set PDF preview if available
-      if (editEvent.pdfDetails) {
-        setPdfPreview(editEvent.pdfDetails);
-        setPdfFileName("Event Details.pdf");
-      }
-      
+
       // Reset form with event values, handling all possible undefined cases
       form.reset({
         title: editEvent.title ?? "",
         description: editEvent.description ?? "",
         date: editEvent.date ?? "",
         time: editEvent.time ?? "",
-        location: editEvent.location === "Virtual" ? "" : editEvent.location ?? "",
+        location:
+          editEvent.location === "Virtual" ? "" : editEvent.location ?? "",
         category: editEvent.category ?? "",
         capacity: editEvent.capacity?.toString() ?? "",
         eventType: editEvent.eventType ?? "physical",
-        price: editEvent.price === "Free" || !editEvent.price ? "" : editEvent.price,
+        price:
+          editEvent.price === "Free" || !editEvent.price ? "" : editEvent.price,
         image: editEvent.image ?? "",
-        pdfDetails: editEvent.pdfDetails ?? undefined,
       });
     } else {
       // Reset to default values when not in edit mode
@@ -183,45 +192,58 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
         eventType: "physical",
         price: "",
         image: "",
-        pdfDetails: undefined,
       });
       setEventType("free");
       setSelectedEventType("physical");
       setImagePreview(null);
-      setPdfPreview(null);
-      setPdfFileName(null);
     }
   }, [isEditMode, editEvent, form]);
 
   // Updated handlers now accept an optional file (for drag & drop)
-  const handleImageUpload = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    file?: File
+  // Update the handleImageUpload function
+  const handleImageUpload = async (
+    event:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.DragEvent<HTMLLabelElement>,
+    droppedFile?: File
   ) => {
-    const fileToProcess = file || event.target.files?.[0];
-    if (fileToProcess) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-        form.setValue("image", reader.result as string);
-      };
-      reader.readAsDataURL(fileToProcess);
-    }
-  };
+    const fileToProcess = droppedFile ||
+      ('target' in event && 'files' in event.target ? event.target.files?.[0] : null);
 
-  const handlePdfUpload = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    file?: File
-  ) => {
-    const fileToProcess = file || event.target.files?.[0];
     if (fileToProcess) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPdfPreview(reader.result as string);
-        setPdfFileName(fileToProcess.name);
-        form.setValue("pdfDetails", reader.result as string);
-      };
-      reader.readAsDataURL(fileToProcess);
+      try {
+        if (!fileToProcess.type.startsWith('image/')) {
+          toast({
+            title: "Error",
+            description: "Please upload an image file",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (fileToProcess.size > 5 * 1024 * 1024) {
+          toast({
+            title: "Error",
+            description: "Image size must not exceed 5MB",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64Data = reader.result as string;
+          setImagePreview(base64Data);
+          form.setValue("image", base64Data);
+        };
+        reader.readAsDataURL(fileToProcess);
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to process image",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -230,35 +252,44 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
     form.setValue("eventType", type);
   };
 
+  // Remove the duplicate onSubmit function and keep only one
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     const newEvent: Event = {
       id: isEditMode && editEvent ? editEvent.id : `event-${Date.now()}`,
       ...values,
       type: eventType,
       date: values.date,
-      location: values.location || "Virtual",
-      organiser: isEditMode && editEvent ? editEvent.organiser : "Your Organization",
-      status: isEditMode && editEvent ? editEvent.status : "pending",
+      location:
+        selectedEventType === "virtual"
+          ? values.virtualLink || "Virtual"
+          : values.location,
+      organiser:
+        isEditMode && editEvent ? editEvent.organiser : "Your Organization",
+      status: "pending",
       eventType: selectedEventType,
       image: values.image || "/placeholder-event.jpg",
+      bankAccount: eventType === "paid" ? values.bankAccount : undefined,
+      ifscCode: eventType === "paid" ? values.ifscCode : undefined,
+      createdAt: new Date().toISOString(),
     };
 
-    // If in edit mode, preserve the original capacity
     if (isEditMode && editEvent) {
       newEvent.capacity = editEvent.capacity;
     }
 
+    console.log("Event Data for API:", JSON.stringify(newEvent, null, 2));
     onAddEvent(newEvent);
 
     toast({
       title: isEditMode ? "Event Updated" : "Event Added",
-      description: `${values.title} has been successfully ${isEditMode ? "updated" : "created"}.`,
+      description: `${values.title} has been successfully ${
+        isEditMode ? "updated" : "created"
+      }.`,
       variant: "default",
     });
 
     form.reset();
     setImagePreview(null);
-    setPdfPreview(null);
     onClose();
   };
 
@@ -304,10 +335,15 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* Image Upload */}
+            {/* Add this near the image upload section */}
             <div>
               <Label className="flex items-center gap-2 mb-2">
                 <FileText className="h-4 w-4" /> Event Cover Image
               </Label>
+              <p className="text-sm text-muted-foreground mb-3">
+                Please upload an image (1200x630 pixels, max 5MB) for the best
+                display
+              </p>
               <Input
                 type="file"
                 accept="image/*"
@@ -317,33 +353,68 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
               />
               <Label
                 htmlFor="image-upload"
-                onDragOver={(e) => e.preventDefault()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.classList.add(
+                    "border-blue-500",
+                    "bg-blue-50/50"
+                  );
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.classList.remove(
+                    "border-blue-500",
+                    "bg-blue-50/50"
+                  );
+                }}
                 onDrop={(e) => {
                   e.preventDefault();
+                  e.currentTarget.classList.remove(
+                    "border-blue-500",
+                    "bg-blue-50/50"
+                  );
                   const file = e.dataTransfer.files[0];
-                  if (file) {
-                    handleImageUpload(e as any, file);
+                  if (file && file.type.startsWith("image/")) {
+                    handleImageUpload(e, file);
+                  } else {
+                    toast({
+                      title: "Error",
+                      description: "Please drop an image file",
+                      variant: "destructive",
+                    });
                   }
                 }}
                 className={cn(
-                  "flex items-center justify-center border-2 p-5 border-dashed rounded-lg cursor-pointer hover:border-blue-500 transition-colors",
-                  imagePreview && "p-0 border-none"
+                  "relative flex flex-col items-center justify-center border-2 border-dashed rounded-lg transition-all duration-300",
+                  "hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-950/10",
+                  imagePreview ? "p-0" : "p-8",
+                  "group cursor-pointer"
                 )}
               >
                 {imagePreview ? (
-                  <Image
-                    src={imagePreview}
-                    alt="Event Cover Image"
-                    width={400}
-                    height={160}
-                    className="w-full h-40 object-cover rounded-lg"
-                  />
+                  <div className="relative w-full aspect-[1200/630] overflow-hidden rounded-lg">
+                    <Image
+                      src={imagePreview}
+                      alt="Event Cover"
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <p className="text-white text-sm">
+                        Click to change image
+                      </p>
+                    </div>
+                  </div>
                 ) : (
                   <div className="flex flex-col items-center">
-                    <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                    <span className="text-sm text-gray-600">
-                      Drag & drop or click to upload cover image
-                    </span>
+                    <Upload className="h-8 w-8 text-blue-600 mb-2" />
+                    <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+                      Drag & drop or click to upload
+                      <br />
+                      <span className="text-blue-600">
+                        1200x630 pixels recommended
+                      </span>
+                    </p>
                   </div>
                 )}
               </Label>
@@ -515,6 +586,29 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
               />
             )}
 
+            {/* Virtual Event Link - Add this after the location field */}
+            {selectedEventType === "virtual" && (
+              <FormField
+                control={form.control}
+                name="virtualLink"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Globe className="h-4 w-4" /> Virtual Event Link
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter meeting link (Zoom, Google Meet, etc.)"
+                        {...field}
+                        className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             {/* Capacity */}
             <FormField
               control={form.control}
@@ -567,62 +661,70 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
               />
             )}
 
-            {/* Details PDF Upload */}
-            <div>
-              <Label className="flex items-center gap-2 mb-2">
-                <FileText className="h-4 w-4" /> Event Details PDF (Optional)
-              </Label>
-              <Input
-                type="file"
-                accept=".pdf"
-                className="hidden"
-                id="details-pdf-upload"
-                onChange={(e) => handlePdfUpload(e)}
-              />
-              <Label
-                htmlFor="details-pdf-upload"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  const file = e.dataTransfer.files[0];
-                  if (file) {
-                    handlePdfUpload(e as any, file);
-                  }
-                }}
-                className="flex items-center justify-center border-2 border-dashed rounded-lg p-5 cursor-pointer hover:border-blue-500 transition-colors"
-              >
-                {pdfPreview ? (
-                  <span className="text-sm text-gray-600">
-                    PDF Uploaded: {pdfFileName}
-                  </span>
-                ) : (
-                  <div className="flex flex-col items-center">
-                    <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                    <span className="text-sm text-gray-600">
-                      Drag & drop or click to upload PDF
-                    </span>
-                  </div>
-                )}
-              </Label>
-            </div>
+            {/* Bank Details Section */}
+            {eventType === "paid" && (
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="bankAccount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <CreditCard className="h-4 w-4" /> Bank Account Number
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Enter bank account number"
+                          {...field}
+                          className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <DialogFooter className="mt-6 flex gap-3">
+                <FormField
+                  control={form.control}
+                  name="ifscCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <Building className="h-4 w-4" /> IFSC Code
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Enter IFSC code"
+                          {...field}
+                          className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                          autoCapitalize="characters"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+
+            {/* Footer Buttons */}
+            <DialogFooter className="flex justify-end gap-2 mt-6">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="h-11"
+                className="h-11 hover:scale-105 duration-150 transition-all"
               >
-                Cancel
+                Close
               </Button>
               <Button
                 type="submit"
                 disabled={
-                  !form.formState.isValid ||
-                  form.formState.isSubmitting ||
-                  (eventType === "paid" && !form.getValues("price")?.trim())
+                  !form.formState.isValid || form.formState.isSubmitting
                 }
-                className="h-11 bg-blue-600 hover:bg-blue-700 text-white px-6 font-medium transition-all duration-150 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-blue-600 hover:bg-blue-700 text-white h-11 hover:scale-105 duration-150 transition-all"
               >
                 {isEditMode ? "Update Event" : "Request Event"}
               </Button>
