@@ -43,7 +43,7 @@ interface ProfileModalProps {
     name: string;
     email: string;
     avatar: string;
-    role: "Super Admin" | "Admin" | "Organizer";
+    role: string;
     phone?: string;
     organization?: string;
   };

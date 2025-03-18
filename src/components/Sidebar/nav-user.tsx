@@ -31,7 +31,7 @@ export function NavUser({
     avatar: string;
     name: string;
     email: string;
-    role: "Admin" | "Organizer" | "Super Admin";
+    role: string;
     phone: string;
   };
 }) {
