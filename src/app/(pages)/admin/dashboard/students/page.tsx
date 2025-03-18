@@ -10,18 +10,21 @@ import React, { useState } from "react";
 
 const AdminStudentPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [studentsList, setStudentsList] = useState(students);
+  const [studentsList, setStudentsList] = useState<Student[]>(students);
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
 
   const handleOpenModal = () => {
+    setEditingStudent(null); // Ensure we're not in edit mode
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
+    setEditingStudent(null);
     setIsModalOpen(false);
   };
 
   const handleAddStudent = (newStudent: Student) => {
-    setStudentsList((prevStudents: any) => [
+    setStudentsList((prevStudents: Student[]) => [
       ...prevStudents,
       {
         ...newStudent,
@@ -30,17 +33,48 @@ const AdminStudentPage = () => {
     ]);
   };
 
+  const handleEditStudent = (student: Student) => {
+    setEditingStudent(student);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateStudent = (
+    updatedStudent: Student,
+    originalStudentId?: string
+  ) => {
+    setStudentsList((prevStudents: Student[]) =>
+      prevStudents.map((student) =>
+        student.id === (originalStudentId || updatedStudent.id)
+          ? updatedStudent
+          : student
+      )
+    );
+  };
+
+  const handleRemoveStudent = (studentId: string) => {
+    setStudentsList((prevStudents: Student[]) =>
+      prevStudents.filter((student) => student.id !== studentId)
+    );
+  };
+
   return (
     <ProtectedRoute requiredRole="admin">
       <Sidebar role="admin">
         <Header onAddClick={handleOpenModal} />
         <div className="p-6">
-          <StudentTable students={studentsList} />
+          <StudentTable
+            students={studentsList}
+            onEditStudent={handleEditStudent}
+            onDeleteStudent={handleRemoveStudent}
+          />
         </div>
         <AddStudentModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           onAddStudent={handleAddStudent}
+          onUpdateStudent={handleUpdateStudent}
+          studentToEdit={editingStudent}
+          isEditMode={!!editingStudent}
         />
       </Sidebar>
     </ProtectedRoute>

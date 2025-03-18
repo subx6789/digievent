@@ -115,7 +115,7 @@ const EventCard = ({ event, className, onEdit, onView }: EventCardProps) => {
             {!isOrganizer && (
               <div className="flex items-center text-gray-600 dark:text-gray-400">
                 <Users className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="truncate">{event.organiser}</span>
+                <span className="truncate">{event.organizer}</span>
               </div>
             )}
 
@@ -129,7 +129,11 @@ const EventCard = ({ event, className, onEdit, onView }: EventCardProps) => {
             <div className="flex items-center text-gray-600 dark:text-gray-400">
               <MapPinIcon className="h-4 w-4 mr-2 flex-shrink-0" />
               <span className="truncate">
-                {event.location ? event.location : "Virtual"}
+                {event.venue
+                  ? event.venue === ""
+                    ? "Virtual"
+                    : event.venue
+                  : "Virtual"}
               </span>
             </div>
           </div>

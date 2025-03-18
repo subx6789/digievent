@@ -3,6 +3,7 @@ export const sidebarDataAdmin = {
     name: "Techno India University",
     email: "tiu@gmail.com",
     role: "Admin",
+    phone: "+91 9999999999",
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [

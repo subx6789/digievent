@@ -43,7 +43,7 @@ interface ProfileModalProps {
     name: string;
     email: string;
     avatar: string;
-    role: "super-admin" | "admin" | "organizer";
+    role: "Super Admin" | "Admin" | "Organizer";
     phone?: string;
     organization?: string;
   };
@@ -293,7 +293,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                 </div>
               </div>
 
-              {user.role === "organizer" && user.organization && (
+              {user.role === "Organizer" && user.organization && (
                 <div className="grid gap-2">
                   <Label className="text-sm text-muted-foreground flex items-center">
                     <Building className="h-4 w-4 mr-2" /> Organization
@@ -401,7 +401,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                   )}
                 />
 
-                {user.role === "organizer" && user.organization && (
+                {user.role === "Organizer" && user.organization && (
                   <div className="grid gap-2">
                     <Label className="text-sm text-muted-foreground flex items-center">
                       <Building className="h-4 w-4 mr-2" /> Organization (Cannot

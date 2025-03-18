@@ -20,7 +20,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Trash2, Eye, Search } from "lucide-react";
+import { Trash2, Search, UserRoundPen } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export interface Organizer {
@@ -103,8 +103,8 @@ export default function OrganizerTable({ organizers }: OrganizerTableProps) {
   };
 
   // Handle view profile action
-  const handleViewProfile = (organizerId: string) => {
-    console.log("View profile:", organizerId);
+  const handleEditOrganizer = (organizerId: string) => {
+    console.log("Edit profile:", organizerId);
     // Navigate to profile or open modal
   };
 
@@ -205,10 +205,10 @@ export default function OrganizerTable({ organizers }: OrganizerTableProps) {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900"
-                            onClick={() => handleViewProfile(organizer.id)}
-                            title="View Profile"
+                            onClick={() => handleEditOrganizer(organizer.id)}
+                            title="Edit Organizer"
                           >
-                            <Eye className="h-4 w-4 text-blue-500" />
+                            <UserRoundPen className="h-4 w-4 text-blue-600" />
                           </Button>
                           <Button
                             variant="ghost"

@@ -7,8 +7,8 @@ export interface Event {
   date: string;
   type: "free" | "paid";
   time: string;
-  location?: string;
-  organiser: string;
+  venue?: string;
+  organizer: string;
   price?: string;
   category: string;
   image: string;

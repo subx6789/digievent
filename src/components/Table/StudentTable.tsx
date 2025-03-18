@@ -1,4 +1,4 @@
-import { Search, Trash2 } from "lucide-react";
+import { Search, Trash2, UserRoundPen } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import {
@@ -34,23 +34,29 @@ export interface Student {
 
 interface StudentTableProps {
   students: Student[];
+  onEditStudent: (student: Student) => void;
+  onDeleteStudent: (studentId: string) => void;
 }
 
-const StudentTable = ({ students }: StudentTableProps) => {
+const StudentTable = ({
+  students,
+  onEditStudent,
+  onDeleteStudent,
+}: StudentTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredStudents, setFilteredStudents] = useState<Student[]>(students);
 
   const itemsPerPage = 5;
 
-  // Filter studentss based on search term
+  // Filter students based on search term
   useEffect(() => {
     const filtered = students.filter(
-      (students) =>
-        students.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        students.course.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        students.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        students.rollno.includes(searchTerm)
+      (student) =>
+        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.course.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.rollno.includes(searchTerm)
     );
     setFilteredStudents(filtered);
     setCurrentPage(1); // Reset to first page when search changes
@@ -98,10 +104,19 @@ const StudentTable = ({ students }: StudentTableProps) => {
     return range;
   };
 
-  // Handle remove students action
-  const handleRemoveStudent = (studentsId: string) => {
-    console.log("Remove students:", studentsId);
-    // Show confirmation dialog and remove
+  // Handle edit student action
+  const handleEditStudent = (student: Student) => {
+    onEditStudent(student);
+  };
+
+  // Handle remove student action
+  const handleRemoveStudent = (studentId: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this student?"
+    );
+    if (confirmed) {
+      onDeleteStudent(studentId);
+    }
   };
 
   return (
@@ -144,20 +159,20 @@ const StudentTable = ({ students }: StudentTableProps) => {
               </TableHeader>
               <TableBody>
                 {currentStudents.length > 0 ? (
-                  currentStudents.map((students) => (
+                  currentStudents.map((student) => (
                     <TableRow
-                      key={students.id}
+                      key={student.id}
                       className="hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-200 dark:border-gray-700 last:border-0"
                     >
                       <TableCell className="w-[200px] p-4">
                         <div className="h-10 w-full flex items-center gap-3">
                           <Avatar className="h-10 w-10 rounded-lg">
                             <AvatarImage
-                              src={students.avatarUrl}
-                              alt={students.name}
+                              src={student.avatarUrl}
+                              alt={student.name}
                             />
                             <AvatarFallback className="rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-200">
-                              {students.name
+                              {student.name
                                 .toUpperCase()
                                 .split(" ")
                                 .map((n) => n[0])
@@ -166,10 +181,10 @@ const StudentTable = ({ students }: StudentTableProps) => {
                           </Avatar>
                           <div>
                             <div className="font-medium text-gray-900 dark:text-white">
-                              {students.name}
+                              {student.name}
                             </div>
                             <div className="text-sm text-gray-500 dark:text-gray-400">
-                              {students.course}
+                              {student.course}
                             </div>
                           </div>
                         </div>
@@ -177,23 +192,34 @@ const StudentTable = ({ students }: StudentTableProps) => {
                       <TableCell className="w-[250px] p-4">
                         <div>
                           <div className="text-sm text-gray-900 dark:text-white">
-                            {students.email}
+                            {student.email}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell className="w-[70px] text-gray-900 dark:text-white p-4">
                         <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium">
-                          {students.rollno}
+                          {student.rollno}
                         </span>
                       </TableCell>
                       <TableCell className="w-[150px] text-right p-4">
                         <div className="flex justify-end space-x-2">
+                          {/* Edit button */}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900"
+                            onClick={() => handleEditStudent(student)}
+                            title="Edit Student"
+                          >
+                            <UserRoundPen className="h-4 w-4 text-blue-600" />
+                          </Button>
+                          {/* Remove button */}
                           <Button
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 rounded-lg hover:bg-red-100 dark:hover:bg-red-900"
-                            onClick={() => handleRemoveStudent(students.id)}
-                            title="Remove Students"
+                            onClick={() => handleRemoveStudent(student.id)}
+                            title="Remove Student"
                           >
                             <Trash2 className="h-4 w-4 text-red-500" />
                           </Button>

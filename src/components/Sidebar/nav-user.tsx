@@ -28,9 +28,11 @@ export function NavUser({
   user,
 }: {
   user: {
+    avatar: string;
     name: string;
     email: string;
-    avatar: string;
+    role: "Admin" | "Organizer" | "Super Admin";
+    phone: string;
   };
 }) {
   const { isMobile } = useSidebar();
@@ -38,23 +40,6 @@ export function NavUser({
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const pathname = usePathname();
-
-  // Determine user role based on pathname
-  const getUserRole = () => {
-    if (pathname?.includes("/super-admin")) return "super-admin";
-    if (pathname?.includes("/admin")) return "admin";
-    if (pathname?.includes("/organizer")) return "organizer";
-    return "admin"; // Default fallback
-  };
-
-  // Enhanced user object with role and optional fields
-  const enhancedUser = {
-    ...user,
-    role: getUserRole(),
-    phone: "123-456-7890", // This would come from your auth context in a real app
-    organization:
-      getUserRole() === "organizer" ? "DigiEvent Organizers" : undefined,
-  };
 
   const handleLogout = () => {
     logout();
@@ -189,16 +174,7 @@ export function NavUser({
       <ProfileModal
         isOpen={isProfileModalOpen}
         onClose={handleCloseProfileModal}
-        user={
-          enhancedUser as {
-            name: string;
-            email: string;
-            avatar: string;
-            role: "super-admin" | "admin" | "organizer";
-            phone?: string;
-            organization?: string;
-          }
-        }
+        user={user}
       />
     </>
   );

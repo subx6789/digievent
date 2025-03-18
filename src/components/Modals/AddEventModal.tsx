@@ -61,8 +61,6 @@ const eventCategories = [
   { id: "fun", name: "Fun" },
 ];
 
-// Update the form schema
-// Update the formSchema with regex validations
 const formSchema = z
   .object({
     title: z
@@ -71,10 +69,18 @@ const formSchema = z
     description: z
       .string()
       .min(10, { message: "Description must be at least 10 characters" }),
-    date: z.string(),
-    time: z.string(),
-    location: z.string().optional(),
-    virtualLink: z.string().optional(),
+    date: z.string().min(1, { message: "Event date is required" }),
+    time: z.string().min(1, { message: "Event time is required" }),
+    venue: z.string().optional(),
+    virtualLink: z
+      .string()
+      .optional()
+      .refine(
+        (val) =>
+          !val ||
+          /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/.test(val),
+        { message: "Please enter a valid URL" }
+      ),
     category: z.string().min(1, { message: "Category is required" }),
     capacity: z
       .string()
@@ -82,24 +88,46 @@ const formSchema = z
         message: "Capacity must be a positive number",
       }),
     eventType: z.enum(["physical", "virtual"]),
-    price: z.string().optional(),
-    image: z.string(),
-    bankAccount: z.string().optional(),
-    ifscCode: z.string().optional(),
+    price: z
+      .string()
+      .optional()
+      .refine((val) => !val || (Number(val) >= 0 && !isNaN(Number(val))), {
+        message: "Price cannot be negative",
+      }),
+    image: z.string().min(1, { message: "Event image is required" }),
+    bankAccount: z
+      .string()
+      .optional()
+      .refine((val) => !val || /^[0-9]{9,18}$/.test(val), {
+        message:
+          "Please enter a valid Indian bank account number (9-18 digits)",
+      }),
+    ifscCode: z
+      .string()
+      .optional()
+      .refine((val) => !val || /^[A-Z]{4}0[A-Z0-9]{6}$/.test(val), {
+        message: "Please enter a valid IFSC code (format: ABCD0123456)",
+      }),
   })
   .refine(
     (data) => {
       if (data.eventType === "physical") {
-        return data.location !== undefined && data.location.trim().length >= 2;
+        return data.venue !== undefined && data.venue.trim().length >= 2;
       }
       if (data.eventType === "virtual") {
-        return data.virtualLink !== undefined && data.virtualLink.trim().length > 0;
+        return (
+          data.virtualLink !== undefined &&
+          data.virtualLink.trim().length > 0 &&
+          /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/.test(
+            data.virtualLink
+          )
+        );
       }
       return true;
     },
     {
-      message: "Location or virtual link is required based on event type",
-      path: ["location"],
+      message: "Venue or valid virtual link is required based on event type",
+      path: ["venue"],
     }
   );
 
@@ -110,6 +138,46 @@ interface AddEventModalProps {
   editEvent?: Event | null;
   isEditMode?: boolean;
 }
+
+// Create a dynamic resolver function that changes based on event type
+const createDynamicResolver = (eventType: "free" | "paid") => {
+  return zodResolver(
+    formSchema.superRefine((data, ctx) => {
+      // For paid events, make price, bankAccount, and ifscCode mandatory
+      if (eventType === "paid") {
+        if (!data.price || data.price.trim() === "") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Price is required for paid events",
+            path: ["price"],
+          });
+        } else if (isNaN(Number(data.price)) || Number(data.price) <= 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Price must be a positive number",
+            path: ["price"],
+          });
+        }
+
+        if (!data.bankAccount || data.bankAccount.trim() === "") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Bank account number is required for paid events",
+            path: ["bankAccount"],
+          });
+        }
+
+        if (!data.ifscCode || data.ifscCode.trim() === "") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "IFSC code is required for paid events",
+            path: ["ifscCode"],
+          });
+        }
+      }
+    })
+  );
+};
 
 const AddEventModal = ({
   isOpen,
@@ -127,14 +195,14 @@ const AddEventModal = ({
 
   // Add these to form default values
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: createDynamicResolver(eventType),
     mode: "onChange", // This enables real-time validation
     defaultValues: {
       title: "",
       description: "",
       date: "",
       time: "",
-      location: "",
+      venue: "",
       virtualLink: "",
       category: "",
       capacity: "",
@@ -156,7 +224,7 @@ const AddEventModal = ({
           : "free"
       );
 
-      // Set event location type
+      // Set event venue type
       setSelectedEventType(editEvent.eventType || "physical");
 
       // Set image preview if available
@@ -170,15 +238,22 @@ const AddEventModal = ({
         description: editEvent.description ?? "",
         date: editEvent.date ?? "",
         time: editEvent.time ?? "",
-        location:
-          editEvent.location === "Virtual" ? "" : editEvent.location ?? "",
+        venue: editEvent.venue === "Virtual" ? "" : editEvent.venue ?? "",
+        virtualLink: editEvent.virtualLink ?? "",
         category: editEvent.category ?? "",
         capacity: editEvent.capacity?.toString() ?? "",
         eventType: editEvent.eventType ?? "physical",
         price:
           editEvent.price === "Free" || !editEvent.price ? "" : editEvent.price,
         image: editEvent.image ?? "",
+        bankAccount: editEvent.bankAccount ?? "",
+        ifscCode: editEvent.ifscCode ?? "",
       });
+
+      // Trigger validation after form reset
+      setTimeout(() => {
+        form.trigger();
+      }, 100);
     } else {
       // Reset to default values when not in edit mode
       form.reset({
@@ -186,7 +261,7 @@ const AddEventModal = ({
         description: "",
         date: "",
         time: "",
-        location: "",
+        venue: "",
         category: "",
         capacity: "",
         eventType: "physical",
@@ -207,26 +282,26 @@ const AddEventModal = ({
       | React.DragEvent<HTMLLabelElement>,
     droppedFile?: File
   ) => {
-    const fileToProcess = droppedFile ||
-      ('target' in event && 'files' in event.target ? event.target.files?.[0] : null);
+    const fileToProcess =
+      droppedFile ||
+      ("target" in event && "files" in event.target
+        ? event.target.files?.[0]
+        : null);
 
     if (fileToProcess) {
       try {
-        if (!fileToProcess.type.startsWith('image/')) {
+        if (!fileToProcess.type.startsWith("image/")) {
           toast({
             title: "Error",
             description: "Please upload an image file",
             variant: "destructive",
           });
+          alert("Please upload an image file");
           return;
         }
 
         if (fileToProcess.size > 5 * 1024 * 1024) {
-          toast({
-            title: "Error",
-            description: "Image size must not exceed 5MB",
-            variant: "destructive",
-          });
+          alert("Image size must not exceed 5MB");
           return;
         }
 
@@ -243,6 +318,7 @@ const AddEventModal = ({
           description: error.message || "Failed to process image",
           variant: "destructive",
         });
+        alert(error.message || "Failed to process image");
       }
     }
   };
@@ -250,6 +326,17 @@ const AddEventModal = ({
   const handleCheckboxChange = (type: "physical" | "virtual") => {
     setSelectedEventType(type);
     form.setValue("eventType", type);
+    // Clear the other field when switching types
+    if (type === "physical") {
+      form.setValue("virtualLink", "");
+    } else {
+      form.setValue("venue", "");
+    }
+
+    // Trigger validation after changing event type
+    setTimeout(() => {
+      form.trigger();
+    }, 100);
   };
 
   // Remove the duplicate onSubmit function and keep only one
@@ -259,17 +346,19 @@ const AddEventModal = ({
       ...values,
       type: eventType,
       date: values.date,
-      location:
-        selectedEventType === "virtual"
-          ? values.virtualLink || "Virtual"
-          : values.location,
-      organiser:
-        isEditMode && editEvent ? editEvent.organiser : "Your Organization",
-      status: "pending",
+      venue: selectedEventType === "virtual" ? "" : values.venue,
+      virtualLink: selectedEventType === "virtual" ? values.virtualLink : "",
+      organizer:
+        isEditMode && editEvent ? editEvent.organizer : "Your Organization",
+      status: isEditMode && editEvent ? editEvent.status : "pending",
+      price:
+        eventType === "paid" && values.price && values.price !== "free"
+          ? values.price
+          : "",
       eventType: selectedEventType,
       image: values.image || "/placeholder-event.jpg",
-      bankAccount: eventType === "paid" ? values.bankAccount : undefined,
-      ifscCode: eventType === "paid" ? values.ifscCode : undefined,
+      bankAccount: eventType === "paid" ? values.bankAccount : "",
+      ifscCode: eventType === "paid" ? values.ifscCode : "",
       createdAt: new Date().toISOString(),
     };
 
@@ -287,10 +376,24 @@ const AddEventModal = ({
       }.`,
       variant: "default",
     });
+    alert(
+      `${values.title} has been successfully ${
+        isEditMode ? "updated" : "created"
+      }`
+    );
 
     form.reset();
     setImagePreview(null);
     onClose();
+  };
+
+  // Update the event type setter to trigger validation
+  const handleEventTypeChange = (type: "free" | "paid") => {
+    setEventType(type);
+    // Trigger validation after changing event type
+    setTimeout(() => {
+      form.trigger();
+    }, 0);
   };
 
   return (
@@ -302,12 +405,12 @@ const AddEventModal = ({
           </DialogTitle>
         </DialogHeader>
 
-        {/* Free/Paid Tabs */}
+        {/* Free/Paid Tabs - Update the onClick handlers */}
         <div className="w-full mb-4 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
           <div className="grid grid-cols-2 gap-1">
             <button
               type="button"
-              onClick={() => setEventType("free")}
+              onClick={() => handleEventTypeChange("free")}
               className={cn(
                 "py-2 rounded-md text-sm font-medium transition-all duration-200",
                 eventType === "free"
@@ -319,7 +422,7 @@ const AddEventModal = ({
             </button>
             <button
               type="button"
-              onClick={() => setEventType("paid")}
+              onClick={() => handleEventTypeChange("paid")}
               className={cn(
                 "py-2 rounded-md text-sm font-medium transition-all duration-200",
                 eventType === "paid"
@@ -341,8 +444,8 @@ const AddEventModal = ({
                 <FileText className="h-4 w-4" /> Event Cover Image
               </Label>
               <p className="text-sm text-muted-foreground mb-3">
-                Please upload an image (1200x630 pixels, max 5MB) for the best
-                display
+                Please upload an image (1200x630 pixels) for the best display
+                and max (5MB).
               </p>
               <Input
                 type="file"
@@ -382,6 +485,7 @@ const AddEventModal = ({
                       description: "Please drop an image file",
                       variant: "destructive",
                     });
+                    alert("Please drop an image file");
                   }
                 }}
                 className={cn(
@@ -567,7 +671,7 @@ const AddEventModal = ({
             {selectedEventType === "physical" && (
               <FormField
                 control={form.control}
-                name="location"
+                name="venue"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2">
@@ -586,7 +690,7 @@ const AddEventModal = ({
               />
             )}
 
-            {/* Virtual Event Link - Add this after the location field */}
+            {/* Virtual Event Link - Add this after the venue field */}
             {selectedEventType === "virtual" && (
               <FormField
                 control={form.control}
