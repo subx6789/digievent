@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import Header from "@/components/Header/Header";
 import AddStudentModal from "@/components/Modals/AddStudentModal";
