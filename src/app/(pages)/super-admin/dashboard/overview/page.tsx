@@ -5,7 +5,6 @@ import EventBookingsBarChart from "@/components/EventBookingsBarChart/EventBooki
 import Header from "@/components/Header/Header";
 // import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import Sidebar from "@/components/Sidebar/Sidebar";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -39,9 +38,13 @@ const Overview = () => {
                   />
                 </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="cursor-pointer">
                 {colleges.map((college, index) => (
-                  <SelectItem value={college.id} key={index}>
+                  <SelectItem
+                    value={college.id}
+                    key={index}
+                    className="cursor-pointer"
+                  >
                     {college.name}
                   </SelectItem>
                 ))}
@@ -59,19 +62,18 @@ const Overview = () => {
                   />
                 </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="cursor-pointer">
                 {timePeriods.map((timePeriod, index) => (
-                  <SelectItem value={timePeriod.id} key={index}>
+                  <SelectItem
+                    value={timePeriod.id}
+                    key={index}
+                    className="cursor-pointer"
+                  >
                     {timePeriod.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-
-            {/* Filter Button */}
-            <Button className="bg-blue-600 h-11 hover:bg-blue-700 text-white px-8 font-medium transition-all duration-150 hover:scale-105 w-full md:w-auto">
-              Filter
-            </Button>
           </div>
         </div>
 

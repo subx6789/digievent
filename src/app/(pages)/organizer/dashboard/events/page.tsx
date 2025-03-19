@@ -4,7 +4,6 @@ import EventCard from "@/components/Card/EventCard";
 import Header from "@/components/Header/Header";
 import AddEventModal from "@/components/Modals/AddEventModal";
 import Sidebar from "@/components/Sidebar/Sidebar";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -23,6 +22,7 @@ const OrganizerEvents = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedState, setSelectedState] = useState("approved"); // Default filter state
   const { toast } = useToast();
 
   const handleOpenModal = () => {
@@ -70,8 +70,46 @@ const OrganizerEvents = () => {
     } else {
       // Add new event
       setEvents([newEvent, ...events]);
+      toast({
+        title: "Event Created",
+        description: `${newEvent.title} has been successfully created.`,
+        variant: "default",
+      });
     }
   };
+
+  // Improved cancel event handler with confirmation and feedback
+  const handleCancelEvent = (eventId: string) => {
+    const eventToCancel = events.find((event) => event.id === eventId);
+
+    // Update event status to cancelled
+    const updatedEvents = events.map((event) =>
+      event.id === eventId ? { ...event, status: "cancelled" } : event
+    );
+    setEvents(updatedEvents as Event[]);
+
+    toast({
+      title: "Event Cancelled",
+      description: `${eventToCancel?.title} has been successfully cancelled.`,
+      variant: "destructive",
+    });
+  };
+
+  // Filter events based on selected state
+  /** const handleFilterEvents = () => {
+    // This would typically filter the events, but for now just show a toast
+    toast({
+      title: "Events Filtered",
+      description: `Showing events with status: ${selectedState}`,
+      variant: "default",
+    });
+  }; **/
+
+  // Get filtered events based on selected state
+  const filteredEvents =
+    selectedState === "all"
+      ? events
+      : events.filter((event) => event.status === selectedState);
 
   return (
     <Sidebar role="organizer">
@@ -81,7 +119,11 @@ const OrganizerEvents = () => {
           {/* Filters Section */}
           <div className="flex flex-col md:flex-row md:justify-end items-center gap-4 mt-4 md:mt-0">
             {/* Event State Filter */}
-            <Select defaultValue="approved">
+            <Select
+              defaultValue="approved"
+              value={selectedState}
+              onValueChange={setSelectedState}
+            >
               <SelectTrigger className="md:w-[320px] w-full bg-white dark:bg-gray-800 h-11 px-4 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <div className="flex items-center gap-3">
                   <Calendar className="h-[18px] w-[18px] text-gray-400" />
@@ -91,37 +133,45 @@ const OrganizerEvents = () => {
                   />
                 </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="cursor-pointer">
                 {eventStates.map((state, index) => (
-                  <SelectItem value={state.id} key={index}>
+                  <SelectItem
+                    value={state.id}
+                    key={index}
+                    className="cursor-pointer"
+                  >
                     {state.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-
-            {/* Filter Button */}
-            <Button className="bg-blue-600 h-11 hover:bg-blue-700 text-white px-8 font-medium transition-all duration-150 hover:scale-105 w-full md:w-auto">
-              Filter
-            </Button>
           </div>
         </div>
 
-        {/* Events Section */}
+        {/* Events Section with conditional rendering for no results */}
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {events.map((event) => (
-            <div
-              key={event.id}
-              className="p-1 hover:drop-shadow-lg transition-all duration-150"
-            >
-              <EventCard
-                event={event}
-                className="w-full max-w-sm mx-auto"
-                onEdit={handleEditEvent}
-                onView={handleViewEvent}
-              />
+          {filteredEvents.length > 0 ? (
+            filteredEvents.map((event) => (
+              <div
+                key={event.id}
+                className="p-1 hover:drop-shadow-lg transition-all duration-150"
+              >
+                <EventCard
+                  event={event}
+                  className="w-full max-w-sm mx-auto"
+                  onEdit={handleEditEvent}
+                  onView={handleViewEvent}
+                  onCancel={handleCancelEvent}
+                />
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-500 dark:text-gray-400">
+                No events match the selected filter.
+              </p>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Modified AddEventModal with edit capability */}

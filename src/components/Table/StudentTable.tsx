@@ -25,6 +25,7 @@ export interface Student {
   id: string;
   name: string;
   email: string;
+  phone: string;
   rollno: string;
   avatarUrl: string;
   course: string;
@@ -147,7 +148,7 @@ const StudentTable = ({
                     Students
                   </TableHead>
                   <TableHead className="w-[250px] text-gray-700 dark:text-gray-300 p-4">
-                    Email
+                    Contact
                   </TableHead>
                   <TableHead className="w-[70px] text-gray-700 dark:text-gray-300 p-4">
                     Roll no
@@ -189,15 +190,18 @@ const StudentTable = ({
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="w-[250px] p-4">
+                      <TableCell className="w-[200px] p-4">
                         <div>
                           <div className="text-sm text-gray-900 dark:text-white">
                             {student.email}
                           </div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                            {student.phone}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell className="w-[70px] text-gray-900 dark:text-white p-4">
-                        <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium">
+                        <span className="inline-flex items-center justify-center text-xs font-medium">
                           {student.rollno}
                         </span>
                       </TableCell>

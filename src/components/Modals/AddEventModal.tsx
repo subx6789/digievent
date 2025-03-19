@@ -140,7 +140,11 @@ interface AddEventModalProps {
 }
 
 // Create a dynamic resolver function that changes based on event type
-const createDynamicResolver = (eventType: "free" | "paid") => {
+// Update the createDynamicResolver function to handle capacity validation
+const createDynamicResolver = (
+  eventType: "free" | "paid",
+  originalCapacity?: string
+) => {
   return zodResolver(
     formSchema.superRefine((data, ctx) => {
       // For paid events, make price, bankAccount, and ifscCode mandatory
@@ -175,6 +179,24 @@ const createDynamicResolver = (eventType: "free" | "paid") => {
           });
         }
       }
+
+      // Check capacity in edit mode
+      if (originalCapacity && data.capacity) {
+        const newCapacity = Number(data.capacity);
+        const originalCapacityNum = Number(originalCapacity);
+
+        if (
+          !isNaN(newCapacity) &&
+          !isNaN(originalCapacityNum) &&
+          newCapacity < originalCapacityNum
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Capacity can only be increased, not decreased",
+            path: ["capacity"],
+          });
+        }
+      }
     })
   );
 };
@@ -192,10 +214,12 @@ const AddEventModal = ({
     "physical" | "virtual"
   >("physical");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-
+  const [originalCapacity, setOriginalCapacity] = useState<string | undefined>(
+    undefined
+  );
   // Add these to form default values
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: createDynamicResolver(eventType),
+    resolver: createDynamicResolver(eventType, originalCapacity),
     mode: "onChange", // This enables real-time validation
     defaultValues: {
       title: "",
@@ -214,6 +238,20 @@ const AddEventModal = ({
     },
   });
 
+  // Update resolver when event type changes
+  useEffect(() => {
+    const currentValues = form.getValues();
+    form.clearErrors();
+    form.reset(currentValues, {
+      keepValues: true,
+      keepDefaultValues: true,
+      keepDirty: true,
+      keepIsSubmitted: false,
+      keepTouched: true,
+      keepIsValid: false,
+    });
+  }, [eventType, originalCapacity, form]);
+
   // Populate form with event data when in edit mode
   useEffect(() => {
     if (isEditMode && editEvent) {
@@ -226,6 +264,9 @@ const AddEventModal = ({
 
       // Set event venue type
       setSelectedEventType(editEvent.eventType || "physical");
+
+      // Store original capacity for validation
+      setOriginalCapacity(editEvent.capacity?.toString());
 
       // Set image preview if available
       if (editEvent.image && editEvent.image !== "/placeholder-event.jpg") {
@@ -271,6 +312,7 @@ const AddEventModal = ({
       setEventType("free");
       setSelectedEventType("physical");
       setImagePreview(null);
+      setOriginalCapacity(undefined);
     }
   }, [isEditMode, editEvent, form]);
 
@@ -352,7 +394,9 @@ const AddEventModal = ({
         isEditMode && editEvent ? editEvent.organizer : "Your Organization",
       status: isEditMode && editEvent ? editEvent.status : "pending",
       price:
-        eventType === "paid" && values.price && values.price !== "free"
+        isEditMode && editEvent && editEvent.price
+          ? editEvent.price
+          : eventType === "paid" && values.price && values.price !== "free"
           ? values.price
           : "",
       eventType: selectedEventType,
@@ -362,8 +406,15 @@ const AddEventModal = ({
       createdAt: new Date().toISOString(),
     };
 
-    if (isEditMode && editEvent) {
-      newEvent.capacity = editEvent.capacity;
+    if (isEditMode && editEvent && editEvent.capacity) {
+      const newCapacity = Number(values.capacity);
+      const originalCapacity = Number(editEvent.capacity);
+
+      if (isNaN(newCapacity) || newCapacity < originalCapacity) {
+        newEvent.capacity = editEvent.capacity;
+      } else {
+        newEvent.capacity = newCapacity.toString();
+      }
     }
 
     console.log("Event Data for API:", JSON.stringify(newEvent, null, 2));
@@ -389,6 +440,16 @@ const AddEventModal = ({
 
   // Update the event type setter to trigger validation
   const handleEventTypeChange = (type: "free" | "paid") => {
+    // Prevent changing event type in edit mode
+    if (isEditMode) {
+      toast({
+        title: "Cannot change event type",
+        description: "Event type cannot be changed after creation",
+        variant: "destructive",
+      });
+      alert("Event type cannot be changed after creation");
+      return;
+    }
     setEventType(type);
     // Trigger validation after changing event type
     setTimeout(() => {
@@ -415,10 +476,12 @@ const AddEventModal = ({
                 "py-2 rounded-md text-sm font-medium transition-all duration-200",
                 eventType === "free"
                   ? "bg-white dark:bg-gray-700 text-blue-600 shadow-sm"
-                  : "text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  : "text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700",
+                isEditMode && "opacity-70 cursor-not-allowed"
               )}
+              disabled={isEditMode}
             >
-              Free Event
+              Free
             </button>
             <button
               type="button"
@@ -427,12 +490,19 @@ const AddEventModal = ({
                 "py-2 rounded-md text-sm font-medium transition-all duration-200",
                 eventType === "paid"
                   ? "bg-white dark:bg-gray-700 text-blue-600 shadow-sm"
-                  : "text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  : "text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700",
+                isEditMode && "opacity-70 cursor-not-allowed"
               )}
+              disabled={isEditMode}
             >
-              Paid Event
+              Paid
             </button>
           </div>
+          {isEditMode && (
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              Event type cannot be changed after creation
+            </p>
+          )}
         </div>
 
         <Form {...form}>
@@ -728,12 +798,12 @@ const AddEventModal = ({
                       placeholder="Enter total seats/capacity"
                       {...field}
                       className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                      disabled={isEditMode} // Disable in edit mode
                     />
                   </FormControl>
-                  {isEditMode && (
+                  {isEditMode && originalCapacity && (
                     <p className="text-xs text-muted-foreground mt-1">
-                      Seat capacity cannot be modified after creation
+                      Current capacity: {originalCapacity}. You can only
+                      increase capacity, not decrease it.
                     </p>
                   )}
                   <FormMessage />
@@ -757,8 +827,14 @@ const AddEventModal = ({
                         placeholder="Enter ticket price"
                         {...field}
                         className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        disabled={isEditMode}
                       />
                     </FormControl>
+                    {isEditMode && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Ticket price cannot be modified after creation
+                      </p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}

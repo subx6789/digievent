@@ -61,9 +61,11 @@ const formSchema = z
     phone: z
       .string()
       .refine(
-        (val) => val.startsWith("+91 ") && val.length >= 12 && val.length <= 15,
+        (val) =>
+          /^(\+91\s)?(?:\(\d{2,3}\)\s\d{4}\s\d{4}|[6-9]\d{9})$/.test(val),
         {
-          message: "Phone number must be atleast 10 digits long",
+          message:
+            "Please enter a valid 10-digit mobile number or a valid landline number with area code.",
         }
       )
       .optional(),
@@ -196,10 +198,10 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
       <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden bg-background dark:bg-gray-900 border-none shadow-lg">
         <div className="p-6">
           <DialogHeader className="mb-4">
-            <DialogTitle className="flex items-center gap-2 text-black text-xl">
+            <DialogTitle className="flex items-center gap-2 text-xl">
               <User className="h-5 w-5" /> Profile Details
             </DialogTitle>
-            <DialogDescription className="text-black">
+            <DialogDescription>
               View and manage your profile information.
             </DialogDescription>
           </DialogHeader>
@@ -254,7 +256,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
             </div>
             <div>
               <h3 className="text-xl font-semibold">{user.name}</h3>
-              <p className="text-sm text-black">
+              <p className="text-sm">
                 {user.role
                   .replace(/[-_]/g, " ") // Replace dashes/underscores with spaces
                   .split(" ") // Split words for capitalization
@@ -263,7 +265,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
               </p>
               {/* Show phone display which updates in real-time */}
               {phoneDisplay && (
-                <p className="text-sm text-black flex items-center mt-1">
+                <p className="text-sm flex items-center mt-1">
                   <Phone className="h-3.5 w-3.5 mr-1" />
                   {phoneDisplay}
                 </p>

@@ -35,9 +35,15 @@ export interface Organizer {
 
 interface OrganizerTableProps {
   organizers: Organizer[];
+  onEditOrganizer: (organizerId: string) => void;
+  onRemoveOrganizer: (organizerId: string) => void;
 }
 
-export default function OrganizerTable({ organizers }: OrganizerTableProps) {
+export default function OrganizerTable({
+  organizers,
+  onEditOrganizer,
+  onRemoveOrganizer,
+}: OrganizerTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredOrganizers, setFilteredOrganizers] =
@@ -100,18 +106,6 @@ export default function OrganizerTable({ organizers }: OrganizerTableProps) {
     }
 
     return range;
-  };
-
-  // Handle view profile action
-  const handleEditOrganizer = (organizerId: string) => {
-    console.log("Edit profile:", organizerId);
-    // Navigate to profile or open modal
-  };
-
-  // Handle remove organizer action
-  const handleRemoveOrganizer = (organizerId: string) => {
-    console.log("Remove organizer:", organizerId);
-    // Show confirmation dialog and remove
   };
 
   return (
@@ -205,7 +199,7 @@ export default function OrganizerTable({ organizers }: OrganizerTableProps) {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900"
-                            onClick={() => handleEditOrganizer(organizer.id)}
+                            onClick={() => onEditOrganizer(organizer.id)}
                             title="Edit Organizer"
                           >
                             <UserRoundPen className="h-4 w-4 text-blue-600" />
@@ -214,7 +208,7 @@ export default function OrganizerTable({ organizers }: OrganizerTableProps) {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 rounded-lg hover:bg-red-100 dark:hover:bg-red-900"
-                            onClick={() => handleRemoveOrganizer(organizer.id)}
+                            onClick={() => onRemoveOrganizer(organizer.id)}
                             title="Remove Organizer"
                           >
                             <Trash2 className="h-4 w-4 text-red-500" />

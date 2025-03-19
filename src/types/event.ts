@@ -12,7 +12,7 @@ export interface Event {
   price?: string;
   category: string;
   image: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "cancelled";
   capacity: string;
   eventType: "physical" | "virtual";
   createdAt?: string;

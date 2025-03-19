@@ -16,6 +16,9 @@ import {
   CheckCircle,
   XCircle,
   Pencil,
+  X,
+  Ban,
+  Ellipsis,
 } from "lucide-react";
 import Image from "next/image";
 import { Event } from "@/types/event";
@@ -23,17 +26,29 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
 import { getCategoryColor } from "../Table/EventsTable";
-
 import { Clock, AlertCircle } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface EventCardProps {
   event: Event;
   className?: string;
   onEdit?: (event: Event) => void;
   onView?: (eventId: string) => void;
+  onCancel?: (eventId: string) => void;
 }
 
-const EventCard = ({ event, className, onEdit, onView }: EventCardProps) => {
+const EventCard = ({
+  event,
+  className,
+  onEdit,
+  onView,
+  onCancel,
+}: EventCardProps) => {
   const pathname = usePathname();
   const isAdmin = pathname?.includes("/admin");
   const isOrganizer = pathname?.includes("/organizer");
@@ -54,21 +69,42 @@ const EventCard = ({ event, className, onEdit, onView }: EventCardProps) => {
     onEdit?.(event);
   };
 
-  // Add this near the other handler functions
   const handleReRequest = () => {
     console.log(`Re-requesting event: ${event.id}`);
+  };
+
+  // Updated cancel event handler to use the onCancel prop
+  const handleCancelEvent = () => {
+    const confirmCancel = window.confirm(
+      `Are you sure you want to cancel the event "${event.title}"? This action cannot be undone.`
+    );
+
+    if (confirmCancel && onCancel) {
+      onCancel(event.id);
+    }
+  };
+
+  // Style variants for different event states
+  const getCardStyle = () => {
+    if (!isOrganizer) return "";
+
+    switch (event.status) {
+      case "pending":
+        return "opacity-85 grayscale-[30%] border-yellow-200 dark:border-yellow-900";
+      case "rejected":
+        return "opacity-80 grayscale-[40%] border-red-200 dark:border-red-900";
+      case "cancelled":
+        return "opacity-75 grayscale-[50%] border-gray-300 dark:border-gray-700";
+      default:
+        return "";
+    }
   };
 
   return (
     <Card
       className={cn(
-        "flex flex-col overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900 h-full",
-        isOrganizer &&
-          event.status === "pending" &&
-          "opacity-85 grayscale-[30%]",
-        isOrganizer &&
-          event.status === "rejected" &&
-          "opacity-80 grayscale-[40%] border-red-200 dark:border-red-900",
+        "flex flex-col overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900 h-full border",
+        getCardStyle(),
         className
       )}
     >
@@ -84,7 +120,7 @@ const EventCard = ({ event, className, onEdit, onView }: EventCardProps) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
 
         {/* Top badges */}
-        <div className="absolute top-3 left-3 right-3">
+        <div className="absolute top-3 left-3 right-3 flex justify-between">
           <Badge
             variant="secondary"
             className={cn(
@@ -95,6 +131,30 @@ const EventCard = ({ event, className, onEdit, onView }: EventCardProps) => {
             <Tag className="h-3.5 w-3.5 mr-1" />
             {event.category}
           </Badge>
+
+          {/* Show three-dot menu for approved events in organizer view with updated styling */}
+          {isOrganizer && event.status === "approved" && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="h-8 w-8 rounded-md bg-transparent hover:bg-black/80 text-white shadow-sm hover:shadow-md transition-opacity"
+                >
+                  <Ellipsis className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem
+                  className="text-red-600 hover:text-red-700 focus:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer font-medium"
+                  onClick={handleCancelEvent}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel Event
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
 
@@ -151,7 +211,7 @@ const EventCard = ({ event, className, onEdit, onView }: EventCardProps) => {
           </div>
         </CardContent>
 
-        {/* Replace the existing organizer section in CardFooter with this conditional rendering */}
+        {/* Improved CardFooter with different status styles */}
         <CardFooter className="p-4 pt-2 mt-auto">
           {isAdmin && (
             <div className="grid grid-cols-2 gap-2 w-full">
@@ -199,18 +259,26 @@ const EventCard = ({ event, className, onEdit, onView }: EventCardProps) => {
 
               {event.status === "pending" && (
                 <div className="w-full">
-                  <div className="flex items-center justify-center gap-2 text-yellow-600 dark:text-yellow-500 bg-yellow-50 dark:bg-yellow-950/30 py-2 rounded-md h-11">
+                  <div className="flex items-center justify-center gap-2 text-yellow-600 dark:text-yellow-500 bg-yellow-50 dark:bg-yellow-950/40 py-2 rounded-md h-11 mb-3 border border-yellow-100 dark:border-yellow-900/50">
                     <Clock className="h-5 w-5 animate-pulse" />
                     <span className="text-sm font-medium">
                       Awaiting Approval
                     </span>
                   </div>
+                  <Button
+                    className="w-full h-11 rounded-lg text-sm font-medium text-white bg-gray-500 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-800 shadow-sm hover:shadow transition-all duration-150 hover:scale-[1.02]"
+                    onClick={handleEdit}
+                    variant="default"
+                  >
+                    <Pencil className="w-4 h-4 mr-2" />
+                    Edit Event
+                  </Button>
                 </div>
               )}
 
               {event.status === "rejected" && (
                 <div className="w-full">
-                  <div className="flex items-center justify-center gap-2 mb-3 text-red-600 dark:text-red-500 bg-red-50 dark:bg-red-950/30 py-2 rounded-md h-11">
+                  <div className="flex items-center justify-center gap-2 mb-3 text-red-600 dark:text-red-500 bg-red-50 dark:bg-red-950/40 py-2 rounded-md h-11 border border-red-100 dark:border-red-900/50">
                     <AlertCircle className="h-5 w-5" />
                     <span className="text-sm font-medium">Event Rejected</span>
                   </div>
@@ -230,6 +298,24 @@ const EventCard = ({ event, className, onEdit, onView }: EventCardProps) => {
                       <Pencil className="w-4 h-4" />
                     </Button>
                   </div>
+                </div>
+              )}
+
+              {/* Enhanced cancelled status styling */}
+              {event.status === "cancelled" && (
+                <div className="w-full">
+                  <div className="flex items-center justify-center gap-2 mb-3 text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800/60 py-2 rounded-md h-11 border border-gray-200 dark:border-gray-700">
+                    <Ban className="h-5 w-5" />
+                    <span className="text-sm font-medium">Event Cancelled</span>
+                  </div>
+                  <Button
+                    className="w-full h-11 rounded-lg text-sm font-medium text-white bg-gray-500 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-800 shadow-sm hover:shadow transition-all duration-150 hover:scale-[1.02]"
+                    onClick={() => handleViewDetails(event.id)}
+                    variant="default"
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Details
+                  </Button>
                 </div>
               )}
             </>

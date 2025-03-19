@@ -61,9 +61,10 @@ const formSchema = z.object({
   phone: z
     .string()
     .refine(
-      (val) => val.startsWith("+91 ") && val.length >= 12 && val.length <= 15,
+      (val) => /^(\+91\s)?(?:\(\d{2,3}\)\s\d{4}\s\d{4}|[6-9]\d{9})$/.test(val),
       {
-        message: "Phone number must be atleast 10 digits long",
+        message:
+          "Please enter a valid 10-digit mobile number or a valid landline number with area code.",
       }
     ),
   email: z.string().email({ message: "Must be a valid email" }),

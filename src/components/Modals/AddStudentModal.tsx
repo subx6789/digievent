@@ -23,6 +23,7 @@ import {
   BookOpen,
   Calendar,
   BookUser,
+  Phone,
 } from "lucide-react";
 import { z } from "zod";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -81,6 +82,15 @@ const baseSchema = {
     .max(12, { message: "Roll number must not exceed 12 characters" })
     .regex(/^\d{12}$/, { message: "Roll number must be 12 digits" }),
   avatarUrl: z.string().optional(),
+  phone: z
+    .string()
+    .refine(
+      (val) => /^(\+91\s)?(?:\(\d{2,3}\)\s\d{4}\s\d{4}|[6-9]\d{9})$/.test(val),
+      {
+        message:
+          "Please enter a valid 10-digit mobile number or a valid landline number with area code.",
+      }
+    ),
 };
 
 // Create the Add mode schema (with email and password)
@@ -125,6 +135,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
     defaultValues: {
       name: "",
       email: "",
+      phone: "+91 ",
       rollno: "",
       course: "",
       department: "",
@@ -140,6 +151,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
       form.reset({
         name: studentToEdit.name,
         email: studentToEdit.email,
+        phone: studentToEdit.phone,
         rollno: studentToEdit.rollno,
         course: studentToEdit.course,
         department: studentToEdit.department,
@@ -157,6 +169,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
       form.reset({
         name: "",
         email: "",
+        phone: "+91 ",
         rollno: "",
         course: "",
         department: "",
@@ -177,9 +190,17 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
         // If there's only one department, auto-select it
         if (courseData.department.length === 1) {
           form.setValue("department", courseData.department[0]);
-        } else if (!isEditMode || !form.getValues("department")) {
-          // Reset department if switching to a course with multiple departments
-          // Only reset if not in edit mode or if department is not already set
+        } else if (isEditMode && studentToEdit) {
+          // In edit mode, preserve the student's existing department if it belongs to the selected course
+          const existingDept = studentToEdit.department;
+          if (courseData.department.includes(existingDept)) {
+            form.setValue("department", existingDept);
+          } else {
+            // If department doesn't belong to the course, reset it
+            form.setValue("department", "");
+          }
+        } else {
+          // In add mode or if department doesn't match, reset it
           form.setValue("department", "");
         }
 
@@ -190,10 +211,21 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
         );
         setAvailableYears(years);
 
-        // Reset year if previously selected year is not valid for new course
-        const currentYear = form.getValues("year");
-        if (!years.includes(currentYear)) {
-          form.setValue("year", 1);
+        // Handle year selection
+        if (isEditMode && studentToEdit) {
+          // In edit mode, preserve the student's year if it's valid for the course
+          const existingYear = studentToEdit.year || 1;
+          if (existingYear <= courseData.noOfYears) {
+            form.setValue("year", existingYear);
+          } else {
+            form.setValue("year", 1);
+          }
+        } else {
+          // Reset year if previously selected year is not valid for new course
+          const currentYear = form.getValues("year");
+          if (!years.includes(currentYear)) {
+            form.setValue("year", 1);
+          }
         }
       }
     } else {
@@ -201,7 +233,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
       form.setValue("year", 1);
       setAvailableYears([]);
     }
-  }, [selectedCourse, form, isEditMode]);
+  }, [selectedCourse, form, isEditMode, studentToEdit]);
 
   const handleAvatarUrlUpload = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -229,6 +261,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
         avatarUrl: values.avatarUrl || studentToEdit.avatarUrl,
         rollno: values.rollno,
         email: values.email,
+        phone: values.phone,
       };
 
       // Update the student
@@ -248,6 +281,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
           id: `student-${Date.now()}`,
           name: values.name,
           email: values.email,
+          phone: values.phone,
           course: values.course,
           department: values.department,
           year: values.year,
@@ -360,7 +394,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
             />
 
             {/* Email */}
-            <div>
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="email"
@@ -377,6 +411,32 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
                         className={`h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
                           isEditMode ? "opacity-70 cursor-not-allowed" : ""
                         }`}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Phone className="h-4 w-4" /> Phone Number
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="+91 5674567891"
+                        {...field}
+                        className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        required
+                        value={field.value || "+91 "}
+                        onChange={(e) => {
+                          if (!e.target.value.startsWith("+91 ")) return;
+                          field.onChange(e.target.value);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -559,7 +619,9 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
               <Button
                 type="submit"
                 disabled={
-                  isEditMode ? !form.formState.isDirty : !form.formState.isValid
+                  isEditMode
+                    ? !form.formState.isDirty
+                    : !form.formState.isValid || form.formState.isSubmitting
                 }
                 className="h-11 bg-blue-600 hover:bg-blue-700 text-white px-6 font-medium transition-all duration-150 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
               >
