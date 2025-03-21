@@ -4,12 +4,7 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  motion,
-  AnimatePresence,
-  useScroll,
-  useTransform,
-} from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,7 +37,16 @@ export default function Home() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [hidden, setHidden] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [showScrollProgress, setShowScrollProgress] = useState(false);
   const heroRef = useRef(null);
+
+  // Scroll progress tracking
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
 
   // Update the scroll event handler to also track if user has scrolled
   useEffect(() => {
@@ -61,6 +65,9 @@ export default function Home() {
         setHasScrolled(true);
       }
 
+      // Show progress bar when scrolled down
+      setShowScrollProgress(currentScrollY > 100);
+
       setLastScrollY(currentScrollY);
     };
 
@@ -74,11 +81,6 @@ export default function Home() {
     features: useRef(null),
     benefits: useRef(null),
   };
-
-  // Parallax effect for hero section
-  const { scrollY } = useScroll();
-  const heroY = useTransform(scrollY, [0, 500], [0, -100]);
-  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0.3]);
 
   // Mouse position animation for hero gradient
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -126,29 +128,20 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-white to-blue-50 dark:from-gray-950 dark:to-blue-950 text-gray-900 dark:text-gray-100 relative overflow-hidden">
+      {/* Scroll Progress Bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 z-[100] origin-left"
+        style={{
+          scaleX,
+          opacity: showScrollProgress ? 1 : 0,
+          transition: "opacity 0.3s ease",
+        }}
+      />
       {/* Animated Background Elements */}
       <div className="absolute inset-0 z-0">
         {/* Gradient Orbs */}
         <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-blue-300/20 dark:bg-blue-600/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-1/3 left-1/4 w-80 h-80 bg-purple-300/20 dark:bg-purple-600/10 rounded-full blur-3xl"></div>
-
-        {/* Grid Pattern Background */}
-        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.07]">
-          <div className="absolute inset-0 grid grid-cols-12 gap-4 pointer-events-none">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="relative h-full">
-                <div className="absolute inset-0 border-r border-gray-900/5 dark:border-gray-100/5"></div>
-              </div>
-            ))}
-          </div>
-          <div className="absolute inset-0 grid grid-rows-12 gap-4 pointer-events-none">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="relative w-full">
-                <div className="absolute inset-0 border-b border-gray-900/5 dark:border-gray-100/5"></div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Header/Navigation */}
@@ -168,26 +161,21 @@ export default function Home() {
         >
           <div className="container mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-md shadow-blue-500/20 dark:shadow-blue-500/10">
+              <div className="h-10 w-10 rounded-xl bg-blue-600 dark:bg-blue-600 flex items-center justify-center shadow-md shadow-blue-500/20 dark:shadow-blue-500/10">
                 <TicketCheck className="h-5 w-5 text-white" />
               </div>
               <motion.span
-                className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent"
+                className="text-xl font-bold"
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                Digievent
+                {landing_content.navigation.logo}
               </motion.span>
             </div>
 
             <nav className="hidden md:flex items-center gap-8">
-              {[
-                { href: "#hero", text: "Home" },
-                { href: "#about", text: "About" },
-                { href: "#terms", text: "T&C" },
-                { href: "#contact", text: "Contact" },
-              ].map((link) => (
+              {landing_content.navigation.links.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
@@ -217,11 +205,15 @@ export default function Home() {
                 )}
               </motion.button>
 
-              <Link href="/login">
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md shadow-blue-500/20 dark:shadow-blue-500/10 border-0 h-11">
-                  Login
-                </Button>
-              </Link>
+              {/* Login button - visible only on desktop */}
+              <div className="hidden md:block">
+                <Link href="/student/auth/login">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 dark:shadow-blue-500/10 border-0 h-11 px-8 hover:scale-105 duration-150 transition-all">
+                    {landing_content.navigation.loginButton}
+                    <ArrowRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
 
               <motion.button
                 className="md:hidden p-2 rounded-md bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 backdrop-blur-sm"
@@ -248,12 +240,7 @@ export default function Home() {
               className="absolute top-full mt-2 left-4 right-4 md:hidden bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-xl border border-white/20 dark:border-gray-800/20 shadow-xl overflow-hidden"
             >
               <div className="py-4 flex flex-col space-y-1">
-                {[
-                  { href: "#hero", text: "Home" },
-                  { href: "#about", text: "About" },
-                  { href: "/terms", text: "T&C" },
-                  { href: "/contact", text: "Contact" },
-                ].map((link) => (
+                {landing_content.navigation.links.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
@@ -268,6 +255,19 @@ export default function Home() {
                     {link.text}
                   </Link>
                 ))}
+
+                {/* Login button in mobile menu */}
+                <div className="px-2 pt-2 mt-2 border-t border-gray-100 dark:border-gray-800/30">
+                  <Link
+                    href="/student/auth/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full h-11 flex items-center justify-center">
+                      <span>{landing_content.navigation.loginButton}</span>
+                      <ArrowRight className="ml-1 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </motion.div>
           )}
@@ -278,22 +278,28 @@ export default function Home() {
       <section
         id="hero"
         ref={sectionRefs.hero}
-        className="min-h-screen md:pt-0 pt-36 flex items-center relative overflow-hidden"
+        className="min-h-screen flex flex-col justify-center relative overflow-hidden md:pt-48 pt-28 pb-20"
         onMouseMove={(e: React.MouseEvent) =>
           handleMouseMove(e as unknown as MouseEvent)
         }
       >
+        {/* Background elements */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-blue-400/20 dark:bg-blue-600/10 rounded-full blur-[100px]"></div>
+          <div className="absolute bottom-1/3 left-1/3 w-96 h-96 bg-purple-400/20 dark:bg-purple-600/10 rounded-full blur-[100px]"></div>
+        </div>
+
         <motion.div
           ref={heroRef}
-          style={{ y: heroY, opacity: heroOpacity }}
+          // style={{ opacity: heroOpacity }}
           className="container mx-auto px-4 relative z-10"
         >
           {/* Interactive gradient spot that follows mouse */}
           <motion.div
-            className="absolute w-96 h-96 rounded-full radial-pulse blur-3xl opacity-20 dark:opacity-10 pointer-events-none"
+            className="absolute w-[500px] h-[500px] rounded-full radial-pulse blur-[100px] opacity-20 dark:opacity-10 pointer-events-none"
             animate={{
-              x: mousePosition.x - 192,
-              y: mousePosition.y - 192,
+              x: mousePosition.x - 250,
+              y: mousePosition.y - 250,
             }}
             transition={{ type: "spring", damping: 15 }}
             style={{
@@ -302,195 +308,190 @@ export default function Home() {
             }}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div className="flex flex-col items-center text-center mb-16">
             <motion.div
-              className="z-10"
+              className="inline-block mb-6 px-5 py-2 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full border border-blue-100 dark:border-blue-800/30 shadow-sm"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <span className="text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent flex items-center gap-1.5">
+                <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                {landing_content.hero.badge}
+              </span>
+            </motion.div>
+
+            <motion.h1
+              className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 max-w-4xl leading-tight"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
+              transition={{ duration: 0.7, delay: 0.3 }}
             >
-              <motion.div
-                className="inline-block mb-4 px-4 py-1.5 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full border border-blue-100 dark:border-blue-800/30 shadow-sm"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                <span className="text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent flex items-center gap-1.5">
-                  <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  {landing_content.hero.badge}
-                </span>
-              </motion.div>
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+                {landing_content.hero.title.split(" ")[0]}{" "}
+              </span>
+              {landing_content.hero.title.split(" ").slice(1).join(" ")}
+            </motion.h1>
 
-              <div className="mb-6">
-                {landing_content.hero.title.split(" ").map((word, i) => (
-                  <motion.span
-                    key={i}
-                    className="inline-block mr-2 text-4xl md:text-5xl lg:text-6xl font-bold"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
-                  >
-                    {i === 0 ? (
-                      <span className="relative inline-block">
-                        <span className="relative z-10 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
-                          {word}
-                        </span>
-                      </span>
-                    ) : i ===
-                      landing_content.hero.title.split(" ").length - 1 ? (
-                      <span className="relative inline-block">
-                        <span className="relative z-10">{word}</span>
-                        <motion.span
-                          className="absolute bottom-2 left-0 w-full h-3 bg-gradient-to-r from-blue-200 to-purple-200 dark:from-blue-800/50 dark:to-purple-800/50 rounded-lg -z-0"
-                          initial={{ width: 0 }}
-                          animate={{ width: "100%" }}
-                          transition={{ duration: 0.7, delay: 0.8 }}
-                        ></motion.span>
-                      </span>
-                    ) : (
-                      word
-                    )}
-                  </motion.span>
-                ))}
-              </div>
-
-              <motion.p
-                className="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl leading-relaxed"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-              >
-                {landing_content.hero.description}
-              </motion.p>
-
-              <motion.div
-                className="flex flex-col sm:flex-row gap-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-              >
-                <Link href="#login">
-                  <Button
-                    size="lg"
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white group transition-all shadow-lg shadow-blue-500/20 dark:shadow-blue-500/10 border-0 h-11 hover:scale-105 duration-150 md:w-[200px] w-full text-center"
-                  >
-                    {landing_content.hero.primaryButton}
-                    <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-
-                <Link href="#demo">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="group border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 h-11 hover:scale-105 duration-150 transition-all md:w-[200px] w-full"
-                  >
-                    <Clapperboard className="mr-1 h-4 w-4" />
-                    {landing_content.hero.secondaryButton}
-                  </Button>
-                </Link>
-              </motion.div>
-            </motion.div>
+            <motion.p
+              className="text-xl md:text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-2xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.4 }}
+            >
+              {landing_content.hero.description}
+            </motion.p>
 
             <motion.div
-              className="relative z-10 w-full max-w-lg mx-auto md:mx-0 md:ml-auto"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
+              className="flex flex-col sm:flex-row gap-4 mb-16"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
             >
-              <div className="relative w-full">
-                {/* Decorative elements */}
-                <motion.div
-                  className="absolute -top-8 -left-8 w-24 h-24 bg-gradient-to-br from-blue-300 to-purple-300 dark:from-blue-600/30 dark:to-purple-600/30 rounded-2xl -z-10 blur-md"
-                  initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  transition={{ duration: 0.5, delay: 0.4 }}
-                ></motion.div>
-
-                <motion.div
-                  className="absolute -bottom-8 -right-8 w-32 h-32 bg-gradient-to-br from-purple-300 to-blue-300 dark:from-purple-600/30 dark:to-blue-600/30 rounded-2xl -z-10 blur-md"
-                  initial={{ opacity: 0, scale: 0.8, rotate: 10 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  transition={{ duration: 0.5, delay: 0.5 }}
-                ></motion.div>
-
-                <motion.div
-                  className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl shadow-2xl overflow-hidden"
-                  whileHover={{
-                    y: -8,
-                    boxShadow: "0 30px 60px -12px rgba(0, 0, 0, 0.25)",
-                  }}
-                  transition={{ duration: 0.4 }}
+              <Link href="/login">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white group transition-all shadow-lg shadow-blue-500/20 dark:shadow-blue-500/10 border-0 h-11 px-8 hover:scale-105 duration-150 text-md font-medium md:w-[250px] w-full"
                 >
-                  {/* Status bar with indicators */}
-                  <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                      <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                      <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                    </div>
-                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                      DigiEvent Dashboard
-                    </div>
-                    <div className="text-xs text-gray-400">●</div>
-                  </div>
+                  {landing_content.hero.primaryButton}
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
 
-                  <div className="relative">
-                    <Image
-                      src="/Placeholder/landing_hero_dashboard.png"
-                      alt="DigiEvent Dashboard"
-                      width={600}
-                      height={400}
-                      className="w-full h-auto"
-                    />
-
-                    {/* Glassmorphism overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 to-transparent mix-blend-overlay"></div>
-                  </div>
-                </motion.div>
-              </div>
+              <Link href="#demo">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="group border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 h-11 px-8 bg-transparent hover:scale-105 duration-150 transition-all text-md font-medium md:w-[250px] w-full"
+                >
+                  <Clapperboard className="mr-2 h-5 w-5" />
+                  {landing_content.hero.secondaryButton}
+                </Button>
+              </Link>
             </motion.div>
           </div>
-        </motion.div>
 
-        {/* Scroll indicator - Desktop (Mouse Animation) */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-gray-400 dark:text-gray-500 hidden md:flex flex-col items-center text-sm"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{
-            opacity: hasScrolled ? 0 : 1,
-            y: hasScrolled ? -20 : 0,
-          }}
-          transition={{
-            opacity: { duration: 0.5, delay: hasScrolled ? 0 : 1 },
-            y: { duration: 0.5 },
-          }}
-        >
+          {/* Main hero image */}
           <motion.div
-            className="w-8 h-12 border-2 border-gray-400 dark:border-gray-500 rounded-full flex justify-center"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ repeat: Infinity, duration: 2 }}
+            className="relative w-full max-w-5xl mx-auto"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
           >
-            <motion.div
-              className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full mt-2"
-              animate={{ y: [0, 15, 0] }}
-              transition={{
-                repeat: Infinity,
-                duration: 1.5,
-                ease: "easeInOut",
-              }}
-            />
-          </motion.div>
-          <span className="mt-2">Scroll to explore</span>
-        </motion.div>
+            <div className="relative">
+              {/* Decorative elements */}
+              <motion.div
+                className="absolute -top-10 -left-10 w-32 h-32 bg-gradient-to-br from-blue-300 to-purple-300 dark:from-blue-600/30 dark:to-purple-600/30 rounded-2xl -z-10 blur-xl"
+                initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                transition={{ duration: 0.5, delay: 0.7 }}
+              ></motion.div>
 
-        {/* Scroll indicator - Mobile (Hidden) */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-gray-400 dark:text-gray-500 md:hidden flex flex-col items-center text-sm"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0 }}
-        >
-          <span className="sr-only">Scroll to explore</span>
+              <motion.div
+                className="absolute -bottom-10 -right-10 w-40 h-40 bg-gradient-to-br from-purple-300 to-blue-300 dark:from-purple-600/30 dark:to-blue-600/30 rounded-2xl -z-10 blur-xl"
+                initial={{ opacity: 0, scale: 0.8, rotate: 10 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                transition={{ duration: 0.5, delay: 0.8 }}
+              ></motion.div>
+
+              <motion.div
+                className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl shadow-2xl overflow-hidden"
+                whileHover={{
+                  y: -8,
+                  boxShadow: "0 30px 60px -12px rgba(0, 0, 0, 0.25)",
+                }}
+                transition={{ duration: 0.4 }}
+              >
+                {/* Status bar with indicators */}
+                <div className="px-6 md:py-4 py-2 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                  </div>
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {landing_content.navigation.statusBar}
+                  </div>
+                  <div className="text-xs text-gray-400">●</div>
+                </div>
+
+                <div className="relative">
+                  <Image
+                    src={
+                      theme === "dark"
+                        ? "/Placeholder/landing_hero_dashboard_dark.png"
+                        : "/Placeholder/landing_hero_dashboard_light.png"
+                    }
+                    alt="DigiEvent Dashboard"
+                    width={1200}
+                    height={800}
+                    className="w-full h-auto"
+                    priority
+                  />
+
+                  {/* Glassmorphism overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/10 to-transparent mix-blend-overlay"></div>
+                </div>
+              </motion.div>
+
+              {/* Floating elements */}
+              <motion.div
+                className="absolute md:block hidden -right-6 top-1/4 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 border border-gray-100 dark:border-gray-700"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 1 }}
+                whileHover={{ y: -5 }}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">
+                      {
+                        landing_content.navigation.notifications.eventCreated
+                          .title
+                      }
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {
+                        landing_content.navigation.notifications.eventCreated
+                          .time
+                      }
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                className="absolute md:block hidden -left-6 bottom-1/4 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 border border-gray-100 dark:border-gray-700"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 1.2 }}
+                whileHover={{ y: -5 }}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">
+                      {
+                        landing_content.navigation.notifications.registrations
+                          .title
+                      }
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {
+                        landing_content.navigation.notifications.registrations
+                          .time
+                      }
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
         </motion.div>
       </section>
 
@@ -498,7 +499,7 @@ export default function Home() {
       <section
         id="features"
         ref={sectionRefs.features}
-        className="py-20 relative"
+        className="py-20 relative bg-gray-100 dark:bg-gray-900"
       >
         {/* Feature section background */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-50/50 to-transparent dark:from-transparent dark:via-blue-950/30 dark:to-transparent -z-10"></div>
@@ -508,19 +509,19 @@ export default function Home() {
             className="text-center mb-16"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: false, margin: "-100px" }}
             transition={{ duration: 0.5 }}
           >
             <motion.div
               className="inline-block mb-4 px-4 py-1.5 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full border border-blue-100 dark:border-blue-800/30"
               initial={{ opacity: 0, y: -10 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: false }}
               transition={{ duration: 0.5 }}
             >
               <span className="text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent flex items-center gap-1.5">
                 <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                Built for organizers, colleges and students
+                {landing_content.features.badge}
               </span>
             </motion.div>
 
@@ -537,7 +538,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-8">
             {landing_content.features.items.map((feature, index) => {
               const Icon =
                 feature.icon === "Calendar"
@@ -556,7 +557,7 @@ export default function Home() {
                   className="bg-white dark:bg-gray-800/50 p-6 rounded-2xl border border-gray-100 dark:border-gray-700/50 hover:border-blue-200 dark:hover:border-blue-700/50 shadow-sm hover:shadow-xl transition-all group"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
+                  viewport={{ once: false, margin: "-100px" }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   whileHover={{ y: -5 }}
                 >
@@ -605,23 +606,25 @@ export default function Home() {
               className="flex-1"
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
+              viewport={{ once: false, margin: "-100px" }}
               transition={{ duration: 0.6 }}
             >
-              <motion.div
-                className="inline-block mb-4 px-4 py-1.5 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full border border-blue-100 dark:border-blue-800/30 shadow-sm"
-                initial={{ opacity: 0, y: -10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-              >
-                <span className="text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent flex items-center gap-1.5">
-                  <Sparkles className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                  Streamlined workflow
-                </span>
-              </motion.div>
+              <div className="flex justify-center md:justify-start">
+                <motion.div
+                  className="inline-block mb-4 px-4 py-1.5 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full border border-blue-100 dark:border-blue-800/30 shadow-sm"
+                  initial={{ opacity: 0, y: -10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <span className="text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent flex items-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                    {landing_content.benefits.badge}
+                  </span>
+                </motion.div>
+              </div>
 
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 md:text-left text-center">
                 <span className="relative inline-block">
                   <span className="relative z-10 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
                     {landing_content.benefits.title.split(" ")[0]}
@@ -631,10 +634,10 @@ export default function Home() {
               </h2>
 
               <motion.p
-                className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed"
+                className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed md:text-left text-center"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
+                viewport={{ once: false }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
                 {landing_content.benefits.description}
@@ -647,7 +650,7 @@ export default function Home() {
                     className="flex items-start gap-4 group"
                     initial={{ opacity: 0, x: -10 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: false }}
                     transition={{ duration: 0.4, delay: index * 0.1 }}
                     whileHover={{ x: 3 }}
                   >
@@ -666,7 +669,7 @@ export default function Home() {
               className="flex-1 w-full"
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
+              viewport={{ once: false, margin: "-100px" }}
               transition={{ duration: 0.6 }}
             >
               <div className="relative rounded-2xl overflow-hidden shadow-2xl group max-w-lg mx-auto lg:max-w-none">
@@ -675,7 +678,7 @@ export default function Home() {
                   className="absolute -top-6 -right-6 w-20 h-20 bg-gradient-to-br from-blue-300 to-purple-300 dark:from-blue-600/30 dark:to-purple-600/30 rounded-2xl -z-10 blur-md"
                   initial={{ opacity: 0, scale: 0.8, rotate: 10 }}
                   whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: false }}
                   transition={{ duration: 0.5, delay: 0.3 }}
                 ></motion.div>
 
@@ -683,7 +686,7 @@ export default function Home() {
                   className="absolute -bottom-6 -left-6 w-24 h-24 bg-gradient-to-br from-purple-300 to-blue-300 dark:from-purple-600/30 dark:to-blue-600/30 rounded-2xl -z-10 blur-md"
                   initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
                   whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: false }}
                   transition={{ duration: 0.5, delay: 0.4 }}
                 ></motion.div>
 
@@ -710,7 +713,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 relative overflow-hidden">
+      <section className="py-20 relative overflow-hidden bg-gray-100 dark:bg-gray-900">
         {/* CTA background elements */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-50/30 to-transparent dark:from-transparent dark:via-blue-950/20 dark:to-transparent -z-10"></div>
 
@@ -733,7 +736,7 @@ export default function Home() {
             className="relative bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 md:p-12 text-white overflow-hidden shadow-2xl"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: false, margin: "-100px" }}
             transition={{ duration: 0.5 }}
             whileHover={{
               boxShadow: "0 30px 60px -12px rgba(0, 0, 0, 0.4)",
@@ -791,13 +794,13 @@ export default function Home() {
                   className="inline-block mb-4 px-4 py-1.5 bg-white/20 backdrop-blur-sm rounded-full"
                   initial={{ opacity: 0, y: -10 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: false }}
                   transition={{ duration: 0.5 }}
                   whileHover={{ scale: 1.05 }}
                 >
                   <span className="text-sm font-medium text-white flex items-center gap-1.5">
                     <Sparkles className="h-3.5 w-3.5" />
-                    Limited time offer
+                    {landing_content.cta.badge}
                   </span>
                 </motion.div>
 
@@ -805,28 +808,27 @@ export default function Home() {
                   className="text-3xl md:text-4xl font-bold mb-4 relative z-10"
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: false }}
                   transition={{ duration: 0.5, delay: 0.1 }}
                 >
-                  Ready to simplify your event management?
+                  {landing_content.cta.title}
                 </motion.h2>
 
                 <motion.p
                   className="text-xl opacity-90 mb-8 max-w-md relative z-10"
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: false }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  Try DigiEvent today and see the difference it makes for your
-                  college events.
+                  {landing_content.cta.description}
                 </motion.p>
 
                 <motion.div
                   className="flex flex-col sm:flex-row gap-4"
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: false }}
                   transition={{ duration: 0.5, delay: 0.3 }}
                 >
                   <Link href="/login">
@@ -834,14 +836,14 @@ export default function Home() {
                       size="lg"
                       className="bg-white text-blue-600 hover:bg-gray-100 group shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-150 h-11 md:w-[200px] w-full"
                     >
-                      Get Started Free
+                      {landing_content.cta.primaryButton}
                       <motion.span
                         className="ml-1"
                         initial={{ x: 0 }}
                         whileHover={{ x: 3 }}
                         transition={{ duration: 0.2 }}
                       >
-                        →
+                        <ArrowRight className="h-4 w-4" />
                       </motion.span>
                     </Button>
                   </Link>
@@ -853,7 +855,7 @@ export default function Home() {
                       className="border-white text-white hover:bg-white/10 group transform transition-all duration-150 h-11 hover:scale-105 bg-transparent hover:text-white md:w-[200px] w-full"
                     >
                       <Clapperboard className="mr-1 h-4 w-4" />
-                      Watch Demo
+                      {landing_content.cta.secondaryButton}
                     </Button>
                   </Link>
                 </motion.div>
@@ -863,7 +865,7 @@ export default function Home() {
                 className="hidden md:flex justify-center items-center h-full"
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: false }}
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
                 <div className="relative h-64 w-64 flex items-center justify-center">
@@ -935,10 +937,10 @@ export default function Home() {
                       </div>
                       <div>
                         <span className="font-bold text-white text-lg">
-                          Event Ticket
+                          Digievent
                         </span>
                         <div className="text-xs text-white/70 mt-0.5">
-                          Premium Access
+                          Entry Ticket
                         </div>
                       </div>
                     </div>
@@ -995,7 +997,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-16 border-t border-gray-200 dark:border-gray-800 relative overflow-hidden">
+      <footer className="py-20 border-t border-gray-200 dark:border-gray-800 relative overflow-hidden">
         {/* Footer background elements */}
         <div className="absolute inset-0 bg-gradient-to-t from-blue-50/50 to-transparent dark:from-blue-950/30 dark:to-transparent -z-10"></div>
 
@@ -1005,21 +1007,18 @@ export default function Home() {
               className="col-span-1 md:col-span-2 lg:col-span-1"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: false }}
               transition={{ duration: 0.5 }}
             >
               <div className="flex items-center gap-2 mb-6">
-                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-md shadow-blue-500/20 dark:shadow-blue-500/10">
-                  <Calendar className="h-5 w-5 text-white" />
+                <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-500/20 dark:shadow-blue-500/10">
+                  <TicketCheck className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
-                  DigiEvent
-                </span>
+                <span className="text-xl font-bold">Digievent</span>
               </div>
 
               <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-xs">
-                The all-in-one platform for college event management. Simplify
-                planning, boost attendance, and create memorable experiences.
+                {landing_content.footer.description}
               </p>
 
               <div className="flex items-center gap-4">
@@ -1040,18 +1039,12 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: false }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
               <h4 className="font-semibold text-lg mb-4">Product</h4>
               <ul className="space-y-3">
-                {[
-                  { name: "Features", href: "/features" },
-                  { name: "Pricing", href: "/pricing" },
-                  { name: "Watch Demo", href: "/demo" },
-                  { name: "Integrations", href: "/integrations" },
-                  { name: "FAQ", href: "/faq" },
-                ].map((item, index) => (
+                {landing_content.footer.links.product.map((item, index) => (
                   <motion.li
                     key={index}
                     whileHover={{ x: 3 }}
@@ -1078,18 +1071,12 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: false }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               <h4 className="font-semibold text-lg mb-4">Company</h4>
               <ul className="space-y-3">
-                {[
-                  { name: "About", href: "/about" },
-                  { name: "Blog", href: "/blog" },
-                  { name: "Careers", href: "/careers" },
-                  { name: "Contact", href: "/contact" },
-                  { name: "Partners", href: "/partners" },
-                ].map((item, index) => (
+                {landing_content.footer.links.company.map((item, index) => (
                   <motion.li
                     key={index}
                     whileHover={{ x: 3 }}
@@ -1116,18 +1103,12 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: false }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
               <h4 className="font-semibold text-lg mb-4">Legal</h4>
               <ul className="space-y-3">
-                {[
-                  { name: "Privacy Policy", href: "/privacy-policy" },
-                  { name: "Terms & Conditions", href: "/terms" },
-                  { name: "Cookie Policy", href: "/cookie-policy" },
-                  { name: "Accessibility", href: "/accessibility" },
-                  { name: "Security", href: "/security" },
-                ].map((item, index) => (
+                {landing_content.footer.links.legal.map((item, index) => (
                   <motion.li
                     key={index}
                     whileHover={{ x: 3 }}
@@ -1156,14 +1137,14 @@ export default function Home() {
             className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: false }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 md:mb-0">
-              © {new Date().getFullYear()} DigiEvent. All rights reserved.
+              {landing_content.footer.copyright}
             </p>
 
-            <div className="flex flex-wrap items-center gap-6">
+            <div className="flex md:flex-row flex-col items-center gap-6">
               <Link
                 href="/privacy-policy"
                 className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"

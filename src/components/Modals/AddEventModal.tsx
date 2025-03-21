@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -53,6 +52,7 @@ import {
   CustomDatePicker,
   CustomTimePicker,
 } from "../Customs/DateAndTimePicker";
+import { useDropzone } from "react-dropzone";
 
 const eventCategories = [
   { id: "edu", name: "Educational" },
@@ -217,6 +217,7 @@ const AddEventModal = ({
   const [originalCapacity, setOriginalCapacity] = useState<string | undefined>(
     undefined
   );
+
   // Add these to form default values
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: createDynamicResolver(eventType, originalCapacity),
@@ -317,32 +318,16 @@ const AddEventModal = ({
   }, [isEditMode, editEvent, form]);
 
   // Updated handlers now accept an optional file (for drag & drop)
-  // Update the handleImageUpload function
-  const handleImageUpload = async (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.DragEvent<HTMLLabelElement>,
-    droppedFile?: File
-  ) => {
-    const fileToProcess =
-      droppedFile ||
-      ("target" in event && "files" in event.target
-        ? event.target.files?.[0]
-        : null);
-
-    if (fileToProcess) {
-      try {
-        if (!fileToProcess.type.startsWith("image/")) {
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) {
           toast({
             title: "Error",
-            description: "Please upload an image file",
+            description: "Image size must not exceed 5MB",
             variant: "destructive",
           });
-          alert("Please upload an image file");
-          return;
-        }
-
-        if (fileToProcess.size > 5 * 1024 * 1024) {
           alert("Image size must not exceed 5MB");
           return;
         }
@@ -352,18 +337,22 @@ const AddEventModal = ({
           const base64Data = reader.result as string;
           setImagePreview(base64Data);
           form.setValue("image", base64Data);
+          form.trigger("image");
         };
-        reader.readAsDataURL(fileToProcess);
-      } catch (error: any) {
-        toast({
-          title: "Error",
-          description: error.message || "Failed to process image",
-          variant: "destructive",
-        });
-        alert(error.message || "Failed to process image");
+        reader.readAsDataURL(file);
       }
-    }
-  };
+    },
+    [form, toast]
+  );
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp"],
+    },
+    maxSize: 5 * 1024 * 1024,
+    multiple: false,
+  });
 
   const handleCheckboxChange = (type: "physical" | "virtual") => {
     setSelectedEventType(type);
@@ -427,11 +416,6 @@ const AddEventModal = ({
       }.`,
       variant: "default",
     });
-    alert(
-      `${values.title} has been successfully ${
-        isEditMode ? "updated" : "created"
-      }`
-    );
 
     form.reset();
     setImagePreview(null);
@@ -508,7 +492,7 @@ const AddEventModal = ({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* Image Upload */}
-            {/* Add this near the image upload section */}
+            {/* Image Upload with React Dropzone */}
             <div>
               <Label className="flex items-center gap-2 mb-2">
                 <FileText className="h-4 w-4" /> Event Cover Image
@@ -517,54 +501,21 @@ const AddEventModal = ({
                 Please upload an image (1200x630 pixels) for the best display
                 and max (5MB).
               </p>
-              <Input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                id="image-upload"
-                onChange={(e) => handleImageUpload(e)}
-              />
-              <Label
-                htmlFor="image-upload"
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  e.currentTarget.classList.add(
-                    "border-blue-500",
-                    "bg-blue-50/50"
-                  );
-                }}
-                onDragLeave={(e) => {
-                  e.preventDefault();
-                  e.currentTarget.classList.remove(
-                    "border-blue-500",
-                    "bg-blue-50/50"
-                  );
-                }}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  e.currentTarget.classList.remove(
-                    "border-blue-500",
-                    "bg-blue-50/50"
-                  );
-                  const file = e.dataTransfer.files[0];
-                  if (file && file.type.startsWith("image/")) {
-                    handleImageUpload(e, file);
-                  } else {
-                    toast({
-                      title: "Error",
-                      description: "Please drop an image file",
-                      variant: "destructive",
-                    });
-                    alert("Please drop an image file");
-                  }
-                }}
+
+              <div
+                {...getRootProps()}
                 className={cn(
                   "relative flex flex-col items-center justify-center border-2 border-dashed rounded-lg transition-all duration-300",
                   "hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-950/10",
+                  isDragActive
+                    ? "border-blue-500 bg-blue-50/50 dark:bg-blue-950/10"
+                    : "border-gray-300 dark:border-gray-700",
                   imagePreview ? "p-0" : "p-8",
                   "group cursor-pointer"
                 )}
               >
+                <input {...getInputProps()} />
+
                 {imagePreview ? (
                   <div className="relative w-full aspect-[1200/630] overflow-hidden rounded-lg">
                     <Image
@@ -575,7 +526,9 @@ const AddEventModal = ({
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <p className="text-white text-sm">
-                        Click to change image
+                        {isDragActive
+                          ? "Drop the image here"
+                          : "Click or drag to replace image"}
                       </p>
                     </div>
                   </div>
@@ -583,7 +536,9 @@ const AddEventModal = ({
                   <div className="flex flex-col items-center">
                     <Upload className="h-8 w-8 text-blue-600 mb-2" />
                     <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-                      Drag & drop or click to upload
+                      {isDragActive
+                        ? "Drop the image here..."
+                        : "Drag & drop or click to upload"}
                       <br />
                       <span className="text-blue-600">
                         1200x630 pixels recommended
@@ -591,7 +546,13 @@ const AddEventModal = ({
                     </p>
                   </div>
                 )}
-              </Label>
+              </div>
+
+              {form.formState.errors.image && (
+                <p className="text-sm text-red-500 mt-1">
+                  {form.formState.errors.image.message}
+                </p>
+              )}
             </div>
 
             {/* Event Title */}

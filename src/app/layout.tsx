@@ -4,6 +4,7 @@ import "./globals.css";
 import TanstackProvider from "@/components/Providers/TanstackProvider";
 import { AuthProvider } from "@/context/AuthProvider";
 import { ThemeProvider } from "@/components/Providers/Theme-Provider";
+import { Toaster } from "@/components/ui/toaster";
 
 const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700", "800"],
@@ -30,7 +31,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TanstackProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              {children}
+              <Toaster />
+            </AuthProvider>
           </TanstackProvider>
         </ThemeProvider>
       </body>

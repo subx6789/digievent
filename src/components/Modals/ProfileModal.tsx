@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import {
@@ -10,8 +11,11 @@ import {
   Mail,
   Trash,
   Upload,
+  Eye,
+  EyeOff,
 } from "lucide-react";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useDropzone } from "react-dropzone";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -42,26 +46,28 @@ interface ProfileModalProps {
   user: {
     name: string;
     email: string;
-    avatar: string;
+    avatar: string | undefined;
     role: string;
     phone?: string;
     organization?: string;
   };
 }
 
-// Define the form schema with Zod
+// Define the form schema with Zod - making password optional
 const formSchema = z
   .object({
     password: z
       .string()
       .min(8, "Password must be at least 8 characters")
       .max(12, "Password must not exceed 12 characters")
-      .optional(),
-    confirmPassword: z.string().optional(),
+      .optional()
+      .or(z.literal("")),
+    confirmPassword: z.string().optional().or(z.literal("")),
     phone: z
       .string()
       .refine(
         (val) =>
+          !val ||
           /^(\+91\s)?(?:\(\d{2,3}\)\s\d{4}\s\d{4}|[6-9]\d{9})$/.test(val),
         {
           message:
@@ -83,6 +89,12 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
     user.avatar || null
   );
+  const [initialAvatar, setInitialAvatar] = useState<string | null>(
+    user.avatar || null
+  );
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   // Track phone number for real-time updates
   const [phoneDisplay, setPhoneDisplay] = useState(user.phone || "");
@@ -98,6 +110,21 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
     mode: "onChange",
   });
 
+  // Check for changes in form values or avatar
+  useEffect(() => {
+    const passwordChanged = !!form.watch("password");
+    const phoneChanged = form.watch("phone") !== user.phone;
+    const avatarChanged = avatarPreview !== initialAvatar;
+
+    setHasChanges(passwordChanged || phoneChanged || avatarChanged);
+  }, [
+    form.watch("password"),
+    form.watch("phone"),
+    avatarPreview,
+    initialAvatar,
+    user.phone,
+  ]);
+
   // Format phone number to ensure it starts with +91
   const formatPhoneNumber = (value: string) => {
     if (!value.startsWith("+91 ")) {
@@ -112,15 +139,13 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
     onChange: (value: string) => void
   ) => {
     let value = e.target.value;
-
     // Ensure the value always starts with +91
     value = formatPhoneNumber(value);
-
     // Call the original onChange
     onChange(value);
   };
 
-  const { isValid, isSubmitting } = form.formState;
+  const { isSubmitting } = form.formState;
 
   // Watch phone field for real-time updates
   const phoneValue = form.watch("phone");
@@ -133,7 +158,14 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
   }, [phoneValue, isEditing]);
 
   const handleSaveChanges = (values: FormValues) => {
-    console.log("Saving profile changes:", values);
+    // Prepare data for backend. Only include fields that have changed.
+    const updatedData = {
+      ...(values.password ? { password: values.password } : {}),
+      ...(values.phone !== user.phone ? { phone: values.phone } : {}),
+      ...(avatarPreview !== initialAvatar ? { avatar: avatarPreview } : {}),
+    };
+
+    console.log("Data to be sent to backend:", updatedData);
     console.log("New avatar:", avatarPreview);
 
     toast({
@@ -142,17 +174,42 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
       variant: "default",
     });
 
+    // Update the initial avatar to the current one
+    setInitialAvatar(avatarPreview);
     setIsEditing(false);
     form.reset({
       password: "",
       confirmPassword: "",
       phone: values.phone,
     });
+    setHasChanges(false);
   };
 
+  // Dropzone setup for avatar upload when there is no picture
+  const onDrop = (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setAvatarPreview(e.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [],
+    },
+    noClick: !isEditing, // Only allow click when editing
+  });
+
   const handleAvatarClick = () => {
-    if (isEditing) {
-      fileInputRef.current?.click();
+    if (isEditing && fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
 
@@ -193,21 +250,31 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
     }
   };
 
+  // Get first letters of name for avatar fallback
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden bg-background dark:bg-gray-900 border-none shadow-lg">
-        <div className="p-6">
-          <DialogHeader className="mb-4">
-            <DialogTitle className="flex items-center gap-2 text-xl">
-              <User className="h-5 w-5" /> Profile Details
+      <DialogContent className="sm:max-w-[550px] max-h-[90vh] p-6 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl">
+        <div className="p-1">
+          <DialogHeader className="mb-6">
+            <DialogTitle className="flex items-center gap-2 text-2xl font-bold">
+              <User className="h-6 w-6" /> Profile Details
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-base">
               View and manage your profile information.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6 mt-4">
             <div className="relative">
+              {/* Hidden file input for non-dropzone upload */}
               <input
                 type="file"
                 ref={fileInputRef}
@@ -215,58 +282,77 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                 className="hidden"
                 accept="image/*"
               />
-              <div
-                className={`relative cursor-pointer ${
-                  isEditing ? "hover:opacity-80 transition-opacity" : ""
-                }`}
-                onClick={isEditing ? handleAvatarClick : undefined}
-              >
-                <Avatar className="h-20 w-20 rounded-full border-2 border-white">
-                  <AvatarImage
-                    src={avatarPreview || undefined}
-                    alt={user.name}
-                  />
-                  <AvatarFallback className="text-lg bg-blue-600 text-white">
-                    {user.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                {isEditing && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/30 opacity-0 hover:opacity-100 transition-opacity">
-                    <Upload className="h-8 w-8 text-white" />
-                  </div>
-                )}
-                {/* Only show delete button when there is an avatar preview and in edit mode */}
-                {isEditing && avatarPreview && (
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteAvatar();
-                    }}
-                  >
-                    <Trash className="h-3.5 w-3.5 text-white" />
-                  </Button>
-                )}
-              </div>
+              {/* If avatarPreview exists, show the avatar with edit/delete options */}
+              {avatarPreview ? (
+                <div
+                  className={`relative cursor-pointer ${
+                    isEditing
+                      ? "hover:opacity-90 transition-opacity duration-300"
+                      : ""
+                  }`}
+                  onClick={isEditing ? handleAvatarClick : undefined}
+                >
+                  <Avatar className="h-24 w-24 rounded-full shadow-lg">
+                    <AvatarImage
+                      src={avatarPreview}
+                      alt={user.name}
+                      className="object-cover"
+                    />
+                    <AvatarFallback className="bg-blue-500 text-white text-xl">
+                      {getInitials(user.name)}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  {isEditing && (
+                    <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 hover:opacity-100 transition-opacity duration-300">
+                      <Upload className="h-10 w-10 text-white" />
+                    </div>
+                  )}
+
+                  {/* Only show trash button if user has an avatar and we're in edit mode */}
+                  {isEditing && (
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full shadow-md hover:bg-red-600 transition-all duration-200"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteAvatar();
+                      }}
+                    >
+                      <Trash className="h-4 w-4 text-white" />
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                // When there is no avatar preview, show a circular dropzone for upload
+                <div
+                  {...getRootProps()}
+                  className={`h-24 w-24 rounded-full border-1 border-solid border-black flex items-center justify-center cursor-pointer bg-blue-700 backdrop-blur-sm ${
+                    isEditing
+                      ? "hover:border-white hover:bg-blue-700/50 transition-all duration-300"
+                      : ""
+                  }`}
+                  onClick={isEditing ? handleAvatarClick : undefined}
+                >
+                  <input {...getInputProps()} />
+                  <Upload className="h-10 w-10 text-white" />
+                </div>
+              )}
             </div>
-            <div>
-              <h3 className="text-xl font-semibold">{user.name}</h3>
-              <p className="text-sm">
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold">{user.name}</h3>
+              <p className="text-lg">
                 {user.role
-                  .replace(/[-_]/g, " ") // Replace dashes/underscores with spaces
-                  .split(" ") // Split words for capitalization
-                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+                  .replace(/[-_]/g, " ")
+                  .split(" ")
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                   .join(" ")}
               </p>
               {/* Show phone display which updates in real-time */}
               {phoneDisplay && (
-                <p className="text-sm flex items-center mt-1">
-                  <Phone className="h-3.5 w-3.5 mr-1" />
+                <p className="flex items-center mt-2">
+                  <Phone className="h-4 w-4 mr-2" />
                   {phoneDisplay}
                 </p>
               )}
@@ -274,57 +360,65 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-1">
           {!isEditing ? (
-            <div className="space-y-4">
-              <div className="grid gap-2">
-                <Label className="text-sm text-muted-foreground flex items-center">
-                  <Mail className="h-4 w-4 mr-2" /> Email
+            <div className="space-y-6">
+              <div className="grid gap-3">
+                <Label className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center">
+                  <Mail className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
+                  Email
                 </Label>
-                <div className="flex items-center gap-2 rounded-md border p-3 dark:bg-gray-800">
-                  <span>{user.email}</span>
+                <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900 shadow-sm">
+                  <span className="font-medium">{user.email}</span>
                 </div>
               </div>
 
-              <div className="grid gap-2">
-                <Label className="text-sm text-muted-foreground flex items-center">
-                  <Phone className="h-4 w-4 mr-2" /> Phone
+              <div className="grid gap-3">
+                <Label className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center">
+                  <Phone className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
+                  Phone
                 </Label>
-                <div className="flex items-center gap-2 rounded-md border p-3 dark:bg-gray-800">
-                  <span>{user.phone || "Not provided"}</span>
+                <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900 shadow-sm">
+                  <span className="font-medium">
+                    {user.phone || "Not provided"}
+                  </span>
                 </div>
               </div>
 
               {user.role === "Organizer" && user.organization && (
-                <div className="grid gap-2">
-                  <Label className="text-sm text-muted-foreground flex items-center">
-                    <Building className="h-4 w-4 mr-2" /> Organization
+                <div className="grid gap-3">
+                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center">
+                    <Building className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
+                    Organization
                   </Label>
-                  <div className="flex items-center gap-2 rounded-md border p-3 dark:bg-gray-800">
-                    <span>{user.organization}</span>
+                  <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900 shadow-sm">
+                    <span className="font-medium">{user.organization}</span>
                   </div>
                 </div>
               )}
 
               <Button
                 onClick={() => setIsEditing(true)}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white hover:scale-105 duration-150 transition-all h-11"
+                className="w-full bg-blue-600 text-white hover:bg-blue-500 mt-4 rounded-lg py-3 px-4 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300 h-12"
               >
-                <Pencil className="mr-2 h-4 w-4" /> Edit Profile
+                <Pencil className="mr-2 h-5 w-5" /> Edit Profile
               </Button>
             </div>
           ) : (
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(handleSaveChanges)}
-                className="space-y-4"
+                className="space-y-6"
               >
-                <div className="grid gap-2">
-                  <Label className="text-sm text-muted-foreground flex items-center">
-                    <Mail className="h-4 w-4 mr-2" /> Email (Cannot be changed)
+                <div className="grid gap-3">
+                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center">
+                    <Mail className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
+                    Email (Cannot be changed)
                   </Label>
-                  <div className="flex items-center gap-2 rounded-md border p-3 bg-muted/50 dark:bg-gray-800 h-11">
-                    <span>{user.email}</span>
+                  <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-100 dark:bg-gray-900 h-12">
+                    <span className="font-medium text-gray-500 dark:text-gray-400">
+                      {user.email}
+                    </span>
                   </div>
                 </div>
 
@@ -333,17 +427,20 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center">
-                        <Phone className="h-4 w-4 mr-2" /> Phone Number
+                      <FormLabel className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center">
+                        <Phone className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
+                        Phone Number
                       </FormLabel>
                       <FormControl>
-                        <div className="flex items-center gap-2 rounded-md border dark:bg-gray-800">
-                          <div className="flex items-center ml-3">
-                            <span className="font-medium">+91</span>
+                        <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200">
+                          <div className="flex items-center ml-4 bg-gray-50 dark:bg-gray-900 h-12">
+                            <span className="font-medium text-gray-600 dark:text-gray-300">
+                              +91
+                            </span>
                           </div>
                           <Input
                             placeholder="Enter your phone number"
-                            className="border-0 dark:bg-gray-800 pl-1 h-11"
+                            className="border-0 focus:ring-0 focus-visible:ring-0 h-12 pl-1"
                             value={field.value?.replace(/^\+91\s*/, "")}
                             onChange={(e) =>
                               handlePhoneChange(e, field.onChange)
@@ -352,7 +449,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                           />
                         </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-red-500 text-sm mt-1" />
                     </FormItem>
                   )}
                 />
@@ -362,20 +459,34 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center">
-                        <Key className="h-4 w-4 mr-2" /> New Password
+                      <FormLabel className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center">
+                        <Key className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
+                        New Password (Optional)
                       </FormLabel>
                       <FormControl>
-                        <div className="flex items-center gap-2 rounded-md border dark:bg-gray-800">
+                        <div className="relative flex items-center rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200">
                           <Input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             placeholder="Enter new password"
-                            className="border-0 dark:bg-gray-800 h-11"
+                            className="border-0 focus:ring-0 focus-visible:ring-0 h-12 pr-12"
                             {...field}
                           />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute inset-y-0 right-[5px] top-[5.5px] flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
                         </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-red-500 text-sm mt-1" />
                     </FormItem>
                   )}
                 />
@@ -385,54 +496,82 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center">
-                        <Key className="h-4 w-4 mr-2" /> Confirm Password
+                      <FormLabel className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center">
+                        <Key className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
+                        Confirm Password
                       </FormLabel>
                       <FormControl>
-                        <div className="flex items-center gap-2 rounded-md border dark:bg-gray-800">
+                        <div className="relative flex items-center rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200">
                           <Input
-                            type="password"
+                            type={showConfirmPassword ? "text" : "password"}
                             placeholder="Confirm new password"
-                            className="border-0 dark:bg-gray-800 h-11"
+                            className="border-0 focus:ring-0 focus-visible:ring-0 h-12 pr-12"
                             {...field}
+                            disabled={!form.watch("password")}
                           />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute inset-y-0 right-[5px] top-[5.5px] flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            onClick={() =>
+                              setShowConfirmPassword(!showConfirmPassword)
+                            }
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-5 w-5" />
+                            ) : (
+                              <Eye className="h-5 w-5" />
+                            )}
+                          </Button>
                         </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-red-500 text-sm mt-1" />
                     </FormItem>
                   )}
                 />
 
                 {user.role === "Organizer" && user.organization && (
-                  <div className="grid gap-2">
-                    <Label className="text-sm text-muted-foreground flex items-center">
-                      <Building className="h-4 w-4 mr-2" /> Organization (Cannot
-                      be changed)
+                  <div className="grid gap-3">
+                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center">
+                      <Building className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
+                      Organization (Cannot be changed)
                     </Label>
-                    <div className="flex items-center gap-2 rounded-md border p-3 bg-muted/50 dark:bg-gray-800 h-11">
-                      <span>{user.organization}</span>
+                    <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-100 dark:bg-gray-900 h-12">
+                      <span className="font-medium text-gray-500 dark:text-gray-400">
+                        {user.organization}
+                      </span>
                     </div>
                   </div>
                 )}
 
-                <div className="flex gap-2 pt-2">
+                <div className="flex gap-4 pt-4">
                   <Button
                     type="button"
                     variant="outline"
-                    className="flex-1 hover:scale-105 duration-150 transition-all h-11"
+                    className="flex-1 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-400 rounded-lg py-3 px-4 font-medium shadow-sm hover:shadow-md transform hover:-translate-y-1 transition-all duration-300 h-12"
                     onClick={() => {
                       setIsEditing(false);
-                      setAvatarPreview(user.avatar || null);
+                      setAvatarPreview(initialAvatar);
+                      form.reset({
+                        password: "",
+                        confirmPassword: "",
+                        phone: user.phone || "",
+                      });
                     }}
                   >
-                    <X className="mr-1 h-4 w-4" /> Cancel
+                    <X className="mr-1 h-5 w-5" /> Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white hover:scale-105 duration-150 transition-all h-11"
-                    disabled={!isValid || isSubmitting}
+                    className={`flex-1 bg-blue-600 text-white rounded-lg py-3 px-4 font-medium shadow-md transform transition-all duration-300 h-12 ${
+                      hasChanges
+                        ? "hover:bg-blue-700 hover:shadow-lg hover:-translate-y-1"
+                        : "opacity-50 cursor-not-allowed"
+                    }`}
+                    disabled={isSubmitting || !hasChanges}
                   >
-                    <Pencil className="mr-1 h-4 w-4" /> Save Changes
+                    <Pencil className="mr-1 h-5 w-5" /> Save Changes
                   </Button>
                 </div>
               </form>

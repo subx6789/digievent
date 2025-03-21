@@ -4,7 +4,7 @@ export const sidebarDataSuperAdmin = {
     email: "adg@gmail.com",
     phone: "+91 9999999999",
     role: "Super Admin",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: undefined,
   },
   navMain: [
     { title: "Overview", url: "/super-admin/dashboard/overview" },

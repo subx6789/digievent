@@ -4,7 +4,8 @@ export const sidebarDataOrganizer = {
     email: "swask@gmail.com",
     phone: "+91 9999999999",
     role: "Organizer",
-    avatar: "/avatars/shadcn.jpg",
+    organization: "ABC",
+    avatar: undefined,
   },
   navMain: [
     { title: "Events", url: "/organizer/dashboard/events" },

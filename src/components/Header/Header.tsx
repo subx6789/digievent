@@ -1,5 +1,12 @@
 "use client";
-import { CalendarPlus, DownloadIcon, SquarePlus, UserPlus } from "lucide-react";
+import {
+  CalendarPlus,
+  ChevronDown,
+  DownloadIcon,
+  FileSpreadsheet,
+  SquarePlus,
+  UserPlus,
+} from "lucide-react";
 import { Button } from "../ui/button";
 import { SidebarTrigger } from "../ui/sidebar";
 import { usePathname } from "next/navigation";
@@ -9,15 +16,33 @@ import clsx from "clsx";
 import { sidebarDataOrganizer } from "@/utils/data/sidebarDataOrganizer";
 import { sidebarDataAdmin } from "@/utils/data/sidebarDataAdmin";
 import TitleAndDescription from "../TitleAndDescription/TitleAndDescription";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-interface HeaderProps {
-  onAddClick?: () => void;
+interface AddOption {
+  label: string;
+  onClick: () => void;
+  icon?: React.ReactNode;
 }
 
-const Header: React.FC<HeaderProps> = ({ onAddClick }) => {
-  const pathname = usePathname();
+interface HeaderProps {
+  onAddClick?: (() => void) | null;
+  addOptions?: AddOption[];
+}
 
+const Header: React.FC<HeaderProps> = ({ onAddClick, addOptions }) => {
+  const pathname = usePathname();
   const role = pathname.split("/")[1];
+
+  // Check if current page should have dropdown
+  const shouldHaveDropdown =
+    pathname === "/admin/dashboard/students" ||
+    pathname === "/admin/dashboard/courses" ||
+    pathname === "/admin/dashboard/organizers";
 
   return (
     <section>
@@ -58,32 +83,72 @@ const Header: React.FC<HeaderProps> = ({ onAddClick }) => {
             pathname === "/admin/dashboard/courses" ||
             pathname === "/super-admin/dashboard/manage-colleges" ||
             pathname === "/organizer/dashboard/events") && (
-            <Button
-              className="bg-blue-600 h-11 hover:bg-blue-700 text-white px-6 font-medium transition-all duration-150 hover:scale-105"
-              onClick={onAddClick}
-            >
-              {role === "admin" ? (
-                <span className="flex items-center gap-2">
-                  <UserPlus />
-                  Add{" "}
-                  {pathname === "/admin/dashboard/students"
-                    ? `Student`
-                    : pathname === "/admin/dashboard/courses"
-                    ? `Course`
-                    : `Organizer`}
-                </span>
-              ) : role === "organizer" ? (
-                <span className="flex items-center gap-2">
-                  <CalendarPlus />
-                  Add Event
-                </span>
+            <>
+              {shouldHaveDropdown && addOptions && addOptions.length > 0 ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="bg-blue-600 h-11 hover:bg-blue-700 text-white px-6 font-medium transition-all duration-150 hover:scale-105">
+                      <span className="flex items-center gap-2">
+                        <UserPlus />
+                        Add{" "}
+                        {pathname === "/admin/dashboard/students"
+                          ? `Student`
+                          : pathname === "/admin/dashboard/courses"
+                          ? `Course`
+                          : `Organizer`}
+                        <ChevronDown className="h-4 w-4 ml-1" />
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    {addOptions.map((option, index) => (
+                      <DropdownMenuItem
+                        key={index}
+                        onClick={option.onClick}
+                        className="cursor-pointer py-2"
+                      >
+                        <span className="flex items-center gap-2">
+                          {option.icon ||
+                            (index === 0 ? (
+                              <UserPlus className="h-4 w-4" />
+                            ) : (
+                              <FileSpreadsheet className="h-4 w-4" />
+                            ))}
+                          {option.label}
+                        </span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
-                <span className="flex items-center gap-2">
-                  <SquarePlus />
-                  Add College
-                </span>
+                <Button
+                  className="bg-blue-600 h-11 hover:bg-blue-700 text-white px-6 font-medium transition-all duration-150 hover:scale-105"
+                  onClick={onAddClick || undefined}
+                >
+                  {role === "admin" ? (
+                    <span className="flex items-center gap-2">
+                      <UserPlus />
+                      Add{" "}
+                      {pathname === "/admin/dashboard/students"
+                        ? `Student`
+                        : pathname === "/admin/dashboard/courses"
+                        ? `Course`
+                        : `Organizer`}
+                    </span>
+                  ) : role === "organizer" ? (
+                    <span className="flex items-center gap-2">
+                      <CalendarPlus />
+                      Add Event
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <SquarePlus />
+                      Add College
+                    </span>
+                  )}
+                </Button>
               )}
-            </Button>
+            </>
           )}
         </div>
       </div>

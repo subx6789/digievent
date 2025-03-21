@@ -8,7 +8,8 @@ export const landing_content = {
     secondaryButton: "See how it works",
   },
   features: {
-    title: "Our product has these big features",
+    badge: "Built for organizers, colleges and students",
+    title: "Our product has these powerful features",
     subtitle:
       "Everything you need to create and manage successful college events",
     items: [
@@ -33,6 +34,7 @@ export const landing_content = {
     ],
   },
   benefits: {
+    badge: "Streamlined workflow",
     title: "Manage your events with ease",
     description:
       "DigiEvent streamlines the entire event management process, saving you time and reducing stress.",
@@ -42,18 +44,57 @@ export const landing_content = {
       "Generate detailed reports on attendance and engagement",
       "Collect feedback with built-in survey tools",
     ],
+    imageAlt: "Event Management",
   },
   cta: {
+    badge: "Limited time offer",
     title: "Ready to simplify your event management?",
-    description: "Try DigiEvent today and see the difference it makes.",
-    buttonText: "Get Started",
+    description:
+      "Try DigiEvent today and see the difference it makes for your college events.",
+    primaryButton: "Get Started Free",
+    secondaryButton: "Watch Demo",
   },
   footer: {
     description: "The all-in-one platform for college event management.",
     links: {
-      product: ["Features", "Integrations", "FAQ"],
-      company: ["About", "Blog", "Careers", "Contact"],
-      legal: ["Privacy", "Terms", "Cookie Policy"],
+      product: [
+        { name: "Features", href: "/features" },
+        { name: "Integrations", href: "/integrations" },
+        { name: "FAQ", href: "/faq" },
+      ],
+      company: [
+        { name: "About", href: "/about" },
+        { name: "Blog", href: "/blog" },
+        { name: "Careers", href: "/careers" },
+        { name: "Contact", href: "/contact" },
+      ],
+      legal: [
+        { name: "Privacy", href: "/privacy" },
+        { name: "Terms", href: "/terms" },
+        { name: "Cookie Policy", href: "/cookie-policy" },
+      ],
+    },
+    copyright: `© ${new Date().getFullYear()} DigiEvent. All rights reserved.`,
+  },
+  navigation: {
+    logo: "Digievent",
+    links: [
+      { href: "#hero", text: "Home" },
+      { href: "#about", text: "About" },
+      { href: "#terms", text: "T&C" },
+      { href: "#contact", text: "Contact" },
+    ],
+    loginButton: "Login",
+    statusBar: "DigiEvent",
+    notifications: {
+      eventCreated: {
+        title: "Event Created",
+        time: "Just now",
+      },
+      registrations: {
+        title: "50+ Registrations",
+        time: "Today",
+      },
     },
   },
 };
