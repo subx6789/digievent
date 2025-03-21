@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from "@/components/ui/modal-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -190,9 +190,10 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] p-6 dark:bg-gray-800 dark:text-white">
+      <DialogContent className="sm:max-w-[550px] p-6 max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+          <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+            <Building className="h-5 w-5 text-blue-600 dark:text-blue-400" />{" "}
             Add New College
           </DialogTitle>
         </DialogHeader>
@@ -200,7 +201,7 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 mt-4"
+            className="space-y-5 mt-4"
           >
             {/* Logo Upload */}
             <div className="flex justify-center mb-4">
@@ -213,16 +214,21 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                   onChange={handleLogoUpload}
                 />
                 <Label htmlFor="avatarUrl-upload" className="cursor-pointer">
-                  <Avatar className="w-24 h-24 border-2 border-gray-300 hover:border-blue-500 transition-all">
+                  <Avatar className="w-24 h-24 border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200">
                     <AvatarImage
                       src={logoFile || "/placeholder-avatar.jpg"}
-                      alt="Organizer AvatavatarUrl"
+                      alt="College Logo"
                       className="object-cover"
                     />
-                    <AvatarFallback>
-                      <Upload />
+                    <AvatarFallback className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300">
+                      <Upload className="h-8 w-8" />
                     </AvatarFallback>
                   </Avatar>
+                  <div className="absolute inset-0 bg-black/0 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-all flex items-center justify-center">
+                    <span className="text-transparent hover:text-white text-xs font-medium opacity-0 hover:opacity-100 transition-opacity">
+                      Upload Logo
+                    </span>
+                  </div>
                 </Label>
               </div>
             </div>
@@ -233,29 +239,31 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                    <Building className="h-4 w-4" /> College Name
+                    <Building className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                    College Name
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter college name"
                       {...field}
-                      className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                       required
                     />
                   </FormControl>
-                  <FormMessage className="text-red-500" />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="state"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                      <MapPin className="h-4 w-4" /> State
+                      <MapPin className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                      State
                     </FormLabel>
                     <Select
                       onValueChange={field.onChange}
@@ -263,23 +271,23 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                       required
                     >
                       <FormControl>
-                        <SelectTrigger className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white cursor-pointer">
+                        <SelectTrigger className="h-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white cursor-pointer focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent">
                           <SelectValue placeholder="Select state" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                      <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                         {STATES.map((state) => (
                           <SelectItem
                             key={state}
                             value={state}
-                            className="dark:text-white dark:focus:bg-gray-700 cursor-pointer"
+                            className="cursor-pointer text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                           >
                             {state}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage className="text-red-500" />
+                    <FormMessage className="text-red-500 dark:text-red-400" />
                   </FormItem>
                 )}
               />
@@ -290,7 +298,8 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                      <MapPin className="h-4 w-4" /> City
+                      <MapPin className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                      City
                     </FormLabel>
                     <Select
                       onValueChange={field.onChange}
@@ -299,7 +308,13 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                       required
                     >
                       <FormControl>
-                        <SelectTrigger className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white cursor-pointer">
+                        <SelectTrigger
+                          className={`h-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white cursor-pointer focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
+                            !state
+                              ? "opacity-70 cursor-not-allowed bg-gray-50 dark:bg-gray-800"
+                              : ""
+                          }`}
+                        >
                           <SelectValue
                             placeholder={
                               state ? "Select city" : "Select state first"
@@ -307,47 +322,48 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                           />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                      <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                         {availableCities.map((city) => (
                           <SelectItem
                             key={city}
                             value={city}
-                            className="dark:text-white dark:focus:bg-gray-700 cursor-pointer"
+                            className="cursor-pointer text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                           >
                             {city}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage className="text-red-500" />
+                    <FormMessage className="text-red-500 dark:text-red-400" />
                   </FormItem>
                 )}
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                      <Phone className="h-4 w-4" /> Phone Number
+                      <Phone className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                      Phone Number
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="+1 234 567 8900"
+                        placeholder="+91 1234567890"
                         {...field}
-                        className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                         required
-                        value={field.value || "+91 "} // ✅ Prevents value from becoming empty
+                        value={field.value || "+91 "}
                         onChange={(e) => {
-                          if (!e.target.value.startsWith("+91 ")) return; // ✅ Prevents deletion
+                          if (!e.target.value.startsWith("+91 ")) return;
                           field.onChange(e.target.value);
                         }}
                       />
                     </FormControl>
-                    <FormMessage className="text-red-500" />
+                    <FormMessage className="text-red-500 dark:text-red-400" />
                   </FormItem>
                 )}
               />
@@ -358,17 +374,18 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                      <Mail className="h-4 w-4" /> Email
+                      <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                      Email
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="college@example.com"
                         {...field}
-                        className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                         required
                       />
                     </FormControl>
-                    <FormMessage className="text-red-500" />
+                    <FormMessage className="text-red-500 dark:text-red-400" />
                   </FormItem>
                 )}
               />
@@ -380,7 +397,8 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                    <Lock className="h-4 w-4" /> Password
+                    <Lock className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                    Password
                   </FormLabel>
                   <div className="flex gap-4">
                     <div className="relative flex-1">
@@ -389,13 +407,13 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                           type={showPassword ? "text" : "password"}
                           placeholder="Enter password"
                           {...field}
-                          className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                          className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                           required
                         />
                       </FormControl>
                       <button
                         type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
@@ -411,22 +429,24 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                       size="default"
                       onClick={generatePassword}
                       disabled={!name || !state}
-                      className="h-10 whitespace-nowrap dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600"
+                      className={`h-10 whitespace-nowrap bg-white hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors ${
+                        !name || !state ? "opacity-70 cursor-not-allowed" : ""
+                      }`}
                     >
                       <RefreshCw className="h-4 w-4 mr-1" /> Generate
                     </Button>
                   </div>
-                  <FormMessage className="text-red-500" />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
 
-            <DialogFooter className="mt-6 flex gap-3">
+            <DialogFooter className="mt-6 flex flex-col sm:flex-row gap-3">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="h-11 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600"
+                className="h-11 w-full sm:w-auto bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-150 hover:scale-105"
               >
                 Cancel
               </Button>
@@ -435,9 +455,16 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                 disabled={
                   !form.formState.isValid || form.formState.isSubmitting
                 }
-                className="h-11 bg-blue-600 hover:bg-blue-700 text-white px-6 font-medium transition-all duration-150 hover:scale-105 dark:bg-blue-600 dark:hover:bg-blue-700"
+                className="h-11 w-full sm:w-auto bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white px-6 font-medium transition-all duration-150 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                Create College
+                {form.formState.isSubmitting ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  "Add College"
+                )}
               </Button>
             </DialogFooter>
           </form>

@@ -13,7 +13,9 @@ const Sidebar = ({
   return (
     <SidebarProvider>
       <AppSidebar role={role} />
-      <SidebarInset className="px-4">{children}</SidebarInset>
+      <SidebarInset className="px-4 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200">
+        {children}
+      </SidebarInset>
     </SidebarProvider>
   );
 };

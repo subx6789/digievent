@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from "@/components/ui/modal-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -153,7 +153,7 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] p-6">
+      <DialogContent className="sm:max-w-[550px] p-6 max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
             {isEditMode ? "Edit Course" : "Add New Course"}
@@ -163,7 +163,7 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 mt-4"
+            className="space-y-5 mt-4"
           >
             {/* Course Name */}
             <FormField
@@ -171,17 +171,18 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
               name="course"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <GraduationCap className="h-4 w-4" /> Course Name
+                  <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                    <GraduationCap className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                    Course Name
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="e.g. BTech, MCA, BA-LLB"
                       {...field}
-                      className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -192,28 +193,30 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
               name="noOfYears"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" /> Duration (Years)
+                  <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                    <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                    Duration (Years)
                   </FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       placeholder="e.g. 4"
                       {...field}
-                      className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                       min={1}
                       max={10}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
 
             {/* Departments */}
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4" /> Departments
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                <BookOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                Departments
               </Label>
 
               {departments.map((dept, index) => (
@@ -224,7 +227,7 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
                       handleDepartmentChange(index, e.target.value)
                     }
                     placeholder="e.g. Computer Science and Engineering"
-                    className="h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className="h-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                   />
                   <Button
                     type="button"
@@ -232,7 +235,7 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
                     size="icon"
                     onClick={() => removeDepartmentField(index)}
                     disabled={departments.length === 1}
-                    className="shrink-0"
+                    className="shrink-0 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 disabled:opacity-30 disabled:pointer-events-none"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -244,27 +247,27 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={addDepartmentField}
-                className="mt-2"
+                className="mt-2 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
               >
                 <Plus className="h-4 w-4 mr-2" /> Add Department
               </Button>
             </div>
 
-            <DialogFooter className="mt-6 flex gap-3">
+            <DialogFooter className="mt-6 flex flex-col sm:flex-row gap-3">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="h-11"
+                className="h-11 w-full sm:w-auto bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-150 hover:scale-105"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={!isFormValid()}
-                className="h-11 bg-blue-600 hover:bg-blue-700 text-white px-6 font-medium transition-all duration-150 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-11 w-full sm:w-auto bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white px-6 font-medium transition-all duration-150 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                {isEditMode ? "Update Course" : "Create Course"}
+                {isEditMode ? "Update Course" : "Add Course"}
               </Button>
             </DialogFooter>
           </form>

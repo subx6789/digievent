@@ -22,7 +22,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/modal-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -264,10 +264,11 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
       <DialogContent className="sm:max-w-[550px] max-h-[90vh] p-6 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl">
         <div className="p-1">
           <DialogHeader className="mb-6">
-            <DialogTitle className="flex items-center gap-2 text-2xl font-bold">
-              <User className="h-6 w-6" /> Profile Details
+            <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white">
+              <User className="h-6 w-6 text-blue-600 dark:text-blue-400" />{" "}
+              Profile Details
             </DialogTitle>
-            <DialogDescription className="text-base">
+            <DialogDescription className="text-base text-gray-600 dark:text-gray-300">
               View and manage your profile information.
             </DialogDescription>
           </DialogHeader>
@@ -292,13 +293,13 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                   }`}
                   onClick={isEditing ? handleAvatarClick : undefined}
                 >
-                  <Avatar className="h-24 w-24 rounded-full shadow-lg">
+                  <Avatar className="h-24 w-24 rounded-full shadow-lg border-2 border-gray-200 dark:border-gray-600">
                     <AvatarImage
                       src={avatarPreview}
                       alt={user.name}
                       className="object-cover"
                     />
-                    <AvatarFallback className="bg-blue-500 text-white text-xl">
+                    <AvatarFallback className="bg-blue-500 dark:bg-blue-600 text-white text-xl">
                       {getInitials(user.name)}
                     </AvatarFallback>
                   </Avatar>
@@ -314,7 +315,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                     <Button
                       variant="destructive"
                       size="icon"
-                      className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full shadow-md hover:bg-red-600 transition-all duration-200"
+                      className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full shadow-md hover:bg-red-600 dark:hover:bg-red-700 transition-all duration-200"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDeleteAvatar();
@@ -328,9 +329,9 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                 // When there is no avatar preview, show a circular dropzone for upload
                 <div
                   {...getRootProps()}
-                  className={`h-24 w-24 rounded-full border-1 border-solid border-black flex items-center justify-center cursor-pointer bg-blue-700 backdrop-blur-sm ${
+                  className={`h-24 w-24 rounded-full border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center cursor-pointer bg-blue-600 dark:bg-blue-700 backdrop-blur-sm ${
                     isEditing
-                      ? "hover:border-white hover:bg-blue-700/50 transition-all duration-300"
+                      ? "hover:border-white hover:bg-blue-700/80 dark:hover:bg-blue-800/80 transition-all duration-300"
                       : ""
                   }`}
                   onClick={isEditing ? handleAvatarClick : undefined}
@@ -341,8 +342,10 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
               )}
             </div>
             <div className="flex-1">
-              <h3 className="text-2xl font-bold">{user.name}</h3>
-              <p className="text-lg">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {user.name}
+              </h3>
+              <p className="text-lg text-gray-700 dark:text-gray-300">
                 {user.role
                   .replace(/[-_]/g, " ")
                   .split(" ")
@@ -351,8 +354,8 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
               </p>
               {/* Show phone display which updates in real-time */}
               {phoneDisplay && (
-                <p className="flex items-center mt-2">
-                  <Phone className="h-4 w-4 mr-2" />
+                <p className="flex items-center mt-2 text-gray-600 dark:text-gray-400">
+                  <Phone className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />
                   {phoneDisplay}
                 </p>
               )}
@@ -360,7 +363,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
           </div>
         </div>
 
-        <div className="p-1">
+        <div className="p-1 mt-4">
           {!isEditing ? (
             <div className="space-y-6">
               <div className="grid gap-3">
@@ -369,7 +372,9 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                   Email
                 </Label>
                 <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900 shadow-sm">
-                  <span className="font-medium">{user.email}</span>
+                  <span className="font-medium text-gray-800 dark:text-gray-200">
+                    {user.email}
+                  </span>
                 </div>
               </div>
 
@@ -379,7 +384,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                   Phone
                 </Label>
                 <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900 shadow-sm">
-                  <span className="font-medium">
+                  <span className="font-medium text-gray-800 dark:text-gray-200">
                     {user.phone || "Not provided"}
                   </span>
                 </div>
@@ -392,14 +397,16 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                     Organization
                   </Label>
                   <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900 shadow-sm">
-                    <span className="font-medium">{user.organization}</span>
+                    <span className="font-medium text-gray-800 dark:text-gray-200">
+                      {user.organization}
+                    </span>
                   </div>
                 </div>
               )}
 
               <Button
                 onClick={() => setIsEditing(true)}
-                className="w-full bg-blue-600 text-white hover:bg-blue-500 mt-4 rounded-lg py-3 px-4 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300 h-12"
+                className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white mt-4 rounded-lg py-3 px-4 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300 h-12"
               >
                 <Pencil className="mr-2 h-5 w-5" /> Edit Profile
               </Button>
@@ -432,15 +439,15 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                         Phone Number
                       </FormLabel>
                       <FormControl>
-                        <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200">
-                          <div className="flex items-center ml-4 bg-gray-50 dark:bg-gray-900 h-12">
+                        <div className="relative flex items-center rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-blue-500 dark:focus-within:ring-blue-400 transition-all duration-200">
+                          <div className="flex items-center justify-center px-3 bg-gray-50 dark:bg-gray-900 h-12 border-r border-gray-200 dark:border-gray-700">
                             <span className="font-medium text-gray-600 dark:text-gray-300">
                               +91
                             </span>
                           </div>
                           <Input
                             placeholder="Enter your phone number"
-                            className="border-0 focus:ring-0 focus-visible:ring-0 h-12 pl-1"
+                            className="border-0 focus:ring-0 focus-visible:ring-0 h-12 pl-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                             value={field.value?.replace(/^\+91\s*/, "")}
                             onChange={(e) =>
                               handlePhoneChange(e, field.onChange)
@@ -449,7 +456,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                           />
                         </div>
                       </FormControl>
-                      <FormMessage className="text-red-500 text-sm mt-1" />
+                      <FormMessage className="text-red-500 dark:text-red-400 text-sm mt-1" />
                     </FormItem>
                   )}
                 />
@@ -464,11 +471,11 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                         New Password (Optional)
                       </FormLabel>
                       <FormControl>
-                        <div className="relative flex items-center rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200">
+                        <div className="relative flex items-center rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-blue-500 dark:focus-within:ring-blue-400 transition-all duration-200">
                           <Input
                             type={showPassword ? "text" : "password"}
                             placeholder="Enter new password"
-                            className="border-0 focus:ring-0 focus-visible:ring-0 h-12 pr-12"
+                            className="border-0 focus:ring-0 focus-visible:ring-0 h-12 pr-12 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                             {...field}
                           />
                           <Button
@@ -486,7 +493,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                           </Button>
                         </div>
                       </FormControl>
-                      <FormMessage className="text-red-500 text-sm mt-1" />
+                      <FormMessage className="text-red-500 dark:text-red-400 text-sm mt-1" />
                     </FormItem>
                   )}
                 />
@@ -501,11 +508,11 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                         Confirm Password
                       </FormLabel>
                       <FormControl>
-                        <div className="relative flex items-center rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200">
+                        <div className="relative flex items-center rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-blue-500 dark:focus-within:ring-blue-400 transition-all duration-200">
                           <Input
                             type={showConfirmPassword ? "text" : "password"}
                             placeholder="Confirm new password"
-                            className="border-0 focus:ring-0 focus-visible:ring-0 h-12 pr-12"
+                            className="border-0 focus:ring-0 focus-visible:ring-0 h-12 pr-12 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                             {...field}
                             disabled={!form.watch("password")}
                           />
@@ -526,7 +533,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                           </Button>
                         </div>
                       </FormControl>
-                      <FormMessage className="text-red-500 text-sm mt-1" />
+                      <FormMessage className="text-red-500 dark:text-red-400 text-sm mt-1" />
                     </FormItem>
                   )}
                 />
@@ -537,7 +544,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                       <Building className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
                       Organization (Cannot be changed)
                     </Label>
-                    <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-100 dark:bg-gray-900 h-12">
+                    <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-100 dark:bg-gray-900 h-12 shadow-inner">
                       <span className="font-medium text-gray-500 dark:text-gray-400">
                         {user.organization}
                       </span>
@@ -545,11 +552,11 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                   </div>
                 )}
 
-                <div className="flex gap-4 pt-4">
+                <div className="flex flex-col sm:flex-row gap-4 pt-5 mt-2 border-t border-gray-100 dark:border-gray-700">
                   <Button
                     type="button"
                     variant="outline"
-                    className="flex-1 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-400 rounded-lg py-3 px-4 font-medium shadow-sm hover:shadow-md transform hover:-translate-y-1 transition-all duration-300 h-12"
+                    className="flex-1 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-gray-500 rounded-lg py-3 px-4 font-medium shadow-sm hover:shadow-md transform hover:-translate-y-1 transition-all duration-300 h-12"
                     onClick={() => {
                       setIsEditing(false);
                       setAvatarPreview(initialAvatar);
@@ -560,18 +567,47 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                       });
                     }}
                   >
-                    <X className="mr-1 h-5 w-5" /> Cancel
+                    <X className="mr-2 h-5 w-5 text-gray-500 dark:text-gray-400" />{" "}
+                    Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className={`flex-1 bg-blue-600 text-white rounded-lg py-3 px-4 font-medium shadow-md transform transition-all duration-300 h-12 ${
+                    className={`flex-1 bg-blue-600 dark:bg-blue-700 text-white rounded-lg py-3 px-4 font-medium shadow-md transform transition-all duration-300 h-12 ${
                       hasChanges
-                        ? "hover:bg-blue-700 hover:shadow-lg hover:-translate-y-1"
-                        : "opacity-50 cursor-not-allowed"
+                        ? "hover:bg-blue-700 dark:hover:bg-blue-800 hover:shadow-lg hover:-translate-y-1 ring-offset-2 ring-offset-white dark:ring-offset-gray-800 hover:ring-2 hover:ring-blue-300 dark:hover:ring-blue-700"
+                        : "opacity-50 cursor-not-allowed bg-blue-400 dark:bg-blue-600"
                     }`}
                     disabled={isSubmitting || !hasChanges}
                   >
-                    <Pencil className="mr-1 h-5 w-5" /> Save Changes
+                    {isSubmitting ? (
+                      <div className="flex items-center justify-center">
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Saving...
+                      </div>
+                    ) : (
+                      <>
+                        <Pencil className="mr-2 h-5 w-5" /> Save Changes
+                      </>
+                    )}
                   </Button>
                 </div>
               </form>

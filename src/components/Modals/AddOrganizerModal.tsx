@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from "@/components/ui/modal-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -212,7 +212,7 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] p-6">
+      <DialogContent className="sm:max-w-[550px] p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
             {editMode ? "Edit Organizer" : "Add New Organizer"}
@@ -235,13 +235,13 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
                   onChange={handleAvatarUrlUpload}
                 />
                 <Label htmlFor="avatarUrl-upload" className="cursor-pointer">
-                  <Avatar className="w-24 h-24 border-2 border-gray-300 hover:border-blue-500 transition-all">
+                  <Avatar className="w-24 h-24 border-2 hover:border-blue-500 transition-all border-gray-300 dark:border-gray-600">
                     <AvatarImage
                       src={avatarUrlPreview || "/placeholder-avatar.jpg"}
                       alt="Organizer Avatar"
                       className="object-cover"
                     />
-                    <AvatarFallback>
+                    <AvatarFallback className="bg-gray-800 text-white">
                       <Upload />
                     </AvatarFallback>
                   </Avatar>
@@ -255,17 +255,18 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <User className="h-4 w-4" /> Organizer Name
+                  <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                    <User className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                    Organizer Name
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter organizer name"
                       {...field}
-                      className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -276,17 +277,18 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
               name="organization"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <Building className="h-4 w-4" /> Name of the Organization
+                  <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                    <Building className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                    Name of the Organization
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter organization name"
                       {...field}
-                      className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -298,15 +300,16 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <Mail className="h-4 w-4" /> Email
+                    <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                      <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                      Email
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="organizer@example.com"
                         {...field}
                         disabled={editMode} // Disable email field in edit mode
-                        className={`h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+                        className={`h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white ${
                           editMode ? "opacity-70 cursor-not-allowed" : ""
                         }`}
                       />
@@ -316,7 +319,7 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
                         Email cannot be changed
                       </p>
                     )}
-                    <FormMessage />
+                    <FormMessage className="text-red-500 dark:text-red-400" />
                   </FormItem>
                 )}
               />
@@ -326,14 +329,15 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <Phone className="h-4 w-4" /> Phone Number
+                    <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                      <Phone className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                      Phone Number
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="+1 234 567 8900"
                         {...field}
-                        className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                         required
                         value={field.value || "+91 "}
                         onChange={(e) => {
@@ -342,7 +346,7 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
                         }}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-500 dark:text-red-400" />
                   </FormItem>
                 )}
               />
@@ -356,7 +360,8 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                      <Lock className="h-4 w-4" /> Password
+                      <Lock className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                      Password
                     </FormLabel>
                     <div className="flex gap-4">
                       <div className="relative flex-1">
@@ -365,7 +370,7 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
                             type={showPassword ? "text" : "password"}
                             placeholder="Enter password"
                             {...field}
-                            className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                             required
                           />
                         </FormControl>
@@ -386,12 +391,12 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
                         variant="outline"
                         size="default"
                         onClick={generateAndSetPassword}
-                        className="h-10 whitespace-nowrap dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600"
+                        className="h-10 whitespace-nowrap bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
                       >
                         <RefreshCw className="h-4 w-4 mr-1" /> Generate
                       </Button>
                     </div>
-                    <FormMessage className="text-red-500" />
+                    <FormMessage className="text-red-500 dark:text-red-400" />
                   </FormItem>
                 )}
               />
@@ -402,7 +407,7 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="h-11"
+                className="h-11 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
               >
                 Cancel
               </Button>
@@ -411,7 +416,7 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
                 disabled={
                   !form.formState.isValid || form.formState.isSubmitting
                 }
-                className="h-11 bg-blue-600 hover:bg-blue-700 text-white px-6 font-medium transition-all duration-150 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-11 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white px-6 font-medium transition-all duration-150 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {editMode ? "Update Organizer" : "Add Organizer"}
               </Button>

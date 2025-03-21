@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Send } from "lucide-react";
+import { Mail, Send, RefreshCw } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -11,7 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/modal-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -92,10 +92,10 @@ const HelpModal = ({ isOpen, onClose, userEmail }: HelpModalProps) => {
         onPointerDownOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Mail className="h-5 w-5" /> Contact Support
+          <DialogTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+            <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" /> Contact Support
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-gray-600 dark:text-gray-300">
             Send a message to our support team. We&apos;ll get back to you as
             soon as possible.
           </DialogDescription>
@@ -106,20 +106,29 @@ const HelpModal = ({ isOpen, onClose, userEmail }: HelpModalProps) => {
             onSubmit={form.handleSubmit(handleSendMessage)}
             className="space-y-4 py-4"
           >
+            <div className="mb-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-100 dark:border-blue-800">
+              <p className="text-sm text-blue-700 dark:text-blue-300 flex items-start">
+                <Mail className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
+                <span>
+                  Your message will be sent from: <strong className="font-medium">{userEmail}</strong>
+                </span>
+              </p>
+            </div>
+            
             <FormField
               control={form.control}
               name="subject"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Subject</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Subject</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="How can we help you?"
-                      className="dark:bg-gray-800 dark:text-white"
+                      className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -129,34 +138,43 @@ const HelpModal = ({ isOpen, onClose, userEmail }: HelpModalProps) => {
               name="message"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Message</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Message</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Please describe your issue in detail..."
-                      className="min-h-[120px] dark:bg-gray-800 dark:text-white"
+                      className="min-h-[120px] bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white resize-y"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
 
-            <DialogFooter className="pt-4">
+            <DialogFooter className="pt-4 flex flex-col sm:flex-row gap-3 sm:gap-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="hover:scale-105 duration-150 transition-all h-11"
+                className="w-full sm:w-auto bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:scale-105 duration-150 transition-all h-11"
               >
                 Close
               </Button>
               <Button
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white hover:scale-105 duration-150 transition-all h-11"
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white hover:scale-105 duration-150 transition-all h-11"
                 disabled={!isValid || isSubmitting}
               >
-                <Send className="mr-1 h-4 w-4" /> Send Message
+                {isSubmitting ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-1 h-4 w-4" /> Send Message
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </form>

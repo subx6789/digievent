@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from "@/components/ui/modal-provider";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { FileSpreadsheet, Upload, X, AlertCircle } from "lucide-react";
@@ -155,7 +155,7 @@ const UploadExcelModal: React.FC<UploadExcelModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[600px] p-6 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] p-6 max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
             {title}
@@ -259,7 +259,7 @@ const UploadExcelModal: React.FC<UploadExcelModalProps> = ({
                     variant="ghost"
                     size="icon"
                     onClick={handleRemoveFile}
-                    className="h-8 w-8 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                    className="h-8 w-8 rounded-full text-black duration-150 transition-all dark:text-white dark:hover:text-blue-800 hover:bg-gray-200 dark:hover:bg-blue-200"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -274,7 +274,7 @@ const UploadExcelModal: React.FC<UploadExcelModalProps> = ({
             type="button"
             variant="outline"
             onClick={onClose}
-            className="h-11"
+            className="h-11 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
           >
             Cancel
           </Button>
@@ -282,7 +282,7 @@ const UploadExcelModal: React.FC<UploadExcelModalProps> = ({
             type="button"
             onClick={handleSubmit}
             disabled={!file || isUploading}
-            className="h-11 bg-blue-600 hover:bg-blue-700 text-white px-6 font-medium transition-all duration-150 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="h-11 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white px-6 font-medium transition-all duration-150 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isUploading ? (
               <>

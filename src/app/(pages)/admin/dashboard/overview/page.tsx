@@ -10,8 +10,20 @@ import { engagementdata } from "@/utils/data/engagementData";
 import { statCardDataAdmin } from "@/utils/data/statCardDataAdmin";
 import { eventBookingData } from "@/utils/data/eventBookingData";
 import Header from "@/components/Header/Header";
+import { useThemeStore } from "@/store/themeStore";
+import { useEffect, useState } from "react";
 
 export default function Overview() {
+  useThemeStore();
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <ProtectedRoute requiredRole="admin">
       <Sidebar role="admin">

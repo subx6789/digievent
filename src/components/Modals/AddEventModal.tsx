@@ -7,10 +7,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from "@/components/ui/modal-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   FileText,
   Upload,
@@ -443,7 +442,7 @@ const AddEventModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] p-6 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[550px] p-6 max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
             {isEditMode ? "Edit Event" : "Create New Event"}
@@ -451,7 +450,7 @@ const AddEventModal = ({
         </DialogHeader>
 
         {/* Free/Paid Tabs - Update the onClick handlers */}
-        <div className="w-full mb-4 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+        <div className="w-full mb-4 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
           <div className="grid grid-cols-2 gap-1">
             <button
               type="button"
@@ -459,8 +458,8 @@ const AddEventModal = ({
               className={cn(
                 "py-2 rounded-md text-sm font-medium transition-all duration-200",
                 eventType === "free"
-                  ? "bg-white dark:bg-gray-700 text-blue-600 shadow-sm"
-                  : "text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700",
+                  ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm"
+                  : "bg-transparent dark:bg-transparent text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50",
                 isEditMode && "opacity-70 cursor-not-allowed"
               )}
               disabled={isEditMode}
@@ -473,8 +472,8 @@ const AddEventModal = ({
               className={cn(
                 "py-2 rounded-md text-sm font-medium transition-all duration-200",
                 eventType === "paid"
-                  ? "bg-white dark:bg-gray-700 text-blue-600 shadow-sm"
-                  : "text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700",
+                  ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm"
+                  : "bg-transparent dark:bg-transparent text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50",
                 isEditMode && "opacity-70 cursor-not-allowed"
               )}
               disabled={isEditMode}
@@ -483,7 +482,7 @@ const AddEventModal = ({
             </button>
           </div>
           {isEditMode && (
-            <p className="text-xs text-muted-foreground mt-2 text-center">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
               Event type cannot be changed after creation
             </p>
           )}
@@ -494,9 +493,10 @@ const AddEventModal = ({
             {/* Image Upload */}
             {/* Image Upload with React Dropzone */}
             <div>
-              <Label className="flex items-center gap-2 mb-2">
-                <FileText className="h-4 w-4" /> Event Cover Image
-              </Label>
+              <FormLabel className="flex items-center gap-2 mb-2 text-gray-700 dark:text-gray-300">
+                <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                Event Cover Image
+              </FormLabel>
               <p className="text-sm text-muted-foreground mb-3">
                 Please upload an image (1200x630 pixels) for the best display
                 and max (5MB).
@@ -561,14 +561,15 @@ const AddEventModal = ({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <Tag className="h-4 w-4" /> Event Title
+                  <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                    <Tag className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                    Event Title
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter event title"
                       {...field}
-                      className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                     />
                   </FormControl>
                   <FormMessage />
@@ -582,8 +583,9 @@ const AddEventModal = ({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" /> Event Description
+                  <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                    <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                    Event Description
                   </FormLabel>
                   <FormControl>
                     <Textarea
@@ -603,8 +605,9 @@ const AddEventModal = ({
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <Tag className="h-4 w-4" /> Event Category
+                  <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                    <Tag className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                    Event Category
                   </FormLabel>
                   <Select
                     onValueChange={field.onChange}
@@ -640,8 +643,9 @@ const AddEventModal = ({
                 name="date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" /> Event Date
+                    <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                      <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                      Event Date
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
@@ -661,8 +665,9 @@ const AddEventModal = ({
                 name="time"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <Clock className="h-4 w-4" /> Event Time
+                    <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                      <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                      Event Time
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
@@ -680,8 +685,9 @@ const AddEventModal = ({
 
             {/* Event Format Checkboxes - Single Selection */}
             <div className="flex flex-col gap-4">
-              <FormLabel className="flex items-center gap-2">
-                <Tag className="h-4 w-4" /> Event Type
+              <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                <Tag className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                Event Type
               </FormLabel>
               {["physical", "virtual"].map((option) => (
                 <div key={option} className="flex items-center gap-1 text-sm">
@@ -690,8 +696,9 @@ const AddEventModal = ({
                     onCheckedChange={() =>
                       handleCheckboxChange(option as "physical" | "virtual")
                     }
+                    className="mr-1"
                   />
-                  <label className="cursor-pointer">
+                  <label className="cursor-pointer text-gray-700 dark:text-gray-300">
                     {option.charAt(0).toUpperCase() + option.slice(1)}
                   </label>
                 </div>
@@ -705,14 +712,15 @@ const AddEventModal = ({
                 name="venue"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" /> Venue Details
+                    <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                      <MapPin className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                      Venue Details
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Enter specific venue address"
                         {...field}
-                        className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                       />
                     </FormControl>
                     <FormMessage />
@@ -728,14 +736,15 @@ const AddEventModal = ({
                 name="virtualLink"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <Globe className="h-4 w-4" /> Virtual Event Link
+                    <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                      <Globe className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                      Virtual Event Link
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Enter meeting link (Zoom, Google Meet, etc.)"
                         {...field}
-                        className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                       />
                     </FormControl>
                     <FormMessage />
@@ -750,15 +759,16 @@ const AddEventModal = ({
               name="capacity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <Sofa className="h-4 w-4" /> Seat Capacity
+                  <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                    <Sofa className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                    Seat Capacity
                   </FormLabel>
                   <FormControl>
                     <Input
                       type="text"
                       placeholder="Enter total seats/capacity"
                       {...field}
-                      className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                     />
                   </FormControl>
                   {isEditMode && originalCapacity && (
@@ -779,15 +789,16 @@ const AddEventModal = ({
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <IndianRupee className="h-4 w-4" /> Ticket Price
+                    <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                      <IndianRupee className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                      Ticket Price
                     </FormLabel>
                     <FormControl>
                       <Input
                         type="text"
                         placeholder="Enter ticket price"
                         {...field}
-                        className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                         disabled={isEditMode}
                       />
                     </FormControl>
@@ -810,15 +821,16 @@ const AddEventModal = ({
                   name="bankAccount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <CreditCard className="h-4 w-4" /> Bank Account Number
+                      <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                        <CreditCard className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                        Bank Account Number
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="text"
                           placeholder="Enter bank account number"
                           {...field}
-                          className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                          className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                         />
                       </FormControl>
                       <FormMessage />
@@ -831,15 +843,16 @@ const AddEventModal = ({
                   name="ifscCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Building className="h-4 w-4" /> IFSC Code
+                      <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                        <Building className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
+                        IFSC Code
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="text"
                           placeholder="Enter IFSC code"
                           {...field}
-                          className="h-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                          className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                           autoCapitalize="characters"
                         />
                       </FormControl>
@@ -856,7 +869,7 @@ const AddEventModal = ({
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="h-11 hover:scale-105 duration-150 transition-all"
+                className="h-11 hover:scale-105 duration-150 transition-all bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
               >
                 Close
               </Button>
@@ -865,7 +878,7 @@ const AddEventModal = ({
                 disabled={
                   !form.formState.isValid || form.formState.isSubmitting
                 }
-                className="bg-blue-600 hover:bg-blue-700 text-white h-11 hover:scale-105 duration-150 transition-all"
+                className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white h-11 hover:scale-105 duration-150 transition-all"
               >
                 {isEditMode ? "Update Event" : "Request Event"}
               </Button>

@@ -14,8 +14,6 @@ import {
   Clock,
   ArrowRight,
   CheckCircle,
-  Moon,
-  Sun,
   Menu,
   X,
   ChevronRight,
@@ -28,9 +26,10 @@ import {
   Clapperboard,
 } from "lucide-react";
 import { landing_content } from "@/utils/data/landing_content";
+import { ModeToggle } from "@/components/ThemeToggler/ThemeToggler";
 
 export default function Home() {
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
@@ -120,10 +119,6 @@ export default function Home() {
     };
   }, []);
 
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
-
   if (!mounted) return null;
 
   return (
@@ -192,18 +187,7 @@ export default function Home() {
             </nav>
 
             <div className="flex items-center gap-4">
-              <motion.button
-                onClick={toggleTheme}
-                whileTap={{ scale: 0.95 }}
-                className="p-2 rounded-full bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-white/80 dark:hover:bg-gray-700/80 transition-colors shadow-sm backdrop-blur-sm"
-                aria-label="Toggle theme"
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
-              </motion.button>
+              <ModeToggle />
 
               {/* Login button - visible only on desktop */}
               <div className="hidden md:block">
