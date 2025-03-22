@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/modal-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   User,
   Mail,
@@ -47,6 +46,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { courses } from "@/utils/data/courses";
+import { useDropzone } from "react-dropzone";
 
 interface AddStudentModalProps {
   isOpen: boolean;
@@ -128,21 +128,35 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
 
+  const defaultFormValues = {
+    name: "",
+    email: "",
+    phone: "+91 ", // Always initialize with a string
+    rollno: "",
+    course: "",
+    department: "",
+    year: 1,
+    avatarUrl: "",
+    password: isEditMode ? undefined : "", // Only include password for add mode
+  };
+
   // Use the appropriate schema based on mode
   const form = useForm<FormValues>({
     resolver: zodResolver(isEditMode ? editFormSchema : addFormSchema),
     mode: "onChange",
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "+91 ",
-      rollno: "",
-      course: "",
-      department: "",
-      year: 1,
-      avatarUrl: "",
-      ...(isEditMode ? {} : { password: "" }),
-    },
+    defaultValues:
+      isEditMode && studentToEdit
+        ? {
+            name: studentToEdit.name || "",
+            email: studentToEdit.email || "",
+            phone: studentToEdit.phone || "+91 ",
+            rollno: studentToEdit.rollno || "",
+            course: studentToEdit.course || "",
+            department: studentToEdit.department || "",
+            year: studentToEdit.year || 1,
+            avatarUrl: studentToEdit.avatarUrl || "",
+          }
+        : defaultFormValues,
   });
 
   // Effect to populate form with existing student data when editing
@@ -235,19 +249,30 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
     }
   }, [selectedCourse, form, isEditMode, studentToEdit]);
 
-  const handleAvatarUrlUpload = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarUrlPreview(reader.result as string);
-        form.setValue("avatarUrl", reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  // Replace the handleAvatarUrlUpload with React Dropzone
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setAvatarUrlPreview(reader.result as string);
+          form.setValue("avatarUrl", reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    [form]
+  );
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [".jpeg", ".jpg", ".png", ".gif"],
+    },
+    maxFiles: 1,
+    maxSize: 5242880, // 5MB
+  });
 
   const onSubmit: SubmitHandler<FormValues> = (values) => {
     if (isEditMode && studentToEdit && onUpdateStudent) {
@@ -302,7 +327,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
     }
 
     // Reset form and close modal
-    form.reset();
+    form.reset(defaultFormValues);
     setAvatarUrlPreview(null);
     onClose();
   };
@@ -328,31 +353,23 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
           >
             {/* AvatarUrl Upload */}
             <div className="flex justify-center mb-4">
-              <div className="relative">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  id="avatarUrl-upload"
-                  onChange={handleAvatarUrlUpload}
-                />
-                <Label htmlFor="avatarUrl-upload" className="cursor-pointer">
-                  <Avatar className="w-24 h-24 border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200">
-                    <AvatarImage
-                      src={avatarUrlPreview || "/placeholder-avatar.jpg"}
-                      alt="Student Avatar"
-                      className="object-cover"
-                    />
-                    <AvatarFallback className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300">
-                      <Upload className="h-8 w-8" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute inset-0 bg-black/0 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-all flex items-center justify-center">
-                    <span className="text-transparent hover:text-white text-xs font-medium opacity-0 hover:opacity-100 transition-opacity">
-                      Change
-                    </span>
-                  </div>
-                </Label>
+              <div
+                {...getRootProps()}
+                className={`relative cursor-pointer transition-all duration-200 ${
+                  isDragActive ? "scale-105" : ""
+                }`}
+              >
+                <input {...getInputProps()} />
+                <Avatar className="w-24 h-24 border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 rounded-full">
+                  <AvatarImage
+                    src={avatarUrlPreview || "/placeholder-avatar.jpg"}
+                    alt="Student Avatar"
+                    className="object-cover rounded-full"
+                  />
+                  <AvatarFallback className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 rounded-full">
+                    <Upload className="h-8 w-8" />
+                  </AvatarFallback>
+                </Avatar>
               </div>
             </div>
 

@@ -19,6 +19,7 @@ import {
   X,
   Ban,
   Ellipsis,
+  Info,
 } from "lucide-react";
 import Image from "next/image";
 import { Event } from "@/types/event";
@@ -325,10 +326,10 @@ const EventCard = ({
             <Button
               size="sm"
               variant="default"
-              className="w-full"
+              className="w-full h-11 hover:scale-105 duration-150 transition-all  bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow text rounded-lg text-sm font-medium"
               onClick={() => handleViewDetails(event.id)}
             >
-              <Eye className="h-4 w-4 mr-2" />
+              <Info className="h-5 w-5 mr-1" />
               View Event
             </Button>
           )}

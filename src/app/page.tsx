@@ -122,10 +122,10 @@ export default function Home() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-white to-blue-50 dark:from-gray-950 dark:to-blue-950 text-gray-900 dark:text-gray-100 relative overflow-hidden">
+    <div className="min-h-screen w-full bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 relative overflow-hidden">
       {/* Scroll Progress Bar */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 z-[100] origin-left"
+        className="fixed top-0 left-0 right-0 h-1 bg-blue-600 dark:bg-blue-500 z-[100] origin-left"
         style={{
           scaleX,
           opacity: showScrollProgress ? 1 : 0,
@@ -135,8 +135,8 @@ export default function Home() {
       {/* Animated Background Elements */}
       <div className="absolute inset-0 z-0">
         {/* Gradient Orbs */}
-        <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-blue-300/20 dark:bg-blue-600/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/3 left-1/4 w-80 h-80 bg-purple-300/20 dark:bg-purple-600/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-blue-100 dark:bg-blue-900/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/3 left-1/4 w-80 h-80 bg-blue-100 dark:bg-blue-900/20 rounded-full blur-3xl"></div>
       </div>
 
       {/* Header/Navigation */}
@@ -149,14 +149,14 @@ export default function Home() {
         transition={{ duration: 0.3 }}
       >
         <motion.div
-          className="w-full px-4 py-3 bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl border-b border-white/20 dark:border-gray-800/20 shadow-lg"
+          className="w-full px-4 py-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-lg"
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
           <div className="container mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-xl bg-blue-600 dark:bg-blue-600 flex items-center justify-center shadow-md shadow-blue-500/20 dark:shadow-blue-500/10">
+              <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-500/20 dark:shadow-blue-500/10">
                 <TicketCheck className="h-5 w-5 text-white" />
               </div>
               <motion.span
@@ -191,7 +191,7 @@ export default function Home() {
 
               {/* Login button - visible only on desktop */}
               <div className="hidden md:block">
-                <Link href="/student/auth/login">
+                <Link href="/login">
                   <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 dark:shadow-blue-500/10 border-0 h-11 px-8 hover:scale-105 duration-150 transition-all">
                     {landing_content.navigation.loginButton}
                     <ArrowRight className="ml-1 h-4 w-4" />
@@ -221,7 +221,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="absolute top-full mt-2 left-4 right-4 md:hidden bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-xl border border-white/20 dark:border-gray-800/20 shadow-xl overflow-hidden"
+              className="absolute top-full mt-2 left-4 right-4 md:hidden bg-white dark:bg-gray-900 backdrop-blur-xl rounded-xl border border-gray-200 dark:border-gray-800 shadow-xl overflow-hidden"
             >
               <div className="py-4 flex flex-col space-y-1">
                 {landing_content.navigation.links.map((link) => (
@@ -242,10 +242,7 @@ export default function Home() {
 
                 {/* Login button in mobile menu */}
                 <div className="px-2 pt-2 mt-2 border-t border-gray-100 dark:border-gray-800/30">
-                  <Link
-                    href="/student/auth/login"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
+                  <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                     <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full h-11 flex items-center justify-center">
                       <span>{landing_content.navigation.loginButton}</span>
                       <ArrowRight className="ml-1 h-4 w-4" />
@@ -269,13 +266,12 @@ export default function Home() {
       >
         {/* Background elements */}
         <div className="absolute inset-0 -z-10">
-          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-blue-400/20 dark:bg-blue-600/10 rounded-full blur-[100px]"></div>
-          <div className="absolute bottom-1/3 left-1/3 w-96 h-96 bg-purple-400/20 dark:bg-purple-600/10 rounded-full blur-[100px]"></div>
+          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-blue-100 dark:bg-blue-900/20 rounded-full blur-[100px]"></div>
+          <div className="absolute bottom-1/3 left-1/3 w-96 h-96 bg-blue-100 dark:bg-blue-900/20 rounded-full blur-[100px]"></div>
         </div>
 
         <motion.div
           ref={heroRef}
-          // style={{ opacity: heroOpacity }}
           className="container mx-auto px-4 relative z-10"
         >
           {/* Interactive gradient spot that follows mouse */}
@@ -288,18 +284,18 @@ export default function Home() {
             transition={{ type: "spring", damping: 15 }}
             style={{
               background:
-                "radial-gradient(circle, rgba(79,70,229,1) 0%, rgba(127,156,245,0) 70%)",
+                "radial-gradient(circle, rgba(37,99,235,1) 0%, rgba(37,99,235,0) 70%)",
             }}
           />
 
           <div className="flex flex-col items-center text-center mb-16">
             <motion.div
-              className="inline-block mb-6 px-5 py-2 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full border border-blue-100 dark:border-blue-800/30 shadow-sm"
+              className="inline-block mb-6 px-5 py-2 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-100 dark:border-blue-800/30 shadow-sm"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <span className="text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent flex items-center gap-1.5">
+              <span className="text-sm font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
                 <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 {landing_content.hero.badge}
               </span>
@@ -311,7 +307,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
             >
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+              <span className="text-blue-600 dark:text-blue-400">
                 {landing_content.hero.title.split(" ")[0]}{" "}
               </span>
               {landing_content.hero.title.split(" ").slice(1).join(" ")}
@@ -335,7 +331,7 @@ export default function Home() {
               <Link href="/login">
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white group transition-all shadow-lg shadow-blue-500/20 dark:shadow-blue-500/10 border-0 h-11 px-8 hover:scale-105 duration-150 text-md font-medium md:w-[250px] w-full"
+                  className="bg-blue-600 hover:bg-blue-700 text-white group transition-all shadow-lg shadow-blue-500/20 dark:shadow-blue-500/10 border-0 h-11 px-8 hover:scale-105 duration-150 text-md font-medium md:w-[250px] w-full"
                 >
                   {landing_content.hero.primaryButton}
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -365,14 +361,14 @@ export default function Home() {
             <div className="relative">
               {/* Decorative elements */}
               <motion.div
-                className="absolute -top-10 -left-10 w-32 h-32 bg-gradient-to-br from-blue-300 to-purple-300 dark:from-blue-600/30 dark:to-purple-600/30 rounded-2xl -z-10 blur-xl"
+                className="absolute -top-10 -left-10 w-32 h-32 bg-blue-200 dark:bg-blue-800/30 rounded-2xl -z-10 blur-xl"
                 initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ duration: 0.5, delay: 0.7 }}
               ></motion.div>
 
               <motion.div
-                className="absolute -bottom-10 -right-10 w-40 h-40 bg-gradient-to-br from-purple-300 to-blue-300 dark:from-purple-600/30 dark:to-blue-600/30 rounded-2xl -z-10 blur-xl"
+                className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-200 dark:bg-blue-800/30 rounded-2xl -z-10 blur-xl"
                 initial={{ opacity: 0, scale: 0.8, rotate: 10 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ duration: 0.5, delay: 0.8 }}
@@ -387,7 +383,7 @@ export default function Home() {
                 transition={{ duration: 0.4 }}
               >
                 {/* Status bar with indicators */}
-                <div className="px-6 md:py-4 py-2 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+                <div className="px-6 md:py-4 py-2 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-blue-50 dark:bg-blue-900/20">
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 rounded-full bg-red-400"></div>
                     <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
@@ -414,7 +410,7 @@ export default function Home() {
                   />
 
                   {/* Glassmorphism overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/10 to-transparent mix-blend-overlay"></div>
+                  <div className="absolute inset-0 bg-blue-600/10 mix-blend-overlay"></div>
                 </div>
               </motion.div>
 
@@ -483,10 +479,10 @@ export default function Home() {
       <section
         id="features"
         ref={sectionRefs.features}
-        className="py-20 relative bg-gray-100 dark:bg-gray-900"
+        className="py-20 relative bg-gray-50 dark:bg-gray-900"
       >
         {/* Feature section background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-50/50 to-transparent dark:from-transparent dark:via-blue-950/30 dark:to-transparent -z-10"></div>
+        <div className="absolute inset-0 bg-blue-50/50 dark:bg-blue-950/30 -z-10"></div>
 
         <div className="container mx-auto px-4">
           <motion.div
@@ -497,13 +493,13 @@ export default function Home() {
             transition={{ duration: 0.5 }}
           >
             <motion.div
-              className="inline-block mb-4 px-4 py-1.5 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full border border-blue-100 dark:border-blue-800/30"
+              className="inline-block mb-4 px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-100 dark:border-blue-800/30"
               initial={{ opacity: 0, y: -10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false }}
               transition={{ duration: 0.5 }}
             >
-              <span className="text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent flex items-center gap-1.5">
+              <span className="text-sm font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
                 <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 {landing_content.features.badge}
               </span>
@@ -512,7 +508,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Our product has these{" "}
               <span className="relative inline-block">
-                <span className="relative z-10 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+                <span className="relative z-10 text-blue-600 dark:text-blue-400">
                   powerful features
                 </span>
               </span>
@@ -538,14 +534,14 @@ export default function Home() {
               return (
                 <motion.div
                   key={index}
-                  className="bg-white dark:bg-gray-800/50 p-6 rounded-2xl border border-gray-100 dark:border-gray-700/50 hover:border-blue-200 dark:hover:border-blue-700/50 shadow-sm hover:shadow-xl transition-all group"
+                  className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-700 shadow-sm hover:shadow-xl transition-all group"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false, margin: "-100px" }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   whileHover={{ y: -5 }}
                 >
-                  <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <div className="h-12 w-12 rounded-2xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                     <Icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <h3 className="text-xl font-bold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
@@ -568,11 +564,11 @@ export default function Home() {
         className="py-20 relative overflow-hidden"
       >
         {/* Benefits section background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-50/30 to-transparent dark:from-transparent dark:via-purple-950/20 dark:to-transparent -z-10"></div>
+        <div className="absolute inset-0 bg-blue-50/30 dark:bg-blue-950/20 -z-10"></div>
 
         {/* Decorative elements */}
         <motion.div
-          className="absolute top-20 right-10 w-64 h-64 bg-blue-300/10 dark:bg-blue-600/5 rounded-full blur-3xl"
+          className="absolute top-20 right-10 w-64 h-64 bg-blue-100 dark:bg-blue-900/20 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.05, 1],
             opacity: [0.5, 0.7, 0.5],
@@ -595,13 +591,13 @@ export default function Home() {
             >
               <div className="flex justify-center md:justify-start">
                 <motion.div
-                  className="inline-block mb-4 px-4 py-1.5 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full border border-blue-100 dark:border-blue-800/30 shadow-sm"
+                  className="inline-block mb-4 px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-100 dark:border-blue-800/30 shadow-sm"
                   initial={{ opacity: 0, y: -10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
                   transition={{ duration: 0.5 }}
                 >
-                  <span className="text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent flex items-center gap-1.5">
+                  <span className="text-sm font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
                     <Sparkles className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
                     {landing_content.benefits.badge}
                   </span>
@@ -610,7 +606,7 @@ export default function Home() {
 
               <h2 className="text-3xl md:text-4xl font-bold mb-6 md:text-left text-center">
                 <span className="relative inline-block">
-                  <span className="relative z-10 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+                  <span className="relative z-10 text-blue-600 dark:text-blue-400">
                     {landing_content.benefits.title.split(" ")[0]}
                   </span>
                 </span>{" "}
@@ -638,7 +634,7 @@ export default function Home() {
                     transition={{ duration: 0.4, delay: index * 0.1 }}
                     whileHover={{ x: 3 }}
                   >
-                    <div className="h-7 w-7 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
+                    <div className="h-7 w-7 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
                       <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                     </div>
                     <p className="text-gray-700 dark:text-gray-300 font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
@@ -659,7 +655,7 @@ export default function Home() {
               <div className="relative rounded-2xl overflow-hidden shadow-2xl group max-w-lg mx-auto lg:max-w-none">
                 {/* Floating elements */}
                 <motion.div
-                  className="absolute -top-6 -right-6 w-20 h-20 bg-gradient-to-br from-blue-300 to-purple-300 dark:from-blue-600/30 dark:to-purple-600/30 rounded-2xl -z-10 blur-md"
+                  className="absolute -top-6 -right-6 w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-2xl -z-10 blur-md"
                   initial={{ opacity: 0, scale: 0.8, rotate: 10 }}
                   whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
                   viewport={{ once: false }}
@@ -667,7 +663,7 @@ export default function Home() {
                 ></motion.div>
 
                 <motion.div
-                  className="absolute -bottom-6 -left-6 w-24 h-24 bg-gradient-to-br from-purple-300 to-blue-300 dark:from-purple-600/30 dark:to-blue-600/30 rounded-2xl -z-10 blur-md"
+                  className="absolute -bottom-6 -left-6 w-24 h-24 bg-blue-100 dark:bg-blue-900/30 rounded-2xl -z-10 blur-md"
                   initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
                   whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
                   viewport={{ once: false }}
@@ -699,11 +695,11 @@ export default function Home() {
       {/* CTA Section */}
       <section className="py-20 relative overflow-hidden bg-gray-100 dark:bg-gray-900">
         {/* CTA background elements */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-50/30 to-transparent dark:from-transparent dark:via-blue-950/20 dark:to-transparent -z-10"></div>
+        <div className="absolute inset-0 bg-blue-50/30 dark:bg-blue-950/20 -z-10"></div>
 
         {/* Decorative elements */}
         <motion.div
-          className="absolute bottom-20 left-10 w-72 h-72 bg-purple-300/10 dark:bg-purple-600/5 rounded-full blur-3xl"
+          className="absolute bottom-20 left-10 w-72 h-72 bg-blue-100 dark:bg-blue-900/20 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.05, 1],
             opacity: [0.5, 0.7, 0.5],
@@ -717,7 +713,7 @@ export default function Home() {
 
         <div className="container mx-auto px-4">
           <motion.div
-            className="relative bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 md:p-12 text-white overflow-hidden shadow-2xl"
+            className="relative bg-blue-600 rounded-3xl p-8 md:p-12 text-white overflow-hidden shadow-2xl"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, margin: "-100px" }}
@@ -1006,15 +1002,33 @@ export default function Home() {
               </p>
 
               <div className="flex items-center gap-4">
-                {[Twitter, Instagram, Linkedin, Github].map((Icon, index) => (
+                {[
+                  {
+                    icon: Twitter,
+                    id: 1,
+                    link: "https://twitter.com/digievent",
+                  },
+                  {
+                    icon: Instagram,
+                    id: 2,
+                    link: "https://instagram.com/digievent",
+                  },
+                  {
+                    icon: Linkedin,
+                    id: 3,
+                    link: "https://linkedin.com/company/digievent",
+                  },
+                  { icon: Github, id: 4, link: "https://github.com/digievent" },
+                ].map((item) => (
                   <motion.a
-                    key={index}
-                    href="#"
-                    className="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    key={item.id}
+                    href={item.link}
+                    className="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                     whileHover={{ y: -3 }}
                     whileTap={{ scale: 0.95 }}
+                    target="_blank"
                   >
-                    <Icon className="h-5 w-5" />
+                    <item.icon className="h-5 w-5" />
                   </motion.a>
                 ))}
               </div>

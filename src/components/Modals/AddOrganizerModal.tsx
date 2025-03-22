@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/modal-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   User,
   Mail,
@@ -35,6 +34,7 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useDropzone } from "react-dropzone";
 
 // Define the Organizer type
 export type Organizer = {
@@ -158,19 +158,30 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
     }
   }, [editMode, organizerToEdit, form]);
 
-  const handleAvatarUrlUpload = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarUrlPreview(reader.result as string);
-        form.setValue("avatarUrl", reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  // Replace the handleAvatarUrlUpload with onDrop for React Dropzone
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setAvatarUrlPreview(reader.result as string);
+          form.setValue("avatarUrl", reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    [form]
+  );
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [".jpeg", ".jpg", ".png", ".gif"],
+    },
+    maxFiles: 1,
+    maxSize: 5242880, // 5MB
+  });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     // Create or update organizer object
@@ -226,26 +237,23 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
           >
             {/* Avatar Upload */}
             <div className="flex justify-center mb-4">
-              <div className="relative">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  id="avatarUrl-upload"
-                  onChange={handleAvatarUrlUpload}
-                />
-                <Label htmlFor="avatarUrl-upload" className="cursor-pointer">
-                  <Avatar className="w-24 h-24 border-2 hover:border-blue-500 transition-all border-gray-300 dark:border-gray-600">
-                    <AvatarImage
-                      src={avatarUrlPreview || "/placeholder-avatar.jpg"}
-                      alt="Organizer Avatar"
-                      className="object-cover"
-                    />
-                    <AvatarFallback className="bg-gray-800 text-white">
-                      <Upload />
-                    </AvatarFallback>
-                  </Avatar>
-                </Label>
+              <div
+                {...getRootProps()}
+                className={`relative cursor-pointer transition-all duration-200 ${
+                  isDragActive ? "scale-105" : ""
+                }`}
+              >
+                <input {...getInputProps()} />
+                <Avatar className="w-24 h-24 rounded-full border-2 hover:border-blue-500 transition-all border-gray-300 dark:border-gray-600">
+                  <AvatarImage
+                    src={avatarUrlPreview || "/placeholder-avatar.jpg"}
+                    alt="Organizer Avatar"
+                    className="object-cover rounded-full"
+                  />
+                  <AvatarFallback className="rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300">
+                    <Upload className="h-8 w-8" />
+                  </AvatarFallback>
+                </Avatar>
               </div>
             </div>
 

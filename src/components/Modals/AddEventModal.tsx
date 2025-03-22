@@ -20,8 +20,6 @@ import {
   Sofa,
   Clock,
   Globe,
-  CreditCard,
-  Building,
 } from "lucide-react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -94,19 +92,6 @@ const formSchema = z
         message: "Price cannot be negative",
       }),
     image: z.string().min(1, { message: "Event image is required" }),
-    bankAccount: z
-      .string()
-      .optional()
-      .refine((val) => !val || /^[0-9]{9,18}$/.test(val), {
-        message:
-          "Please enter a valid Indian bank account number (9-18 digits)",
-      }),
-    ifscCode: z
-      .string()
-      .optional()
-      .refine((val) => !val || /^[A-Z]{4}0[A-Z0-9]{6}$/.test(val), {
-        message: "Please enter a valid IFSC code (format: ABCD0123456)",
-      }),
   })
   .refine(
     (data) => {
@@ -159,22 +144,6 @@ const createDynamicResolver = (
             code: z.ZodIssueCode.custom,
             message: "Price must be a positive number",
             path: ["price"],
-          });
-        }
-
-        if (!data.bankAccount || data.bankAccount.trim() === "") {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Bank account number is required for paid events",
-            path: ["bankAccount"],
-          });
-        }
-
-        if (!data.ifscCode || data.ifscCode.trim() === "") {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "IFSC code is required for paid events",
-            path: ["ifscCode"],
           });
         }
       }
@@ -233,8 +202,6 @@ const AddEventModal = ({
       eventType: "physical",
       price: "",
       image: "",
-      bankAccount: "",
-      ifscCode: "",
     },
   });
 
@@ -287,8 +254,6 @@ const AddEventModal = ({
         price:
           editEvent.price === "Free" || !editEvent.price ? "" : editEvent.price,
         image: editEvent.image ?? "",
-        bankAccount: editEvent.bankAccount ?? "",
-        ifscCode: editEvent.ifscCode ?? "",
       });
 
       // Trigger validation after form reset
@@ -389,8 +354,6 @@ const AddEventModal = ({
           : "",
       eventType: selectedEventType,
       image: values.image || "/placeholder-event.jpg",
-      bankAccount: eventType === "paid" ? values.bankAccount : "",
-      ifscCode: eventType === "paid" ? values.ifscCode : "",
       createdAt: new Date().toISOString(),
     };
 
@@ -430,9 +393,19 @@ const AddEventModal = ({
         description: "Event type cannot be changed after creation",
         variant: "destructive",
       });
-      alert("Event type cannot be changed after creation");
+    }
+
+    // For paid events, show toast but don't change the event type
+    if (type === "paid") {
+      toast({
+        title: "Bank Account Required",
+        description:
+          "Paid events require bank account verification. Please add your bank details first.",
+        variant: "destructive",
+      });
       return;
     }
+
     setEventType(type);
     // Trigger validation after changing event type
     setTimeout(() => {
@@ -459,10 +432,8 @@ const AddEventModal = ({
                 "py-2 rounded-md text-sm font-medium transition-all duration-200",
                 eventType === "free"
                   ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm"
-                  : "bg-transparent dark:bg-transparent text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50",
-                isEditMode && "opacity-70 cursor-not-allowed"
+                  : "bg-transparent dark:bg-transparent text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50"
               )}
-              disabled={isEditMode}
             >
               Free
             </button>
@@ -473,24 +444,16 @@ const AddEventModal = ({
                 "py-2 rounded-md text-sm font-medium transition-all duration-200",
                 eventType === "paid"
                   ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm"
-                  : "bg-transparent dark:bg-transparent text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50",
-                isEditMode && "opacity-70 cursor-not-allowed"
+                  : "bg-transparent dark:bg-transparent text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50"
               )}
-              disabled={isEditMode}
             >
               Paid
             </button>
           </div>
-          {isEditMode && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
-              Event type cannot be changed after creation
-            </p>
-          )}
         </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {/* Image Upload */}
             {/* Image Upload with React Dropzone */}
             <div>
               <FormLabel className="flex items-center gap-2 mb-2 text-gray-700 dark:text-gray-300">
@@ -811,56 +774,6 @@ const AddEventModal = ({
                   </FormItem>
                 )}
               />
-            )}
-
-            {/* Bank Details Section */}
-            {eventType === "paid" && (
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="bankAccount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        <CreditCard className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
-                        Bank Account Number
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          placeholder="Enter bank account number"
-                          {...field}
-                          className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="ifscCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        <Building className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
-                        IFSC Code
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          placeholder="Enter IFSC code"
-                          {...field}
-                          className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
-                          autoCapitalize="characters"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
             )}
 
             {/* Footer Buttons */}

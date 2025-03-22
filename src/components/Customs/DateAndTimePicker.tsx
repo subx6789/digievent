@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/modal-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -60,18 +60,20 @@ export const CustomDatePicker: React.FC<DatePickerProps> = ({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <div className={cn("relative", className)}>
-          <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
+          <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 z-10" />
           <Input
             placeholder="dd-mm-yyyy"
             value={selectedDay ? format(selectedDay, "MMM dd, yyyy") : ""}
             readOnly
-            className="pl-10 h-10 cursor-pointer dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            className="pl-10 h-10 cursor-pointer bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
           />
         </div>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <DialogHeader className="p-4 pb-0">
-          <DialogTitle>Select Date</DialogTitle>
+          <DialogTitle className="text-gray-900 dark:text-gray-100">
+            Select Date
+          </DialogTitle>
         </DialogHeader>
         <DayPicker
           mode="single"
@@ -81,28 +83,31 @@ export const CustomDatePicker: React.FC<DatePickerProps> = ({
           className="w-full p-4"
           classNames={{
             caption: "flex justify-between items-center mb-4",
-            caption_label: "text-sm font-semibold text-gray-700",
+            caption_label:
+              "text-sm font-semibold text-gray-700 dark:text-gray-300",
             nav: "flex items-center space-x-1",
             nav_button: cn(
-              "h-8 w-8 bg-transparent hover:bg-gray-100 rounded-full",
+              "h-8 w-8 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300",
               "disabled:cursor-not-allowed disabled:opacity-50"
             ),
-            head: "border-b pb-2",
+            head: "border-b border-gray-200 dark:border-gray-700 pb-2",
             head_row: "flex",
-            head_cell: "w-12 text-center text-xs font-medium text-gray-500",
+            head_cell:
+              "w-12 text-center text-xs font-medium text-gray-500 dark:text-gray-400",
             row: "flex",
             cell: "w-12 text-center",
             day: cn(
-              "h-10 w-10 p-2 rounded-full text-sm",
-              "hover:bg-blue-100 hover:text-blue-600",
-              "focus:bg-blue-500 focus:text-white",
-              "aria-selected:bg-blue-500 aria-selected:text-white"
+              "h-10 w-10 p-2 rounded-full text-sm text-gray-800 dark:text-gray-200",
+              "hover:bg-blue-100 dark:hover:bg-blue-900/40 hover:text-blue-600 dark:hover:text-blue-300",
+              "focus:bg-blue-500 focus:text-white dark:focus:text-white",
+              "aria-selected:bg-blue-500 aria-selected:text-white dark:aria-selected:text-white"
             ),
-            day_today: "bg-blue-50 text-blue-600",
-            day_outside: "text-gray-300",
+            day_today:
+              "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400",
+            day_outside: "text-gray-300 dark:text-gray-600",
             day_disabled:
-              "text-gray-300 cursor-not-allowed hover:bg-transparent",
-            day_selected: "bg-blue-500 text-white",
+              "text-gray-300 dark:text-gray-600 cursor-not-allowed hover:bg-transparent",
+            day_selected: "bg-blue-500 text-white dark:text-white",
           }}
         />
       </DialogContent>
@@ -158,32 +163,35 @@ export const CustomTimePicker: React.FC<TimePickerProps> = ({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <div className={cn("relative", className)}>
-          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
+          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 z-10" />
           <Input
             placeholder="--:--"
             value={selectedTime}
             readOnly
-            className="pl-10 h-10 cursor-pointer dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            className="pl-10 h-10 cursor-pointer bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
           />
         </div>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <DialogHeader>
-          <DialogTitle>Select Time</DialogTitle>
+          <DialogTitle className="text-gray-900 dark:text-gray-100">
+            Select Time
+          </DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Hour
             </label>
-            <div className="max-h-48 overflow-y-auto border rounded-md">
+            <div className="max-h-48 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md">
               {hours.map((hour) => (
                 <div
                   key={hour}
                   onClick={() => setSelectedHour(hour)}
                   className={cn(
-                    "p-2 text-center cursor-pointer hover:bg-gray-200 hover:text-black",
-                    selectedHour === hour && "bg-blue-600 text-white"
+                    "p-2 text-center cursor-pointer text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700",
+                    selectedHour === hour &&
+                      "bg-blue-600 dark:bg-blue-700 text-white dark:text-white"
                   )}
                 >
                   {hour}
@@ -192,17 +200,18 @@ export const CustomTimePicker: React.FC<TimePickerProps> = ({
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Minute
             </label>
-            <div className="max-h-48 overflow-y-auto border rounded-md">
+            <div className="max-h-48 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md">
               {minutes.map((minute) => (
                 <div
                   key={minute}
                   onClick={() => setSelectedMinute(minute)}
                   className={cn(
-                    "p-2 text-center cursor-pointer hover:bg-gray-200 hover:text-black",
-                    selectedMinute === minute && "bg-blue-600 text-white"
+                    "p-2 text-center cursor-pointer text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700",
+                    selectedMinute === minute &&
+                      "bg-blue-600 dark:bg-blue-700 text-white dark:text-white"
                   )}
                 >
                   {minute}
@@ -216,7 +225,7 @@ export const CustomTimePicker: React.FC<TimePickerProps> = ({
             type="button"
             onClick={handleTimeChange}
             disabled={!selectedHour || !selectedMinute}
-            className="bg-blue-500 text-white hover:bg-blue-600"
+            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white"
           >
             Confirm
           </Button>

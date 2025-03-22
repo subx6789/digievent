@@ -77,8 +77,6 @@ export const organizerEvents: Event[] = [
     eventType: "physical",
     status: "approved",
     createdAt: "2024-02-15T16:30:00Z",
-    bankAccount: "35672819045",
-    ifscCode: "SBIN0015622",
     virtualLink: "",
   },
   {
@@ -99,8 +97,6 @@ export const organizerEvents: Event[] = [
     eventType: "physical",
     status: "approved",
     createdAt: "2024-03-01T11:00:00Z",
-    bankAccount: "42198736540",
-    ifscCode: "HDFC0002345",
     virtualLink: "",
   },
   {
@@ -120,8 +116,6 @@ export const organizerEvents: Event[] = [
     eventType: "physical",
     status: "approved",
     createdAt: "2024-03-10T13:45:00Z",
-    bankAccount: "78123456789",
-    ifscCode: "ICIC0001234",
     virtualLink: "",
   },
   {
@@ -141,8 +135,6 @@ export const organizerEvents: Event[] = [
     eventType: "physical",
     status: "pending",
     createdAt: "2024-03-15T18:30:00Z",
-    bankAccount: "91827364501",
-    ifscCode: "AXIS0007654",
     virtualLink: "",
   },
   {
@@ -163,8 +155,6 @@ export const organizerEvents: Event[] = [
     eventType: "virtual",
     status: "rejected",
     createdAt: "2024-03-20T09:15:00Z",
-    bankAccount: "65432198701",
-    ifscCode: "YESB0000123",
     virtualLink: "https://meet.google.com/abc-defg-hij",
   },
   {
@@ -205,8 +195,6 @@ export const organizerEvents: Event[] = [
     eventType: "physical",
     status: "pending",
     createdAt: "2024-04-01T10:30:00Z",
-    bankAccount: "12345678901",
-    ifscCode: "SBIN0012345",
     virtualLink: "",
   },
   {
@@ -226,8 +214,6 @@ export const organizerEvents: Event[] = [
     eventType: "virtual",
     status: "approved",
     createdAt: "2024-04-10T15:45:00Z",
-    bankAccount: "98765432109",
-    ifscCode: "HDFC0009876",
     virtualLink: "https://discord.gg/gamerstournament",
   },
 ];

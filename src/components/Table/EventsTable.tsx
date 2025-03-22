@@ -289,28 +289,46 @@ const EventsTable = ({ events }: TableProps) => {
       </div>
 
       {totalPages > 1 && (
-        <div className="py-6 flex justify-center">
+        <div className="py-6 flex justify-center border-t border-gray-200 dark:border-gray-700">
           <Pagination>
-            <PaginationContent>
+            <PaginationContent className="flex items-center gap-2">
               <PaginationItem>
                 <PaginationPrevious
                   onClick={() =>
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
-                  className={
-                    currentPage === 1 ? "pointer-events-none opacity-50" : ""
-                  }
+                  className={`
+                    border border-gray-200 dark:border-gray-700 rounded-md 
+                    hover:bg-gray-100 dark:hover:bg-gray-800 
+                    text-gray-700 dark:text-gray-300 
+                    transition-colors duration-200 cursor-pointer
+                    ${
+                      currentPage === 1
+                        ? "pointer-events-none opacity-50"
+                        : "hover:text-gray-900 dark:hover:text-white"
+                    }
+                  `}
                 />
               </PaginationItem>
 
               {getPaginationRange().map((page, i) => (
                 <PaginationItem key={i}>
                   {page === "ellipsis-start" || page === "ellipsis-end" ? (
-                    <PaginationEllipsis />
+                    <PaginationEllipsis className="text-gray-500 dark:text-gray-400" />
                   ) : (
                     <PaginationLink
                       onClick={() => setCurrentPage(page as number)}
                       isActive={currentPage === page}
+                      className={`
+                        cursor-pointer transition-all duration-200
+                        border border-gray-200 dark:border-gray-700 rounded-md
+                        hover:shadow-sm
+                        ${
+                          currentPage === page
+                            ? "bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white border-blue-600 dark:border-blue-700"
+                            : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                        }
+                      `}
                     >
                       {page}
                     </PaginationLink>
@@ -323,11 +341,17 @@ const EventsTable = ({ events }: TableProps) => {
                   onClick={() =>
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                   }
-                  className={
-                    currentPage === totalPages
-                      ? "pointer-events-none opacity-50"
-                      : ""
-                  }
+                  className={`
+                    border border-gray-200 dark:border-gray-700 rounded-md 
+                    hover:bg-gray-100 dark:hover:bg-gray-800 
+                    text-gray-700 dark:text-gray-300 
+                    transition-colors duration-200 cursor-pointer
+                    ${
+                      currentPage === totalPages
+                        ? "pointer-events-none opacity-50"
+                        : "hover:text-gray-900 dark:hover:text-white"
+                    }
+                  `}
                 />
               </PaginationItem>
             </PaginationContent>

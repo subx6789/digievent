@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -43,7 +43,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { College } from "../Table/CollegeTable";
 import { getCitiesForState, STATES } from "@/utils/data/statesAndCities";
-import { Label } from "../ui/label";
+import { useDropzone } from "react-dropzone";
 
 interface AddCollegeModalProps {
   isOpen: boolean;
@@ -134,18 +134,29 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
   };
 
   // Handle logo file upload
-  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setLogoFile(e.target.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setLogoFile(reader.result as string);
+          form.setValue("logo", reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    [form]
+  );
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [".jpeg", ".jpg", ".png", ".gif"],
+    },
+    maxFiles: 1,
+    maxSize: 5242880, // 5MB
+  });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     try {
@@ -205,31 +216,23 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
           >
             {/* Logo Upload */}
             <div className="flex justify-center mb-4">
-              <div className="relative">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  id="avatarUrl-upload"
-                  onChange={handleLogoUpload}
-                />
-                <Label htmlFor="avatarUrl-upload" className="cursor-pointer">
-                  <Avatar className="w-24 h-24 border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200">
-                    <AvatarImage
-                      src={logoFile || "/placeholder-avatar.jpg"}
-                      alt="College Logo"
-                      className="object-cover"
-                    />
-                    <AvatarFallback className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300">
-                      <Upload className="h-8 w-8" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute inset-0 bg-black/0 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-all flex items-center justify-center">
-                    <span className="text-transparent hover:text-white text-xs font-medium opacity-0 hover:opacity-100 transition-opacity">
-                      Upload Logo
-                    </span>
-                  </div>
-                </Label>
+              <div
+                {...getRootProps()}
+                className={`relative cursor-pointer transition-all duration-200 ${
+                  isDragActive ? "scale-105" : ""
+                }`}
+              >
+                <input {...getInputProps()} />
+                <Avatar className="w-24 h-24 rounded-full border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200">
+                  <AvatarImage
+                    src={logoFile || "/placeholder-avatar.jpg"}
+                    alt="College Logo"
+                    className="object-cover rounded-full"
+                  />
+                  <AvatarFallback className="rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300">
+                    <Upload className="h-8 w-8" />
+                  </AvatarFallback>
+                </Avatar>
               </div>
             </div>
 

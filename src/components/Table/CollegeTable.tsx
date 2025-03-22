@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Avatar } from "../ui/avatar";
 import { AvatarFallback, AvatarImage } from "../ui/avatar";
 import clsx from "clsx";
@@ -186,8 +186,19 @@ export const CollegeTable = ({ colleges }: CollegeTableProps) => {
           size="sm"
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
+          className={`
+            bg-transparent border border-gray-200 dark:border-gray-700 
+            hover:bg-gray-100 dark:hover:bg-gray-800 
+            text-gray-700 dark:text-gray-300 
+            rounded-md font-medium transition-colors duration-200
+            ${
+              currentPage === 1
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:text-gray-900 dark:hover:text-white cursor-pointer"
+            }
+          `}
         >
-          Previous
+          <ChevronLeft className="w-5 h-5" />
         </Button>
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
           <Button
@@ -195,6 +206,15 @@ export const CollegeTable = ({ colleges }: CollegeTableProps) => {
             variant={currentPage === page ? "default" : "outline"}
             size="sm"
             onClick={() => setCurrentPage(page)}
+            className={`
+              transition-all duration-200 cursor-pointer
+              border rounded-md font-medium
+              ${
+                currentPage === page
+                  ? "bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white border-blue-600 dark:border-blue-700"
+                  : "bg-transparent dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              }
+            `}
           >
             {page}
           </Button>
@@ -206,8 +226,19 @@ export const CollegeTable = ({ colleges }: CollegeTableProps) => {
             setCurrentPage((prev) => Math.min(prev + 1, totalPages))
           }
           disabled={currentPage === totalPages}
+          className={`
+            bg-transparent border border-gray-200 dark:border-gray-700 
+            hover:bg-gray-100 dark:hover:bg-gray-800 
+            text-gray-700 dark:text-gray-300 
+            rounded-md font-medium transition-colors duration-200
+            ${
+              currentPage === totalPages
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:text-gray-900 dark:hover:text-white cursor-pointer"
+            }
+          `}
         >
-          Next
+          <ChevronRight className="w-5 h-5" />
         </Button>
       </div>
     </div>

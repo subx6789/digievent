@@ -76,7 +76,7 @@ export function StudentLoginForm({
           <div className="mx-auto bg-blue-100 dark:bg-blue-900/30 w-12 h-12 rounded-full flex items-center justify-center mb-2">
             <School className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+          <CardTitle className="text-2xl font-bold text-blue-600 dark:text-blue-400">
             Welcome back
           </CardTitle>
           <CardDescription className="text-gray-500 dark:text-gray-400">
@@ -215,7 +215,7 @@ export function StudentLoginForm({
 
               <Button
                 type="submit"
-                className="w-full h-11 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600 text-white font-medium shadow-md shadow-blue-500/20 dark:shadow-blue-500/10 transition-all duration-200 hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="w-full h-11 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium shadow-md shadow-blue-500/20 dark:shadow-blue-500/10 transition-all duration-200 hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
                 disabled={!isValid || isSubmitting}
               >
                 {isSubmitting ? (

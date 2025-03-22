@@ -16,7 +16,5 @@ export interface Event {
   capacity: string;
   eventType: "physical" | "virtual";
   createdAt?: string;
-  bankAccount?: string;
-  ifscCode?: string;
   virtualLink?: string;
 }
