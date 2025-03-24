@@ -55,26 +55,66 @@ export const landing_content = {
     secondaryButton: "Watch Demo",
   },
   footer: {
-    description: "The all-in-one platform for college event management.",
-    links: {
-      product: [
-        { name: "Features", href: "/features" },
-        { name: "Integrations", href: "/integrations" },
-        { name: "FAQ", href: "/faq" },
-      ],
-      company: [
-        { name: "About", href: "/about" },
-        { name: "Blog", href: "/blog" },
-        { name: "Careers", href: "/careers" },
-        { name: "Contact", href: "/contact" },
-      ],
-      legal: [
-        { name: "Privacy", href: "/privacy" },
-        { name: "Terms", href: "/terms" },
-        { name: "Cookie Policy", href: "/cookie-policy" },
-      ],
-    },
-    copyright: `© ${new Date().getFullYear()} DigiEvent. All rights reserved.`,
+    description:
+      "Simplifying event management for colleges and universities with our all-in-one platform.",
+    socialLinks: [
+      {
+        platform: "twitter",
+        url: "https://twitter.com",
+        hoverColor: "blue-500",
+      },
+      {
+        platform: "instagram",
+        url: "https://instagram.com",
+        hoverColor: "pink-500",
+      },
+      {
+        platform: "linkedin",
+        url: "https://linkedin.com",
+        hoverColor: "blue-700",
+      },
+      {
+        platform: "github",
+        url: "https://github.com",
+        hoverColor: "gray-900",
+      },
+    ],
+    linkColumns: [
+      {
+        title: "Product",
+        links: [
+          { text: "Features", href: "/features" },
+          { text: "Pricing", href: "/pricing" },
+          { text: "Demo", href: "/demo" },
+          { text: "Roadmap", href: "/roadmap" },
+        ],
+      },
+      {
+        title: "Company",
+        links: [
+          { text: "About Us", href: "/about" },
+          { text: "Contact", href: "/contact" },
+          { text: "Careers", href: "/careers" },
+          { text: "Blog", href: "/blog" },
+        ],
+      },
+      {
+        title: "Legal",
+        links: [
+          { text: "Terms of Service", href: "/terms" },
+          { text: "Privacy Policy", href: "/privacy" },
+          { text: "Cookie Policy", href: "/cookies" },
+          { text: "GDPR", href: "/gdpr" },
+        ],
+      },
+    ],
+    copyright: `© ${new Date().getFullYear()} Digievent. All rights reserved.`,
+    bottomLinks: [
+      { text: "Terms", href: "/terms" },
+      { text: "Privacy", href: "/privacy" },
+      { text: "Cookies", href: "/cookies" },
+      { text: "Sitemap", href: "/sitemap" },
+    ],
   },
   navigation: {
     logo: "Digievent",

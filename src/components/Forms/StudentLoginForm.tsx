@@ -66,7 +66,7 @@ export function StudentLoginForm({
     console.log("Form submitted:", data);
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    router.push("/");
+    router.push("/events");
   };
 
   return (
