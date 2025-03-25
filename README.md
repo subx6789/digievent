@@ -1,11 +1,14 @@
-# EventPulse
+# Digievent
 
-EventPulse is an event hosting and booking platform designed specifically for college communities. The platform allows students and event organizers to create, manage, and book events seamlessly. Built with a focus on simplicity and responsiveness, EventPulse provides an intuitive user experience, allowing users to easily browse, register, and participate in college events.
+Digievent is an event hosting and booking platform designed specifically for college communities. The platform allows students and event organizers to create, manage, and book events seamlessly. Built with a focus on simplicity and responsiveness, Digievent provides an intuitive user experience, allowing users to easily browse, register, and participate in college events.
 
 ## Tech Stack
 
 - **Next.js:** React-based framework for building the frontend of the application.
 - **Tanstack Query:** For data fetching and state management.
+- **React Hook Form:** For form validation and submission.
+- **Zod:** For form validation.
+- **Zustand:** For state management.
 - **TypeScript:** Ensures type safety and a better developer experience.
 - **Tailwind CSS:** Utility-first CSS framework for fast, responsive design.
 
@@ -16,8 +19,8 @@ To get started with the project locally:
 - **Clone the repository:**
 
   ```bash
-   git clone https://github.com/subx6789/eventpulse-client.git
-   cd eventpulse-client
+   git clone https://github.com/subx6789/digievent-client.git
+   cd digievent-client
   ```
 
 - **Install dependencies:**
