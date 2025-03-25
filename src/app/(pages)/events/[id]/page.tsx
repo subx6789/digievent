@@ -45,6 +45,7 @@ const EventDetails = () => {
         const foundEvent = events.find((e) => String(e.id) === String(eventId));
 
         if (foundEvent) {
+          // Convert foundEvent to unknown first, then cast to Event type
           setEvent(foundEvent as Event);
           setProgress(Math.floor(Math.random() * 60) + 30);
         } else {
@@ -308,7 +309,7 @@ const EventDetails = () => {
             {/* Clean image with improved gradient overlay for better title visibility */}
             <div className="relative w-full aspect-video">
               <Image
-                src={event.image}
+                src={event.coverImage}
                 alt={event.title}
                 fill
                 className="object-cover"
