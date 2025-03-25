@@ -306,7 +306,7 @@ const EventDetails = () => {
             </motion.div>
 
             {/* Clean image with improved gradient overlay for better title visibility */}
-            <div className="relative w-full aspect-[16/9] sm:aspect-[1200/630]">
+            <div className="relative w-full aspect-video">
               <Image
                 src={event.image}
                 alt={event.title}
@@ -314,22 +314,22 @@ const EventDetails = () => {
                 className="object-cover"
                 priority
               />
-              {/* Enhanced gradient overlay to ensure title visibility regardless of image color */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/20" />
+              {/* Enhanced gradient overlay only visible on medium screens and up */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/20 hidden md:block" />
 
               {/* Additional overlay for white images */}
               <div className="absolute inset-0 bg-black/10" />
 
-              {/* Event title overlay with improved visibility */}
+              {/* Event title overlay with improved visibility - only visible on medium screens and up */}
               <motion.div
-                className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 md:p-10"
+                className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 md:p-10 hidden md:block"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
                 <div className="relative max-w-full sm:max-w-3xl">
                   {/* Title shadow for better readability on any background */}
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-left">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-left line-clamp-2">
                     {event.title}
                   </h1>
 
@@ -346,6 +346,30 @@ const EventDetails = () => {
                   </div>
                 </div>
               </motion.div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Mobile Title Card - Only visible on small screens */}
+        <div className="container mx-auto px-4 md:hidden mb-5">
+          <motion.div
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-3">
+              {event.title}
+            </h1>
+            <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex items-center">
+                <Calendar className="w-4 h-4 mr-1.5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                <span className="truncate max-w-[120px]">{event.date}</span>
+              </div>
+              <div className="flex items-center">
+                <Clock className="w-4 h-4 mr-1.5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                <span className="truncate max-w-[120px]">{event.time}</span>
+              </div>
             </div>
           </motion.div>
         </div>
@@ -369,7 +393,14 @@ const EventDetails = () => {
               </h3>
 
               <div className="prose prose-sm max-w-none text-gray-600 dark:text-gray-300">
-                <p className="leading-relaxed">{event.description}</p>
+                <p className="leading-relaxed line-clamp-[12] md:line-clamp-none">
+                  {event.description}
+                </p>
+                {event.description.length > 500 && (
+                  <button className="text-blue-600 dark:text-blue-400 font-medium mt-2 md:hidden">
+                    Read more
+                  </button>
+                )}
               </div>
             </motion.div>
 
@@ -406,7 +437,7 @@ const EventDetails = () => {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  <Button className="w-full py-5 text-base font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
+                  <Button className="w-full py-5 text-base font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 h-11 rounded-xl">
                     <Ticket className="h-5 w-5 mr-2" />
                     Book Now
                   </Button>
@@ -643,7 +674,7 @@ const EventDetails = () => {
             {/* CTA Card */}
             <motion.div
               variants={fadeInUp}
-              className="bg-gradient-to-br from-blue-500 to-blue-700 dark:from-blue-600 dark:to-blue-900 rounded-xl shadow-lg p-8 md:col-span-3 lg:col-span-6 text-white order-9"
+              className="bg-gradient-to-br from-blue-500 to-blue-700 dark:from-blue-600 dark:to-blue-900 rounded-xl shadow-lg p-8 md:col-span-6 lg:col-span-6 text-white order-9"
               whileHover={{ y: -5, transition: { duration: 0.2 } }}
             >
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">

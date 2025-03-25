@@ -1,20 +1,28 @@
-// File: @/types/event.ts
-
+// Update the Event interface to match the new requirements
 export interface Event {
   id: string;
   title: string;
   description: string;
-  date: string;
-  type: "free" | "paid";
-  time: string;
-  venue?: string;
-  organizer: string;
-  price?: string;
-  category: string;
-  image: string;
-  status: "pending" | "approved" | "rejected" | "cancelled";
-  capacity: string;
+  dayType: "single day" | "multi day";
+  date?: string; // Only for single day events
+  dateRange?: string; // Only for multi-day events
+  time: string; // In 12 hrs format
+  duration: string; // In hours
+  isFree: boolean;
+  price?: string; // Only if isFree is false
   eventType: "physical" | "virtual";
+  venue?: string; // Only if eventType is physical
+  virtualLink?: string; // Only if eventType is virtual
+  coverImage: string; // Landscape image
+  eventPoster: string; // Portrait image
+  clubName: string; // Organization name
+  category: string; // Event category
+  status: "pending" | "approved" | "rejected" | "cancelled";
+  capacity: string; // Number of seats
+  course: string[]; // Array of courses
+  department: string[]; // Array of departments
+  year: string[]; // Array of years
+  imageGallery?: string[]; // Optional array of additional images
   createdAt?: string;
-  virtualLink?: string;
+  organizer: string; // For backward compatibility
 }

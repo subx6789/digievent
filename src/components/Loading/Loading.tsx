@@ -1,61 +1,54 @@
 "use client";
-import { Variants, motion } from "framer-motion";
+import { motion } from "framer-motion";
+import { TicketCheck } from "lucide-react";
 
-const Loading = () => {
+interface LoadingProps {
+  fullScreen?: boolean;
+}
+
+const Loading = ({ fullScreen = true }: LoadingProps) => {
   return (
-    <div className="grid place-content-center h-screen px-4 py-24">
-      <BarLoader />
+    <div
+      className={`flex items-center justify-center ${
+        fullScreen ? "h-screen" : "h-full min-h-[300px]"
+      } w-full bg-white dark:bg-gray-950`}
+    >
+      <SquareLoader />
     </div>
   );
 };
 
-const variants = {
-  initial: {
-    scaleY: 0.5,
-    opacity: 0,
-  },
-  animate: {
-    scaleY: 1,
-    opacity: 1,
-    transition: {
-      repeat: Infinity,
-      repeatType: "mirror",
-      duration: 1,
-      ease: "circIn",
-    },
-  },
-} as Variants;
-
-const BarLoader = () => {
+const SquareLoader = () => {
   return (
     <motion.div
-      transition={{
-        staggerChildren: 0.25,
+      className="relative flex items-center gap-3"
+      animate={{
+        scale: [1, 0.5, 1],
       }}
-      initial="initial"
-      animate="animate"
-      className="flex gap-1"
+      transition={{
+        duration: 2,
+        ease: "easeInOut",
+        repeat: Infinity,
+        repeatType: "reverse",
+      }}
     >
       <motion.div
-        variants={variants}
-        className="h-36 w-6 rounded-lg bg-blue-600"
-      />
-      <motion.div
-        variants={variants}
-        className="h-36 w-6 rounded-lg bg-blue-600"
-      />
-      <motion.div
-        variants={variants}
-        className="h-36 w-6 rounded-lg bg-blue-600"
-      />
-      <motion.div
-        variants={variants}
-        className="h-36 w-6 rounded-lg bg-blue-600"
-      />
-      <motion.div
-        variants={variants}
-        className="h-36 w-6 rounded-lg bg-blue-600"
-      />
+        className="w-10 h-10 rounded-lg bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white"
+        animate={{
+          rotate: [0, 360, 0],
+        }}
+        transition={{
+          duration: 2,
+          ease: "easeInOut",
+          repeat: Infinity,
+          repeatType: "reverse",
+        }}
+      >
+        <TicketCheck className="w-6 h-6" />
+      </motion.div>
+      <span className="text-xl font-bold text-black dark:text-white">
+        Digievent
+      </span>
     </motion.div>
   );
 };

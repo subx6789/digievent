@@ -112,7 +112,7 @@ const EventCard = ({
       {/* Image Section with overlay gradient and badges */}
       <div className="relative aspect-[4/3] w-full">
         <Image
-          src={event.image}
+          src={event.eventPoster}
           alt={event.title}
           fill
           className="object-cover"

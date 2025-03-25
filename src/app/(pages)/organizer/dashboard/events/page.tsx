@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import EventCard from "@/components/Card/EventCard";
 import Header from "@/components/Header/Header";
-import AddEventModal from "@/components/Modals/AddEventModal";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import {
   Select,
@@ -16,66 +15,27 @@ import { eventStates } from "@/utils/data/eventStates";
 import { organizerEvents } from "@/utils/data/organizerEvents";
 import { Calendar } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 const OrganizerEvents = () => {
   const [events, setEvents] = useState<Event[]>(organizerEvents);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [isEditMode, setIsEditMode] = useState(false);
   const [selectedState, setSelectedState] = useState("approved"); // Default filter state
   const { toast } = useToast();
+  const router = useRouter();
 
-  const handleOpenModal = () => {
-    setIsEditMode(false);
-    setSelectedEvent(null);
-    setIsModalOpen(true);
+  // Navigate to create event page
+  const handleCreateEvent = () => {
+    router.push("/organizer/dashboard/events/request-event");
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedEvent(null);
-    setIsEditMode(false);
-  };
-
-  // Handle edit event - populates modal with event data
+  // Handle edit event - navigate to edit page with event ID
   const handleEditEvent = (event: Event) => {
-    setSelectedEvent(event);
-    setIsEditMode(true);
-    setIsModalOpen(true);
+    router.push(`/organizer/dashboard/events/edit/${event.id}`);
   };
 
   // Handle view event details
   const handleViewEvent = (eventId: string) => {
-    // For now, just show a toast notification
-    const event = events.find((e) => e.id === eventId);
-    toast({
-      title: "View Event",
-      description: `Viewing ${event?.title} details. This functionality will be implemented later.`,
-    });
-  };
-
-  // Add a new event to the list
-  const handleAddEvent = (newEvent: Event) => {
-    if (isEditMode && selectedEvent) {
-      // Update existing event
-      const updatedEvents = events.map((event) =>
-        event.id === selectedEvent.id ? { ...newEvent, id: event.id } : event
-      );
-      setEvents(updatedEvents);
-      toast({
-        title: "Event Updated",
-        description: `${newEvent.title} has been successfully updated.`,
-        variant: "default",
-      });
-    } else {
-      // Add new event
-      setEvents([newEvent, ...events]);
-      toast({
-        title: "Event Created",
-        description: `${newEvent.title} has been successfully created.`,
-        variant: "default",
-      });
-    }
+    router.push(`/organizer/dashboard/events/${eventId}`);
   };
 
   // Improved cancel event handler with confirmation and feedback
@@ -95,16 +55,6 @@ const OrganizerEvents = () => {
     });
   };
 
-  // Filter events based on selected state
-  /** const handleFilterEvents = () => {
-    // This would typically filter the events, but for now just show a toast
-    toast({
-      title: "Events Filtered",
-      description: `Showing events with status: ${selectedState}`,
-      variant: "default",
-    });
-  }; **/
-
   // Get filtered events based on selected state
   const filteredEvents =
     selectedState === "all"
@@ -113,7 +63,7 @@ const OrganizerEvents = () => {
 
   return (
     <Sidebar role="organizer">
-      <Header onAddClick={handleOpenModal} />
+      <Header onAddClick={handleCreateEvent} />
       <div className="my-5 space-y-6">
         <div className="w-full">
           {/* Filters Section */}
@@ -173,46 +123,8 @@ const OrganizerEvents = () => {
             </div>
           )}
         </div>
-
-        {/* Modified AddEventModal with edit capability */}
-        {isModalOpen && (
-          <ModifiedAddEventModal
-            isOpen={isModalOpen}
-            onClose={handleCloseModal}
-            onAddEvent={handleAddEvent}
-            editEvent={selectedEvent}
-            isEditMode={isEditMode}
-          />
-        )}
       </div>
     </Sidebar>
-  );
-};
-
-// Modified AddEventModal component wrapper to handle edit functionality
-interface ModifiedAddEventModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onAddEvent: (newEvent: Event) => void;
-  editEvent: Event | null;
-  isEditMode: boolean;
-}
-
-const ModifiedAddEventModal: React.FC<ModifiedAddEventModalProps> = ({
-  isOpen,
-  onClose,
-  onAddEvent,
-  editEvent,
-  isEditMode,
-}) => {
-  return (
-    <AddEventModal
-      isOpen={isOpen}
-      onClose={onClose}
-      onAddEvent={onAddEvent}
-      editEvent={editEvent}
-      isEditMode={isEditMode}
-    />
   );
 };
 
