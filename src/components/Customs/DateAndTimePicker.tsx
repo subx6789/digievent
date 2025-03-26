@@ -73,7 +73,7 @@ export const CustomDatePicker: React.FC<DatePickerProps> = ({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <div className={cn("relative group", className)}>
-          <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 dark:text-blue-400 h-4 w-4 z-10 transition-colors" />
+          <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 h-5 w-5 z-10 transition-colors" />
           <Input
             placeholder="Select date"
             value={date ? format(date, "MMM dd, yyyy") : ""}
@@ -185,7 +185,7 @@ export const CustomDateRangePicker: React.FC<DateRangePickerProps> = ({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <div className={cn("relative group", className)}>
-          <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 dark:text-blue-400 h-4 w-4 z-10 transition-colors" />
+          <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 h-5 w-5 z-10 transition-colors" />
           <Input
             placeholder="Select date range"
             value={
@@ -335,7 +335,7 @@ export const CustomTimePicker: React.FC<TimePickerProps> = ({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <div className={cn("relative group", className)}>
-          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 dark:text-blue-400 h-4 w-4 z-10 transition-colors" />
+          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 h-5 w-5 z-10 transition-colors" />
           <Input
             placeholder="Select time"
             value={selectedTime}

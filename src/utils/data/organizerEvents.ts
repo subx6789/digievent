@@ -16,20 +16,16 @@ export const organizerEvents: Event[] = [
     eventType: "physical",
     venue: "Techno India University, Salt Lake, Kolkata",
     coverImage: getRandomImage("Fun") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Fun") || "/Placeholder/event-poster.jpg",
+
     clubName: "Vivarta Cultural Club",
     category: "Fun",
     organizer: "Vivarta",
     capacity: "300",
     status: "approved",
-    course: ["B.Tech", "BCA", "BBA", "M.Tech"],
-    department: ["CSE", "IT", "ECE", "EE", "ME"],
+    course: ["BTech", "BCA", "MTech"],
+    department: ["Computer Science and Engineering", "IT", "ECE", "EE", "ME"],
     year: ["1st Year", "2nd Year", "3rd Year", "4th Year"],
-    imageGallery: [
-      getRandomImage("Fun") || "",
-      getRandomImage("Fun") || "",
-      getRandomImage("Fun") || "",
-    ],
+
     createdAt: "2024-01-15T10:30:00Z",
     virtualLink: "",
   },
@@ -47,7 +43,7 @@ export const organizerEvents: Event[] = [
     eventType: "physical",
     venue: "Salt Lake Stadium Area, Kolkata",
     coverImage: getRandomImage("Fun") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Fun") || "/Placeholder/event-poster.jpg",
+
     clubName: "Sanskaran Music Society",
     category: "Fun",
     organizer: "Sanskaran",
@@ -56,7 +52,7 @@ export const organizerEvents: Event[] = [
     course: ["All Courses"],
     department: ["All Departments"],
     year: ["All Years"],
-    imageGallery: [getRandomImage("Fun") || "", getRandomImage("Fun") || ""],
+
     createdAt: "2024-01-20T14:45:00Z",
     virtualLink: "",
   },
@@ -74,17 +70,16 @@ export const organizerEvents: Event[] = [
     eventType: "physical",
     venue: "Techno India University, Salt Lake, Kolkata",
     coverImage: getRandomImage("Educational") || "/Placeholder/event-cover.jpg",
-    eventPoster:
-      getRandomImage("Educational") || "/Placeholder/event-poster.jpg",
+
     clubName: "Takshila Tech Club",
     category: "Educational",
     organizer: "Takshila",
     capacity: "300",
     status: "approved",
     course: ["B.Tech", "BCA", "M.Tech", "MCA"],
-    department: ["CSE", "IT", "ECE"],
+    department: ["Computer Science and Engineering", "IT", "ECE"],
     year: ["2nd Year", "3rd Year", "4th Year"],
-    imageGallery: ["", "", ""],
+
     createdAt: "2024-02-05T09:15:00Z",
     virtualLink: "",
   },
@@ -102,7 +97,7 @@ export const organizerEvents: Event[] = [
     eventType: "physical",
     venue: "Salt Lake Sector V, Kolkata",
     coverImage: getRandomImage("Fun") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Fun") || "/Placeholder/event-poster.jpg",
+
     clubName: "Alpha Dancers Club",
     category: "Fun",
     organizer: "Alpha Dancers",
@@ -111,7 +106,7 @@ export const organizerEvents: Event[] = [
     course: ["All Courses"],
     department: ["All Departments"],
     year: ["All Years"],
-    imageGallery: [getRandomImage("Fun") || "", getRandomImage("Fun") || ""],
+
     createdAt: "2024-02-15T16:30:00Z",
     virtualLink: "",
   },
@@ -129,17 +124,16 @@ export const organizerEvents: Event[] = [
     eventType: "physical",
     venue: "Techno India University, Salt Lake, Kolkata",
     coverImage: getRandomImage("Educational") || "/Placeholder/event-cover.jpg",
-    eventPoster:
-      getRandomImage("Educational") || "/Placeholder/event-poster.jpg",
+
     clubName: "Google Developer Student Club",
     category: "Educational",
     organizer: "GDSC",
     capacity: "300",
     status: "approved",
     course: ["B.Tech", "BCA", "M.Tech", "MCA"],
-    department: ["CSE", "IT", "ECE"],
+    department: ["Computer Science and Engineering", "IT", "ECE"],
     year: ["All Years"],
-    imageGallery: ["", ""],
+
     createdAt: "2024-03-01T11:00:00Z",
     virtualLink: "",
   },
@@ -157,7 +151,7 @@ export const organizerEvents: Event[] = [
     eventType: "physical",
     venue: "Techno India University, Salt Lake, Kolkata",
     coverImage: getRandomImage("Fun") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Fun") || "/Placeholder/event-poster.jpg",
+
     clubName: "Vivarta Cultural Club",
     category: "Fun",
     organizer: "Vivarta",
@@ -166,12 +160,7 @@ export const organizerEvents: Event[] = [
     course: ["All Courses"],
     department: ["All Departments"],
     year: ["All Years"],
-    imageGallery: [
-      getRandomImage("Fun") || "",
-      getRandomImage("Fun") || "",
-      getRandomImage("Fun") || "",
-      getRandomImage("Fun") || "",
-    ],
+
     createdAt: "2024-03-10T13:45:00Z",
     virtualLink: "",
   },
@@ -189,7 +178,7 @@ export const organizerEvents: Event[] = [
     eventType: "physical",
     venue: "The Lalit Great Eastern, Kolkata",
     coverImage: getRandomImage("Fun") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Fun") || "/Placeholder/event-poster.jpg",
+
     clubName: "Vivarta Cultural Club",
     category: "Fun",
     organizer: "Vivarta",
@@ -198,7 +187,7 @@ export const organizerEvents: Event[] = [
     course: ["B.Tech", "BCA", "BBA"],
     department: ["All Departments"],
     year: ["3rd Year", "4th Year"],
-    imageGallery: [getRandomImage("Fun") || "", getRandomImage("Fun") || ""],
+
     createdAt: "2024-03-15T18:30:00Z",
     virtualLink: "",
   },
@@ -217,17 +206,21 @@ export const organizerEvents: Event[] = [
     venue: "Virtual",
     virtualLink: "https://meet.google.com/abc-defg-hij",
     coverImage: getRandomImage("Educational") || "/Placeholder/event-cover.jpg",
-    eventPoster:
-      getRandomImage("Educational") || "/Placeholder/event-poster.jpg",
+
     clubName: "TechMinds AI Community",
     category: "Educational",
     organizer: "TechMinds",
     capacity: "500",
     status: "rejected",
     course: ["B.Tech", "M.Tech", "BCA", "MCA"],
-    department: ["CSE", "IT", "ECE", "Data Science"],
+    department: [
+      "Computer Science and Engineering",
+      "IT",
+      "ECE",
+      "Data Science",
+    ],
     year: ["All Years"],
-    imageGallery: ["", ""],
+
     createdAt: "2024-03-20T09:15:00Z",
   },
   {
@@ -245,17 +238,16 @@ export const organizerEvents: Event[] = [
     venue: "Virtual",
     virtualLink: "https://zoom.us/j/123456789",
     coverImage: getRandomImage("Educational") || "/Placeholder/event-cover.jpg",
-    eventPoster:
-      getRandomImage("Educational") || "/Placeholder/event-poster.jpg",
+
     clubName: "CodeCrafters Community",
     category: "Educational",
     organizer: "CodeCrafters",
     capacity: "400",
     status: "rejected",
     course: ["B.Tech", "BCA", "M.Tech", "MCA"],
-    department: ["CSE", "IT"],
+    department: ["Computer Science and Engineering", "IT"],
     year: ["3rd Year", "4th Year"],
-    imageGallery: [""],
+
     createdAt: "2024-03-25T14:00:00Z",
   },
   {
@@ -272,17 +264,16 @@ export const organizerEvents: Event[] = [
     eventType: "physical",
     venue: "JW Marriott, Kolkata",
     coverImage: getRandomImage("Educational") || "/Placeholder/event-cover.jpg",
-    eventPoster:
-      getRandomImage("Educational") || "/Placeholder/event-poster.jpg",
+
     clubName: "BlockchainHub India",
     category: "Educational",
     organizer: "BlockchainHub",
     capacity: "250",
     status: "pending",
     course: ["B.Tech", "M.Tech", "MBA", "BBA"],
-    department: ["CSE", "IT", "Finance"],
+    department: ["Computer Science and Engineering", "IT", "Finance"],
     year: ["All Years"],
-    imageGallery: ["", "", ""],
+
     createdAt: "2024-04-01T10:30:00Z",
     virtualLink: "",
   },
@@ -301,7 +292,7 @@ export const organizerEvents: Event[] = [
     venue: "Virtual",
     virtualLink: "https://discord.gg/gamerstournament",
     coverImage: getRandomImage("Gaming") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Fun") || "/Placeholder/event-poster.jpg",
+
     clubName: "GamersUnite Community",
     category: "Gaming",
     organizer: "GamersUnite",
@@ -310,7 +301,7 @@ export const organizerEvents: Event[] = [
     course: ["All Courses"],
     department: ["All Departments"],
     year: ["All Years"],
-    imageGallery: ["", "", ""],
+
     createdAt: "2024-04-10T15:45:00Z",
   },
 ];

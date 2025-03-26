@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import EventCard from "@/components/Card/EventCard";
 import Header from "@/components/Header/Header";
 import Sidebar from "@/components/Sidebar/Sidebar";
@@ -12,16 +12,25 @@ import {
 } from "@/components/ui/select";
 import { Event } from "@/types/event";
 import { eventStates } from "@/utils/data/eventStates";
-import { organizerEvents } from "@/utils/data/organizerEvents";
 import { Calendar } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { useEventFormStore } from "@/store/eventFormStore";
 
 const OrganizerEvents = () => {
-  const [events, setEvents] = useState<Event[]>(organizerEvents);
+  // Use Zustand store instead of local state
+  const { events, updateEvent, initializeEvents } = useEventFormStore();
   const [selectedState, setSelectedState] = useState("approved"); // Default filter state
   const { toast } = useToast();
   const router = useRouter();
+
+  // Initialize events if empty
+  useEffect(() => {
+    if (events.length === 0) {
+      initializeEvents();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Navigate to create event page
   const handleCreateEvent = () => {
@@ -42,17 +51,17 @@ const OrganizerEvents = () => {
   const handleCancelEvent = (eventId: string) => {
     const eventToCancel = events.find((event) => event.id === eventId);
 
-    // Update event status to cancelled
-    const updatedEvents = events.map((event) =>
-      event.id === eventId ? { ...event, status: "cancelled" } : event
-    );
-    setEvents(updatedEvents as Event[]);
+    if (eventToCancel) {
+      // Update event status to cancelled in Zustand store
+      const updatedEvent: Event = { ...eventToCancel, status: "cancelled" };
+      updateEvent(updatedEvent);
 
-    toast({
-      title: "Event Cancelled",
-      description: `${eventToCancel?.title} has been successfully cancelled.`,
-      variant: "destructive",
-    });
+      toast({
+        title: "Event Cancelled",
+        description: `${eventToCancel.title} has been successfully cancelled.`,
+        variant: "destructive",
+      });
+    }
   };
 
   // Get filtered events based on selected state

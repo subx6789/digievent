@@ -16,7 +16,7 @@ export const events: Event[] = [
     eventType: "physical",
     venue: "Techno India University, Salt Lake, Kolkata",
     coverImage: getRandomImage("Fun") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Fun") || "/Placeholder/event-poster.jpg",
+
     clubName: "Vivarta Cultural Club",
     category: "Fun",
     organizer: "Vivarta",
@@ -25,11 +25,7 @@ export const events: Event[] = [
     course: ["B.Tech", "BCA", "BBA", "M.Tech"],
     department: ["CSE", "IT", "ECE", "EE", "ME"],
     year: ["1st Year", "2nd Year", "3rd Year", "4th Year"],
-    imageGallery: [
-      getRandomImage("Fun") || "",
-      getRandomImage("Fun") || "",
-      getRandomImage("Fun") || "",
-    ],
+
     createdAt: "2024-01-15T10:30:00Z",
     virtualLink: "",
   },
@@ -47,8 +43,7 @@ export const events: Event[] = [
     eventType: "physical",
     venue: "Biswa Bangla Convention Centre, Kolkata",
     coverImage: getRandomImage("Technology") || "/Placeholder/event-cover.jpg",
-    eventPoster:
-      getRandomImage("Technology") || "/Placeholder/event-poster.jpg",
+
     clubName: "TechMinds Association",
     category: "Technology",
     organizer: "TechMinds Association",
@@ -57,11 +52,7 @@ export const events: Event[] = [
     course: ["B.Tech", "M.Tech", "BCA", "MCA"],
     department: ["CSE", "IT", "ECE", "EE"],
     year: ["All Years"],
-    imageGallery: [
-      getRandomImage("Technology") || "",
-      getRandomImage("Technology") || "",
-      getRandomImage("Technology") || "",
-    ],
+
     createdAt: "2023-12-10T14:20:00Z",
     virtualLink: "",
   },
@@ -79,7 +70,7 @@ export const events: Event[] = [
     eventType: "virtual",
     virtualLink: "https://meet.google.com/abc-defg-hij",
     coverImage: getRandomImage("Career") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Career") || "/Placeholder/event-poster.jpg",
+
     clubName: "Campus Placement Cell",
     category: "Career",
     organizer: "Campus Placement Cell",
@@ -88,10 +79,7 @@ export const events: Event[] = [
     course: ["All Courses"],
     department: ["All Departments"],
     year: ["3rd Year", "4th Year"],
-    imageGallery: [
-      getRandomImage("Career") || "",
-      getRandomImage("Career") || "",
-    ],
+
     createdAt: "2024-01-20T09:15:00Z",
   },
   {
@@ -108,7 +96,7 @@ export const events: Event[] = [
     eventType: "physical",
     venue: "Business School Auditorium, Park Street",
     coverImage: getRandomImage("Workshop") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Workshop") || "/Placeholder/event-poster.jpg",
+
     clubName: "Startup Incubator",
     category: "Workshop",
     organizer: "Startup Incubator",
@@ -117,10 +105,7 @@ export const events: Event[] = [
     course: ["BBA", "MBA", "B.Tech", "M.Tech"],
     department: ["Management", "CSE", "IT", "ECE"],
     year: ["3rd Year", "4th Year"],
-    imageGallery: [
-      getRandomImage("Workshop") || "",
-      getRandomImage("Workshop") || "",
-    ],
+
     createdAt: "2024-02-01T11:45:00Z",
     virtualLink: "",
   },
@@ -138,7 +123,7 @@ export const events: Event[] = [
     eventType: "physical",
     venue: "College Amphitheater",
     coverImage: getRandomImage("Cultural") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Cultural") || "/Placeholder/event-poster.jpg",
+
     clubName: "Cultural Committee",
     category: "Cultural",
     organizer: "Cultural Committee",
@@ -147,11 +132,7 @@ export const events: Event[] = [
     course: ["All Courses"],
     department: ["All Departments"],
     year: ["All Years"],
-    imageGallery: [
-      getRandomImage("Cultural") || "",
-      getRandomImage("Cultural") || "",
-      getRandomImage("Cultural") || "",
-    ],
+
     createdAt: "2024-01-25T16:30:00Z",
     virtualLink: "",
   },
@@ -169,8 +150,7 @@ export const events: Event[] = [
     eventType: "physical",
     venue: "Computer Science Building",
     coverImage: getRandomImage("Technology") || "/Placeholder/event-cover.jpg",
-    eventPoster:
-      getRandomImage("Technology") || "/Placeholder/event-poster.jpg",
+
     clubName: "Developer Student Club",
     category: "Technology",
     organizer: "Developer Student Club",
@@ -179,10 +159,7 @@ export const events: Event[] = [
     course: ["B.Tech", "BCA", "M.Tech", "MCA"],
     department: ["CSE", "IT", "ECE"],
     year: ["2nd Year", "3rd Year", "4th Year"],
-    imageGallery: [
-      getRandomImage("Technology") || "",
-      getRandomImage("Technology") || "",
-    ],
+
     createdAt: "2024-02-10T13:20:00Z",
     virtualLink: "",
   },
@@ -200,7 +177,7 @@ export const events: Event[] = [
     eventType: "virtual",
     virtualLink: "https://zoom.us/j/123456789",
     coverImage: getRandomImage("Workshop") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Workshop") || "/Placeholder/event-poster.jpg",
+
     clubName: "Design Innovation Lab",
     category: "Workshop",
     organizer: "Design Innovation Lab",
@@ -209,7 +186,7 @@ export const events: Event[] = [
     course: ["All Courses"],
     department: ["All Departments"],
     year: ["All Years"],
-    imageGallery: [getRandomImage("Workshop") || ""],
+
     createdAt: "2024-02-15T10:10:00Z",
   },
   {
@@ -226,7 +203,7 @@ export const events: Event[] = [
     eventType: "physical",
     venue: "University Sports Complex",
     coverImage: getRandomImage("Sports") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Sports") || "/Placeholder/event-poster.jpg",
+
     clubName: "Sports Committee",
     category: "Sports",
     organizer: "Sports Committee",
@@ -235,12 +212,7 @@ export const events: Event[] = [
     course: ["All Courses"],
     department: ["All Departments"],
     year: ["All Years"],
-    imageGallery: [
-      getRandomImage("Sports") || "",
-      getRandomImage("Sports") || "",
-      getRandomImage("Sports") || "",
-      getRandomImage("Sports") || "",
-    ],
+
     createdAt: "2024-01-30T09:45:00Z",
     virtualLink: "",
   },
@@ -258,7 +230,7 @@ export const events: Event[] = [
     eventType: "physical",
     venue: "Art Gallery, New Town",
     coverImage: getRandomImage("Art") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Art") || "/Placeholder/event-poster.jpg",
+
     clubName: "Photography Club",
     category: "Art",
     organizer: "Photography Club",
@@ -267,11 +239,7 @@ export const events: Event[] = [
     course: ["All Courses"],
     department: ["All Departments"],
     year: ["All Years"],
-    imageGallery: [
-      getRandomImage("Art") || "",
-      getRandomImage("Art") || "",
-      getRandomImage("Art") || "",
-    ],
+
     createdAt: "2024-02-05T15:30:00Z",
     virtualLink: "",
   },
@@ -289,7 +257,7 @@ export const events: Event[] = [
     eventType: "virtual",
     virtualLink: "https://teams.microsoft.com/l/meetup-join/abc123",
     coverImage: getRandomImage("Education") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Education") || "/Placeholder/event-poster.jpg",
+
     clubName: "AI Research Group",
     category: "Education",
     organizer: "AI Research Group",
@@ -298,7 +266,7 @@ export const events: Event[] = [
     course: ["B.Tech", "M.Tech", "BCA", "MCA", "PhD"],
     department: ["CSE", "IT", "ECE", "Data Science"],
     year: ["All Years"],
-    imageGallery: [getRandomImage("Education") || ""],
+
     createdAt: "2024-02-20T12:00:00Z",
   },
   {
@@ -315,8 +283,7 @@ export const events: Event[] = [
     eventType: "physical",
     venue: "Grand Hotel Banquet Hall",
     coverImage: getRandomImage("Networking") || "/Placeholder/event-cover.jpg",
-    eventPoster:
-      getRandomImage("Networking") || "/Placeholder/event-poster.jpg",
+
     clubName: "Alumni Association",
     category: "Networking",
     organizer: "Alumni Association",
@@ -325,10 +292,7 @@ export const events: Event[] = [
     course: ["All Courses"],
     department: ["All Departments"],
     year: ["4th Year"],
-    imageGallery: [
-      getRandomImage("Networking") || "",
-      getRandomImage("Networking") || "",
-    ],
+
     createdAt: "2024-01-05T17:40:00Z",
     virtualLink: "",
   },
@@ -346,8 +310,7 @@ export const events: Event[] = [
     eventType: "physical",
     venue: "Main Auditorium",
     coverImage: getRandomImage("Competition") || "/Placeholder/event-cover.jpg",
-    eventPoster:
-      getRandomImage("Competition") || "/Placeholder/event-poster.jpg",
+
     clubName: "Debating Society",
     category: "Competition",
     organizer: "Debating Society",
@@ -356,10 +319,7 @@ export const events: Event[] = [
     course: ["All Courses"],
     department: ["All Departments"],
     year: ["All Years"],
-    imageGallery: [
-      getRandomImage("Competition") || "",
-      getRandomImage("Competition") || "",
-    ],
+
     createdAt: "2024-02-25T14:15:00Z",
     virtualLink: "",
   },

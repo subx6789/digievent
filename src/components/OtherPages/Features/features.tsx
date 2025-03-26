@@ -27,7 +27,7 @@ export const Features = ({ sectionRef }: FeaturesProps) => {
 
       <div className="container mx-auto px-4">
         <motion.div
-          className="text-center mb-16"
+          className="md:text-center text-left mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, margin: "-100px" }}
@@ -46,7 +46,7 @@ export const Features = ({ sectionRef }: FeaturesProps) => {
             </span>
           </motion.div>
 
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">
             Our product has these{" "}
             <span className="relative inline-block">
               <span className="relative z-10 text-blue-600 dark:text-blue-400">
@@ -54,7 +54,7 @@ export const Features = ({ sectionRef }: FeaturesProps) => {
               </span>
             </span>
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="md:text-xl text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             {landing_content.features.subtitle}
           </p>
         </motion.div>

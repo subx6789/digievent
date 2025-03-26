@@ -112,7 +112,7 @@ const EventCard = ({
       {/* Image Section with overlay gradient and badges */}
       <div className="relative aspect-[4/3] w-full">
         <Image
-          src={event.eventPoster}
+          src={event.coverImage}
           alt={event.title}
           fill
           className="object-cover"
@@ -176,24 +176,23 @@ const EventCard = ({
             {!isOrganizer && (
               <div className="flex items-center text-gray-600 dark:text-gray-400">
                 <Users className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="truncate">{event.organizer}</span>
+                <span className="truncate">{event.clubName}</span>
               </div>
             )}
 
             <div className="flex items-center text-gray-600 dark:text-gray-400">
               <CalendarIcon className="h-4 w-4 mr-2 flex-shrink-0" />
               <span className="truncate">
-                {event.date} • {event.time}
+                {event.dayType === "single day" ? event.date : event.dateRange}{" "}
+                • {event.time}
               </span>
             </div>
 
             <div className="flex items-center text-gray-600 dark:text-gray-400">
               <MapPinIcon className="h-4 w-4 mr-2 flex-shrink-0" />
               <span className="truncate">
-                {event.venue
-                  ? event.venue === ""
-                    ? "Virtual"
-                    : event.venue
+                {event.eventType === "physical"
+                  ? event.venue || "TBA"
                   : "Virtual"}
               </span>
             </div>
@@ -201,13 +200,7 @@ const EventCard = ({
 
           <div className="py-2">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white line-clamp-1 min-h-[0.5rem]">
-              {event.price === "Free" ||
-              event.price === "0" ||
-              event.price === "" ||
-              event.price === undefined ||
-              event.price === null
-                ? "Free"
-                : "₹" + event.price}
+              {event.isFree ? "Free" : event.price ? `₹${event.price}` : "Free"}
             </h3>
           </div>
         </CardContent>

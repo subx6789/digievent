@@ -1,6 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -18,6 +21,9 @@ import {
   MapPin,
   Users,
   ImageIcon,
+  RefreshCw,
+  CircleX,
+  CircleCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ModeToggle } from "@/components/ThemeToggler/ThemeToggler";
@@ -29,9 +35,10 @@ import DateTimeForm from "@/components/Forms/EventForms/DateTimeForm";
 import LocationForm from "@/components/Forms/EventForms/LocationForm";
 import MediaForm from "@/components/Forms/EventForms/MediaForm";
 import AudienceForm from "@/components/Forms/EventForms/AudienceForm";
+import { useEventFormStore } from "@/store/eventFormStore";
 
 // Form steps with Lucide icons
-const formSteps: Step[] = [
+export const formSteps: Step[] = [
   { id: "basic-details", label: "Basic Details", icon: <FileText size={16} /> },
   { id: "date-time", label: "Date & Time", icon: <Calendar size={16} /> },
   { id: "location", label: "Location", icon: <MapPin size={16} /> },
@@ -44,16 +51,11 @@ const RequestEventPage = () => {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
   const [isFormComplete, setIsFormComplete] = useState(false);
-  const [formData, setFormData] = useState<Partial<Event>>({
-    status: "pending",
-    isFree: true,
-    dayType: "single day",
-    eventType: "physical",
-    course: [],
-    department: [],
-    year: [],
-    imageGallery: [],
-  });
+  const [saveStatus, setSaveStatus] = useState<"saving" | "saved" | "error">(
+    "saved"
+  );
+  const [lastSaved, setLastSaved] = useState<string>("");
+  const [formKey, setFormKey] = useState(Date.now()); // Add a key for forcing re-render
 
   // Animation variants
   const pageVariants = {
@@ -82,40 +84,144 @@ const RequestEventPage = () => {
     },
   };
 
+  // Get form data from Zustand store
+  const {
+    formData,
+    setFormData: setStoreFormData,
+    resetFormData,
+  } = useEventFormStore();
+
+  // Debounce function for auto-save
+  const debounce = (func: Function, delay: number) => {
+    let timeoutId: NodeJS.Timeout;
+    return (...args: any[]) => {
+      setSaveStatus("saving");
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func(...args);
+        setSaveStatus("saved");
+        setLastSaved(new Date().toLocaleTimeString());
+      }, delay);
+    };
+  };
+
+  // Debounced save function
+  const debouncedSave = useCallback(
+    debounce((data: Partial<Event>) => {
+      setStoreFormData(data);
+      localStorage.setItem("eventFormData", JSON.stringify(data));
+    }, 1000),
+    []
+  );
+
+  // Load saved form data on initial render
+  useEffect(() => {
+    const savedData = localStorage.getItem("eventFormData");
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        setStoreFormData(parsedData);
+        setLastSaved("Previously saved data loaded");
+        // Force re-render of form components
+        setFormKey(Date.now());
+      } catch (error) {
+        console.error("Error parsing saved form data:", error);
+        setSaveStatus("error");
+      }
+    }
+  }, [setStoreFormData]);
+
   // Check if form is complete enough to submit
   useEffect(() => {
-    const requiredFields = [
+    // Basic required fields for all events
+    const basicRequiredFields = [
       "title",
       "description",
-      "date",
       "time",
+      "duration",
       "coverImage",
-      "eventPoster",
+      "capacity",
+      "category",
     ];
-    const isComplete = requiredFields.every(
-      (field) =>
-        formData[field as keyof Partial<Event>] &&
-        formData[field as keyof Partial<Event>] !== ""
-    );
-    setIsFormComplete(isComplete);
+
+    // Conditional required fields
+    const conditionalFields = [];
+
+    // If single day event, date is required
+    if (formData.dayType === "single day") {
+      conditionalFields.push("date");
+    }
+
+    // If multi day event, dateRange is required
+    if (formData.dayType === "multi day") {
+      conditionalFields.push("dateRange");
+    }
+
+    // If not free, price is required
+    if (formData.isFree === false) {
+      conditionalFields.push("price");
+    }
+
+    // If physical event, venue is required
+    if (formData.eventType === "physical") {
+      conditionalFields.push("venue");
+    }
+
+    // If virtual event, virtualLink is required
+    if (formData.eventType === "virtual") {
+      conditionalFields.push("virtualLink");
+    }
+
+    // Check if audience targeting is set
+    const hasAudience =
+      formData.course &&
+      formData.course.length > 0 &&
+      formData.department &&
+      formData.department.length > 0 &&
+      formData.year &&
+      formData.year.length > 0;
+
+    // Combine all required fields
+    const allRequiredFields = [...basicRequiredFields, ...conditionalFields];
+
+    // Check if all required fields are filled
+    const fieldsComplete = allRequiredFields.every((field) => {
+      const value = formData[field as keyof Partial<Event>];
+      return value !== undefined && value !== "";
+    });
+
+    setIsFormComplete(Boolean(fieldsComplete && hasAudience));
   }, [formData]);
 
+  // Update form data and trigger auto-save
+  const updateFormData = (data: Partial<Event>) => {
+    const updatedData = { ...formData, ...data };
+
+    // Set clubName to "My Club" if not provided
+    if (!updatedData.clubName) {
+      updatedData.clubName = "My Club";
+    }
+
+    setStoreFormData(updatedData);
+    debouncedSave(updatedData);
+  };
+
   // Handle next step
-  const handleNext = () => {
+  const handleNextStep = () => {
     if (currentStep < formSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
 
   // Handle previous step
-  const handlePrevious = () => {
+  const handlePreviousStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
 
   // Handle back navigation
-  const handleBack = () => {
+  const handleBackButton = () => {
     router.push("/organizer/dashboard/events");
   };
 
@@ -137,44 +243,45 @@ const RequestEventPage = () => {
       venue: formData.venue || "",
       virtualLink: formData.virtualLink || "",
       coverImage: formData.coverImage || "/Placeholder/event-placeholder.jpg",
-      eventPoster: formData.eventPoster || "/Placeholder/event-placeholder.jpg",
-      clubName: formData.clubName || "",
+      clubName: formData.clubName || "My Club",
       category: formData.category || "",
       status: "pending",
       capacity: formData.capacity || "0",
       course: formData.course || [],
       department: formData.department || [],
       year: formData.year || [],
-      imageGallery: formData.imageGallery || [],
       createdAt: new Date().toISOString(),
-      organizer: formData.clubName || "", // For backward compatibility
+      organizer: formData.clubName || "My Club", // For backward compatibility
     };
 
     console.log("Submitting event:", newEvent);
 
-    // Show success toast with animation
-    toast({
-      title: "Event Requested",
-      description: "Your event has been submitted for approval.",
-      variant: "default",
-      action: (
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 200, damping: 10 }}
-        >
-          <CheckCircle2 className="h-5 w-5 text-green-500" />
-        </motion.div>
-      ),
-    });
+    // Simulate API call success
+    // In the future, replace with actual API call
+    setTimeout(() => {
+      // Show success toast with animation
+      toast({
+        title: "Event Requested Successfully",
+        description: "Your event has been submitted for approval.",
+        variant: "default",
+        action: (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 10 }}
+          >
+            <CheckCircle2 className="h-5 w-5 text-green-500" />
+          </motion.div>
+        ),
+      });
 
-    // Redirect to events page
-    router.push("/organizer/dashboard/events");
-  };
+      // Clear form data from localStorage and store
+      localStorage.removeItem("eventFormData");
+      resetFormData();
 
-  // Update form data
-  const updateFormData = (data: Partial<Event>) => {
-    setFormData((prev) => ({ ...prev, ...data }));
+      // Redirect to events page
+      router.push("/organizer/dashboard/events");
+    }, 1000);
   };
 
   return (
@@ -191,13 +298,14 @@ const RequestEventPage = () => {
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
               variant="outline"
-              onClick={handleBack}
-              className="flex items-center gap-2 rounded-lg h-11 bg-transparent dark:text-white text-black"
+              onClick={handleBackButton}
+              className="flex items-center gap-2 rounded-lg h-11 bg-transparent dark:text-white text-black hover:scale-105 transition-all duration-150"
             >
               <ArrowLeft className="h-4 w-4" />
               <span className="md:block hidden">Back to Events</span>
             </Button>
           </motion.div>
+
           <motion.div whileHover={{ scale: 1.05, rotate: 15 }}>
             <ModeToggle />
           </motion.div>
@@ -219,7 +327,8 @@ const RequestEventPage = () => {
             className="text-muted-foreground"
           >
             Fill out the form below to request a new event. All events require
-            approval before they are published.
+            approval before they are published. Your progress is automatically
+            saved.
           </motion.p>
         </div>
 
@@ -239,10 +348,47 @@ const RequestEventPage = () => {
 
         {/* Form content with animations */}
         <Card className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg overflow-hidden">
+          {/* Auto-save status indicator moved to top right of form area */}
+          <div className="flex justify-end pt-4 pr-4">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={saveStatus}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-md bg-gray-100 dark:bg-gray-800 shadow-sm"
+              >
+                {saveStatus === "saving" && (
+                  <>
+                    <RefreshCw className="h-3.5 w-3.5 animate-spin text-amber-500" />
+                    <span className="text-amber-500">Saving...</span>
+                  </>
+                )}
+                {saveStatus === "saved" && (
+                  <>
+                    <CircleCheck className="h-3.5 w-3.5 text-green-500" />
+                    <span className="text-green-500">Saved</span>
+                    {lastSaved && (
+                      <span className="text-gray-500 text-xs">
+                        at {lastSaved}
+                      </span>
+                    )}
+                  </>
+                )}
+                {saveStatus === "error" && (
+                  <>
+                    <CircleX className="h-3.5 w-3.5 text-red-500" />
+                    <span className="text-red-500">Error saving</span>
+                  </>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
           <CardContent className="p-6">
             <AnimatePresence mode="wait">
               <motion.div
-                key={currentStep}
+                key={`${currentStep}-${formKey}`}
                 initial="hidden"
                 animate="visible"
                 exit="exit"
@@ -251,6 +397,7 @@ const RequestEventPage = () => {
               >
                 {currentStep === 0 && (
                   <BasicDetailsForm
+                    key={`basic-${formKey}`}
                     formData={formData}
                     updateFormData={updateFormData}
                   />
@@ -258,6 +405,7 @@ const RequestEventPage = () => {
 
                 {currentStep === 1 && (
                   <DateTimeForm
+                    key={`datetime-${formKey}`}
                     formData={formData}
                     updateFormData={updateFormData}
                   />
@@ -265,6 +413,7 @@ const RequestEventPage = () => {
 
                 {currentStep === 2 && (
                   <LocationForm
+                    key={`location-${formKey}`}
                     formData={formData}
                     updateFormData={updateFormData}
                   />
@@ -273,12 +422,14 @@ const RequestEventPage = () => {
                 {currentStep === 3 && (
                   <MediaForm
                     formData={formData}
+                    key={`media-${formKey}`}
                     updateFormData={updateFormData}
                   />
                 )}
 
                 {currentStep === 4 && (
                   <AudienceForm
+                    key={`audience-${formKey}`}
                     formData={formData}
                     updateFormData={updateFormData}
                     courses={courses}
@@ -300,9 +451,9 @@ const RequestEventPage = () => {
               >
                 <Button
                   variant="outline"
-                  onClick={handlePrevious}
+                  onClick={handlePreviousStep}
                   disabled={currentStep === 0}
-                  className="flex items-center gap-2 px-8 rounded-lg h-11 bg-transparent dark:text-white text-black"
+                  className="flex items-center gap-2 px-8 rounded-lg h-11 bg-transparent dark:text-white text-black hover:scale-105 transition-all duration-150"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   Previous
@@ -315,8 +466,8 @@ const RequestEventPage = () => {
                   whileTap={{ scale: 0.98 }}
                 >
                   <Button
-                    onClick={handleNext}
-                    className="flex items-center px-8 gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-lg h-11"
+                    onClick={handleNextStep}
+                    className="flex items-center px-8 gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-lg h-11 hover:scale-105 transition-all duration-150"
                   >
                     Next
                     <ChevronRight className="h-4 w-4" />
@@ -342,7 +493,7 @@ const RequestEventPage = () => {
                     disabled={!isFormComplete}
                     className={`flex items-center px-8 gap-2 rounded-lg h-11 ${
                       isFormComplete
-                        ? "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white"
+                        ? "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white hover:scale-105 transition-all duration-150"
                         : "bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed"
                     }`}
                   >

@@ -8,7 +8,7 @@ export const landing_content = {
     secondaryButton: "See how it works",
   },
   features: {
-    badge: "Built for organizers, colleges and students",
+    badge: "Built for colleges & universities",
     title: "Our product has these powerful features",
     subtitle:
       "Everything you need to create and manage successful college events",

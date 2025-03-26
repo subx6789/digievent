@@ -16,7 +16,7 @@ export const eventRequests: Event[] = [
     eventType: "physical",
     venue: "Techno India University, Salt Lake, Kolkata",
     coverImage: getRandomImage("Fun") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Fun") || "/Placeholder/event-poster.jpg",
+
     clubName: "Vivarta Cultural Club",
     category: "Fun",
     organizer: "Vivarta",
@@ -42,7 +42,7 @@ export const eventRequests: Event[] = [
     eventType: "physical",
     venue: "Salt Lake Stadium Area, Kolkata",
     coverImage: getRandomImage("Fun") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Fun") || "/Placeholder/event-poster.jpg",
+
     clubName: "Sanskaran Music Society",
     category: "Fun",
     organizer: "Sanskaran",
@@ -68,8 +68,7 @@ export const eventRequests: Event[] = [
     eventType: "physical",
     venue: "Techno India University, Salt Lake, Kolkata",
     coverImage: getRandomImage("Educational") || "/Placeholder/event-cover.jpg",
-    eventPoster:
-      getRandomImage("Educational") || "/Placeholder/event-poster.jpg",
+
     clubName: "Takshila Tech Club",
     category: "Educational",
     organizer: "Takshila",
@@ -95,7 +94,7 @@ export const eventRequests: Event[] = [
     eventType: "physical",
     venue: "Salt Lake Sector V, Kolkata",
     coverImage: getRandomImage("Fun") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Fun") || "/Placeholder/event-poster.jpg",
+
     clubName: "Alpha Dancers Club",
     category: "Fun",
     organizer: "Alpha Dancers",
@@ -121,8 +120,7 @@ export const eventRequests: Event[] = [
     eventType: "physical",
     venue: "Techno India University, Salt Lake, Kolkata",
     coverImage: getRandomImage("Educational") || "/Placeholder/event-cover.jpg",
-    eventPoster:
-      getRandomImage("Educational") || "/Placeholder/event-poster.jpg",
+
     clubName: "Google Developer Student Club",
     category: "Educational",
     organizer: "GDSC",
@@ -148,7 +146,7 @@ export const eventRequests: Event[] = [
     eventType: "physical",
     venue: "Techno India University, Salt Lake, Kolkata",
     coverImage: getRandomImage("Fun") || "/Placeholder/event-cover.jpg",
-    eventPoster: getRandomImage("Fun") || "/Placeholder/event-poster.jpg",
+
     clubName: "Vivarta Cultural Club",
     category: "Fun",
     organizer: "Vivarta",
@@ -174,8 +172,7 @@ export const eventRequests: Event[] = [
     eventType: "virtual",
     virtualLink: "https://meet.google.com/abc-defg-hij",
     coverImage: getRandomImage("Educational") || "/Placeholder/event-cover.jpg",
-    eventPoster:
-      getRandomImage("Educational") || "/Placeholder/event-poster.jpg",
+
     clubName: "TechMinds AI Community",
     category: "Educational",
     organizer: "TechMinds",
@@ -201,8 +198,7 @@ export const eventRequests: Event[] = [
     eventType: "physical",
     venue: "JW Marriott, Kolkata",
     coverImage: getRandomImage("Educational") || "/Placeholder/event-cover.jpg",
-    eventPoster:
-      getRandomImage("Educational") || "/Placeholder/event-poster.jpg",
+
     clubName: "BlockchainHub India",
     category: "Educational",
     organizer: "BlockchainHub",

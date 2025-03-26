@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Event } from "@/types/event";
 import { eventCategory } from "@/utils/data/eventCategory";
+import { Tag } from "lucide-react";
 
 // Form schema
 const formSchema = z.object({
@@ -44,6 +45,7 @@ const BasicDetailsForm = ({
   // Initialize form with existing data
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       title: formData.title || "",
       description: formData.description || "",
@@ -68,7 +70,7 @@ const BasicDetailsForm = ({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-6 bg-gray-50 dark:bg-gray-900"
+        className="space-y-6 bg-white dark:bg-gray-900"
       >
         <div className="grid grid-cols-1 gap-6">
           <FormField
@@ -128,9 +130,12 @@ const BasicDetailsForm = ({
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger className="h-11 cursor-pointer dark:bg-gray-800 bg-white dark:text-white text-black">
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
+                      <div className="relative">
+                        <Tag className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
+                        <SelectTrigger className="pl-10 h-11 cursor-pointer dark:bg-gray-800 bg-white dark:text-white text-black">
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                      </div>
                     </FormControl>
                     <SelectContent>
                       {eventCategory.map((category) => (

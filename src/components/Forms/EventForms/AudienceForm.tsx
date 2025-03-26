@@ -19,24 +19,28 @@ import { Event } from "@/types/event";
 import { Course } from "@/utils/data/courses";
 import { Users } from "lucide-react";
 
-// Form schema
-const formSchema = z.object({
-  capacity: z.string().min(1, "Capacity is required"),
-  course: z.array(z.string()).min(1, "At least one course must be selected"),
-  department: z.array(z.string()).optional(),
-  year: z.array(z.string()).optional(),
-});
-
 interface AudienceFormProps {
   formData: Partial<Event>;
   updateFormData: (data: Partial<Event>) => void;
   courses: Course[]; // Using your existing Course type
+  editMode?: boolean;
+  restrictions?: {
+    capacity?: {
+      minValue: string;
+      canEdit: boolean;
+    };
+    course?: boolean;
+    department?: boolean;
+    year?: boolean;
+  };
 }
 
 const AudienceForm = ({
   formData,
   updateFormData,
   courses,
+  editMode,
+  restrictions,
 }: AudienceFormProps) => {
   // State for departments and years based on selected courses
   const [availableDepartments, setAvailableDepartments] = useState<string[]>(
@@ -51,9 +55,33 @@ const AudienceForm = ({
   );
   const [maxYears, setMaxYears] = useState<number>(0);
 
+  // Form schema
+  const formSchema = z.object({
+    capacity: z
+      .string()
+      .min(1, "Capacity is required")
+      .refine(
+        (val) => {
+          const capacityValue = parseInt(val);
+          // Only validate if it's a valid number
+          if (!isNaN(capacityValue) && hasCapacityRestriction) {
+            return capacityValue >= parseInt(restrictions!.capacity!.minValue);
+          }
+          return true;
+        },
+        {
+          message: `Capacity must be at least ${restrictions?.capacity?.minValue} seats`,
+        }
+      ),
+    course: z.array(z.string()).min(1, "At least one course must be selected"),
+    department: z.array(z.string()),
+    year: z.array(z.string()),
+  });
+
   // Initialize form with existing data
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       capacity: formData.capacity || "",
       course: formData.course || [],
@@ -70,6 +98,11 @@ const AudienceForm = ({
   // Auto-save on field change
   useEffect(() => {
     const subscription = form.watch((value) => {
+      // Make sure capacity is properly converted to a string before updating
+      if (value.capacity) {
+        // Ensure capacity is properly formatted as a string
+        value.capacity = String(parseInt(value.capacity));
+      }
       updateFormData(value as Partial<Event>);
     });
     return () => subscription.unsubscribe();
@@ -162,6 +195,12 @@ const AudienceForm = ({
     }
   };
 
+  // Check if capacity has a minimum value restriction
+  const hasCapacityRestriction =
+    editMode &&
+    restrictions?.capacity?.minValue &&
+    parseInt(restrictions.capacity.minValue) > 0;
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -174,19 +213,31 @@ const AudienceForm = ({
               <FormLabel>Event Capacity</FormLabel>
               <FormControl>
                 <div className="relative">
-                  <Users className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <Users className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
                   <Input
                     type="number"
+                    className="pl-10 h-11 bg-white text-black dark:bg-gray-800 dark:text-white"
                     placeholder="Enter maximum number of attendees"
                     {...field}
-                    className="pl-10 h-11 bg-white dark:bg-gray-800 text-black dark:text-white"
-                    min="1"
+                    min={
+                      hasCapacityRestriction
+                        ? restrictions?.capacity?.minValue
+                        : "1"
+                    }
+                    onChange={(e) => {
+                      field.onChange(e);
+                    }}
                   />
                 </div>
               </FormControl>
               <FormDescription>
-                The maximum number of people who can attend this event. Enter 0
-                for unlimited capacity.
+                Enter the maximum number of attendees allowed.
+                {hasCapacityRestriction && (
+                  <span className="text-amber-500 block mt-1">
+                    Capacity cannot be decreased below{" "}
+                    {restrictions?.capacity?.minValue} (current capacity)
+                  </span>
+                )}
               </FormDescription>
               <FormMessage />
             </FormItem>

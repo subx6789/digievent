@@ -29,17 +29,16 @@ export default function LoginPage() {
         <div className="flex justify-between items-center mb-8">
           <Link href="/">
             <motion.button
-              className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-bold"
-              whileHover={{ x: -3 }}
-              whileTap={{ scale: 0.97 }}
+              className="flex items-center gap-2 text-black dark:text-white transition-colors font-bold text-lg"
+              whileHover={{ scale: 1.05 }}
             >
-              <div
-                className={`flex h-6 w-6 items-center justify-center rounded-lg text-white transition-colors duration-300 ${
-                  activeTab === "student" ? "bg-blue-600" : "bg-indigo-600"
-                }`}
+              <motion.div
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.5 }}
+                className={`flex h-8 w-8 items-center justify-center rounded-lg text-white transition-colors duration-300 bg-blue-600`}
               >
-                <TicketCheck className="size-4" />
-              </div>
+                <TicketCheck className="w-5 h-5" />
+              </motion.div>
               Digievent
             </motion.button>
           </Link>

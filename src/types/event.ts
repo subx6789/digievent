@@ -14,7 +14,6 @@ export interface Event {
   venue?: string; // Only if eventType is physical
   virtualLink?: string; // Only if eventType is virtual
   coverImage: string; // Landscape image
-  eventPoster: string; // Portrait image
   clubName: string; // Organization name
   category: string; // Event category
   status: "pending" | "approved" | "rejected" | "cancelled";
@@ -22,7 +21,6 @@ export interface Event {
   course: string[]; // Array of courses
   department: string[]; // Array of departments
   year: string[]; // Array of years
-  imageGallery?: string[]; // Optional array of additional images
   createdAt?: string;
   organizer: string; // For backward compatibility
 }

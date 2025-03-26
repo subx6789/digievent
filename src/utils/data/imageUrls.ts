@@ -38,6 +38,8 @@ function getRandomImage(category: string): string | undefined {
       return getRandomFromArray(educationalImages);
     case "Fun":
       return getRandomFromArray(funImages);
+    case "Gaming":
+      return getRandomFromArray(gamingImages);
     default:
       return undefined;
   }

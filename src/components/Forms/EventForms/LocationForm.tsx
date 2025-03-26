@@ -14,31 +14,92 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Event } from "@/types/event";
 import { MapPin, Globe, IndianRupee } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 // Form schema with conditional validation
-const formSchema = z.object({
-  eventType: z.enum(["physical", "virtual"]),
-  venue: z.string().optional(),
-  virtualLink: z.string().optional(),
-  isFree: z.boolean(),
-  price: z.string().optional(),
-});
+const formSchema = z
+  .object({
+    eventType: z.enum(["physical", "virtual"]),
+    venue: z.string().optional(),
+    virtualLink: z
+      .string()
+
+      .optional(),
+    isFree: z.boolean(),
+    price: z
+      .string()
+
+      .optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.eventType === "physical") {
+        return data.venue && data.venue.length >= 5;
+      }
+      return true;
+    },
+    {
+      message: "Venue must be at least 5 characters for physical events",
+      path: ["venue"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.eventType === "virtual") {
+        return (
+          data.virtualLink &&
+          /^(https?:\/\/(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,})(?:\/[^\s]*)?$/.test(
+            data.virtualLink
+          )
+        );
+      }
+      return true;
+    },
+    {
+      message: "Invalid URL format. Use https://URL_ADDRESS",
+      path: ["virtualLink"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.isFree === false) {
+        return data.price && /^(?:\d+(\.\d*)?|\.\d+)$/.test(data.price);
+      }
+      return true;
+    },
+    {
+      message: "Price must be greater than zero",
+      path: ["price"],
+    }
+  );
 
 interface LocationFormProps {
   formData: Partial<Event>;
   updateFormData: (data: Partial<Event>) => void;
+  editMode?: boolean;
+  restrictions?: {
+    isFree?: {
+      value?: boolean;
+      canEdit: boolean;
+    };
+  };
 }
 
-const LocationForm = ({ formData, updateFormData }: LocationFormProps) => {
+const LocationForm = ({
+  formData,
+  updateFormData,
+  editMode = false,
+  restrictions,
+}: LocationFormProps) => {
   // Initialize form with existing data
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       eventType: formData.eventType || "physical",
       venue: formData.venue || "",
@@ -64,6 +125,21 @@ const LocationForm = ({ formData, updateFormData }: LocationFormProps) => {
     });
     return () => subscription.unsubscribe();
   }, [form, updateFormData]);
+
+  // Check if isFree is restricted from editing
+  const isIsFreeDisabled =
+    editMode && restrictions?.isFree && !restrictions.isFree.canEdit;
+
+  const handleRestrictedSwitchClick = () => {
+    if (isIsFreeDisabled) {
+      toast({
+        title: "Cannot Change Pricing Type",
+        description:
+          "Free events cannot be changed to paid events and vice versa after creation.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <Form {...form}>
@@ -112,12 +188,14 @@ const LocationForm = ({ formData, updateFormData }: LocationFormProps) => {
               <FormItem>
                 <FormLabel>Venue</FormLabel>
                 <FormControl>
-                  <Textarea
-                    placeholder="Enter the physical location of your event"
-                    {...field}
-                    rows={3}
-                    className="resize-y bg-white text-black dark:bg-gray-800 dark:text-white"
-                  />
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
+                    <Input
+                      placeholder="Enter the physical location of your event"
+                      {...field}
+                      className="pl-10 h-11 bg-white text-black dark:bg-gray-800 dark:text-white"
+                    />
+                  </div>
                 </FormControl>
                 <FormDescription>
                   Provide the full address and any specific instructions for
@@ -135,11 +213,14 @@ const LocationForm = ({ formData, updateFormData }: LocationFormProps) => {
               <FormItem>
                 <FormLabel>Virtual Meeting Link</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="e.g., Zoom, Google Meet, or Microsoft Teams link"
-                    {...field}
-                    className="h-11 dark:bg-gray-800 bg-white dark:text-white text-black"
-                  />
+                  <div className="relative">
+                    <Globe className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
+                    <Input
+                      placeholder="e.g., Zoom, Google Meet, or Microsoft Teams link"
+                      {...field}
+                      className="pl-10 h-11 dark:bg-gray-800 bg-white dark:text-white text-black"
+                    />
+                  </div>
                 </FormControl>
                 <FormDescription>
                   Provide a link to the virtual meeting platform you&apos;ll be
@@ -163,14 +244,26 @@ const LocationForm = ({ formData, updateFormData }: LocationFormProps) => {
                   <FormLabel className="text-base">Free Event</FormLabel>
                   <FormDescription>
                     Toggle this if your event is free to attend.
+                    {isIsFreeDisabled && (
+                      <span className="block text-amber-500 mt-1">
+                        Pricing type cannot be changed after event creation.
+                      </span>
+                    )}
                   </FormDescription>
                 </div>
                 <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    className="bg-gray-300 data-[state=checked]:bg-blue-600 dark:bg-gray-700 dark:data-[state=checked]:bg-blue-500"
-                  />
+                  <div onClick={handleRestrictedSwitchClick}>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={
+                        isIsFreeDisabled ? undefined : field.onChange
+                      }
+                      disabled={isIsFreeDisabled}
+                      className={`bg-gray-300 data-[state=checked]:bg-blue-600 dark:bg-gray-700 dark:data-[state=checked]:bg-blue-500 ${
+                        isIsFreeDisabled ? "opacity-60 cursor-not-allowed" : ""
+                      }`}
+                    />
+                  </div>
                 </FormControl>
               </FormItem>
             )}
@@ -185,9 +278,9 @@ const LocationForm = ({ formData, updateFormData }: LocationFormProps) => {
                   <FormLabel>Ticket Price (₹)</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <IndianRupee className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                      <IndianRupee className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
                       <Input
-                        type="number"
+                        type="text"
                         placeholder="Enter ticket price"
                         {...field}
                         className="pl-10 h-11 dark:bg-gray-800 bg-white dark:text-white text-black"

@@ -22,6 +22,7 @@ import {
   CustomDateRangePicker,
   CustomTimePicker,
 } from "@/components/Customs/DateAndTimePicker";
+import { Hourglass } from "lucide-react";
 
 // Form schema
 const formSchema = z.object({
@@ -41,6 +42,7 @@ const DateTimeForm = ({ formData, updateFormData }: DateTimeFormProps) => {
   // Initialize form with existing data
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       dayType: formData.dayType || "single day",
       date: formData.date || "",
@@ -173,14 +175,17 @@ const DateTimeForm = ({ formData, updateFormData }: DateTimeFormProps) => {
               <FormItem>
                 <FormLabel>Duration (hours)</FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="e.g., 2.5"
-                    {...field}
-                    step="0.5"
-                    min="0.5"
-                    className="h-11 dark:bg-gray-800 bg-white dark:text-white text-black"
-                  />
+                  <div className="relative">
+                    <Hourglass className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
+                    <Input
+                      type="number"
+                      placeholder="e.g., 2.5"
+                      {...field}
+                      step="0.5"
+                      min="0.5"
+                      className="pl-10 h-11 dark:bg-gray-800 bg-white dark:text-white text-black"
+                    />
+                  </div>
                 </FormControl>
                 <FormDescription>
                   How long the event will last (in hours).

@@ -66,7 +66,7 @@ export const Hero = ({ sectionRef }: HeroProps) => {
           }}
         />
 
-        <div className="flex flex-col items-center text-center mb-16">
+        <div className="flex flex-col md:items-center place-items-start text-center mb-16">
           <motion.div
             className="inline-block mb-6 px-5 py-2 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-100 dark:border-blue-800/30 shadow-sm"
             initial={{ opacity: 0, y: -20 }}
@@ -80,7 +80,7 @@ export const Hero = ({ sectionRef }: HeroProps) => {
           </motion.div>
 
           <motion.h1
-            className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 max-w-4xl leading-tight"
+            className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 max-w-4xl leading-tight md:text-center text-left"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
@@ -92,7 +92,7 @@ export const Hero = ({ sectionRef }: HeroProps) => {
           </motion.h1>
 
           <motion.p
-            className="text-xl md:text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-2xl"
+            className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-2xl md:text-center text-left"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.4 }}
@@ -101,7 +101,7 @@ export const Hero = ({ sectionRef }: HeroProps) => {
           </motion.p>
 
           <motion.div
-            className="flex flex-col sm:flex-row gap-4 mb-16"
+            className="flex flex-col sm:flex-row gap-4 mb-16 w-full md:justify-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}

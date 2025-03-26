@@ -36,7 +36,7 @@ export const Benefits = ({ sectionRef }: BenefitsProps) => {
       </div>
 
       <div className="container mx-auto px-4">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
+        <div className="flex flex-col lg:flex-row lg:items-center items-start gap-12">
           <motion.div
             className="flex-1"
             initial={{ opacity: 0, x: -20 }}
@@ -44,7 +44,7 @@ export const Benefits = ({ sectionRef }: BenefitsProps) => {
             viewport={{ once: false, margin: "-100px" }}
             transition={{ duration: 0.6 }}
           >
-            <div className="flex justify-center md:justify-start">
+            <div className="flex justify-start">
               <motion.div
                 className="inline-block mb-4 px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-100 dark:border-blue-800/30 shadow-sm"
                 initial={{ opacity: 0, y: -10 }}
@@ -59,7 +59,7 @@ export const Benefits = ({ sectionRef }: BenefitsProps) => {
               </motion.div>
             </div>
 
-            <h2 className="text-3xl md:text-4xl font-bold mb-6 md:text-left text-center">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-left">
               <span className="relative inline-block">
                 <span className="relative z-10 text-blue-600 dark:text-blue-400">
                   {landing_content.benefits.title.split(" ")[0]}
@@ -69,7 +69,7 @@ export const Benefits = ({ sectionRef }: BenefitsProps) => {
             </h2>
 
             <motion.p
-              className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed md:text-left text-center"
+              className="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-8 leading-relaxed text-left"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: false }}
