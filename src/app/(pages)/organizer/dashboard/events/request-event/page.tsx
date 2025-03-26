@@ -16,18 +16,14 @@ import {
   Save,
   CheckCircle2,
   ArrowLeft,
-  FileText,
-  Calendar,
-  MapPin,
-  Users,
-  ImageIcon,
   RefreshCw,
   CircleX,
   CircleCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ModeToggle } from "@/components/ThemeToggler/ThemeToggler";
-import StepIndicator, { Step } from "@/components/Customs/StepIndicator";
+import StepIndicator from "@/components/Customs/StepIndicator";
+import { formSteps } from "@/utils/functions/formSteps";
 
 // Import form sections
 import BasicDetailsForm from "@/components/Forms/EventForms/BasicDetailsForm";
@@ -36,15 +32,6 @@ import LocationForm from "@/components/Forms/EventForms/LocationForm";
 import MediaForm from "@/components/Forms/EventForms/MediaForm";
 import AudienceForm from "@/components/Forms/EventForms/AudienceForm";
 import { useEventFormStore } from "@/store/eventFormStore";
-
-// Form steps with Lucide icons
-export const formSteps: Step[] = [
-  { id: "basic-details", label: "Basic Details", icon: <FileText size={16} /> },
-  { id: "date-time", label: "Date & Time", icon: <Calendar size={16} /> },
-  { id: "location", label: "Location", icon: <MapPin size={16} /> },
-  { id: "media", label: "Media", icon: <ImageIcon size={16} /> },
-  { id: "audience", label: "Audience", icon: <Users size={16} /> },
-];
 
 const RequestEventPage = () => {
   const router = useRouter();

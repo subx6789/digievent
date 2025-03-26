@@ -19,7 +19,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { ModeToggle } from "@/components/ThemeToggler/ThemeToggler";
 import StepIndicator from "@/components/Customs/StepIndicator";
-import { formSteps } from "../../request-event/page";
+import { formSteps } from "@/utils/functions/formSteps";
 import { format } from "date-fns";
 import { useEventFormStore } from "@/store/eventFormStore";
 
