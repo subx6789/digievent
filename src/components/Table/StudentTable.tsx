@@ -20,18 +20,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "../ui/pagination";
-
-export interface Student {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  rollno: string;
-  avatarUrl: string;
-  course: string;
-  department: string;
-  year: number | undefined;
-}
+import { Student } from "@/types/student";
 
 interface StudentTableProps {
   students: Student[];

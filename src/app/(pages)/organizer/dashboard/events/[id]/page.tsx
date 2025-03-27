@@ -24,6 +24,10 @@ import { ModeToggle } from "@/components/ThemeToggler/ThemeToggler";
 // Mock data - in a real app, you would fetch this from an API
 import { Event } from "@/types/event";
 import { events } from "@/utils/data/events";
+import Loading from "@/components/Loading/Loading";
+import { mockAttendees } from "@/utils/data/mockAttendees";
+import { Student } from "@/types/student";
+import AttendeeTableModal from "@/components/Modals/AttendeeTableModal";
 
 const OrganizerEventDetails = () => {
   const params = useParams();
@@ -31,6 +35,20 @@ const OrganizerEventDetails = () => {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [isAttendeeModalOpen, setIsAttendeeModalOpen] = useState(false);
+  const [attendees, setAttendees] = useState<Student[]>([]);
+
+  // Simulate fetching attendees
+  const fetchAttendees = () => {
+    // In a real app, you would fetch attendees from an API
+    // For now, we'll use mock data
+    setAttendees(mockAttendees);
+    setIsAttendeeModalOpen(true);
+  };
+
+  const handleViewAttendees = () => {
+    fetchAttendees();
+  };
 
   // Simulate fetching event data
   useEffect(() => {
@@ -72,7 +90,7 @@ const OrganizerEventDetails = () => {
             className="flex flex-col items-center"
           >
             {/* Loading animation content remains the same */}
-            {/* ... existing loading animation ... */}
+            <Loading />
           </motion.div>
         </div>
       </div>
@@ -133,10 +151,6 @@ const OrganizerEventDetails = () => {
 
   const handleBackButton = () => {
     router.push("/organizer/dashboard/events");
-  };
-
-  const handleViewAttendees = () => {
-    router.push(`/organizer/dashboard/events/${event.id}/attendees`);
   };
 
   const handleEditEvent = () => {
@@ -586,8 +600,6 @@ const OrganizerEventDetails = () => {
                         ? "bg-green-500"
                         : event.status === "pending"
                         ? "bg-yellow-500"
-                        : event.status === "cancelled"
-                        ? "bg-red-500"
                         : "bg-gray-500"
                     )}
                   />
@@ -598,8 +610,6 @@ const OrganizerEventDetails = () => {
                         ? "text-green-600 dark:text-green-400"
                         : event.status === "pending"
                         ? "text-yellow-600 dark:text-yellow-400"
-                        : event.status === "cancelled"
-                        ? "text-red-600 dark:text-red-400"
                         : "text-gray-600 dark:text-gray-400"
                     )}
                   >
@@ -621,11 +631,6 @@ const OrganizerEventDetails = () => {
                     <span className="text-sm text-gray-600 dark:text-gray-400">
                       Your event has been rejected. Please contact admin for
                       details.
-                    </span>
-                  )}
-                  {event.status === "cancelled" && (
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      This event has been cancelled
                     </span>
                   )}
                 </div>
@@ -790,6 +795,13 @@ const OrganizerEventDetails = () => {
           </motion.div>
         </div>
       </main>
+      {/* Attendee Modal */}
+      <AttendeeTableModal
+        isOpen={isAttendeeModalOpen}
+        onClose={() => setIsAttendeeModalOpen(false)}
+        attendees={attendees}
+        eventTitle={event?.title || ""}
+      />
     </section>
   );
 };

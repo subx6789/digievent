@@ -5,12 +5,11 @@ import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import OrganizerTable from "@/components/Table/OrganiserTable";
 import { organizers } from "@/utils/data/organizers";
-import AddOrganizerModal, {
-  Organizer,
-} from "@/components/Modals/AddOrganizerModal";
+import AddOrganizerModal from "@/components/Modals/AddOrganizerModal";
 import UploadExcelModal from "@/components/Modals/UploadExcelModal";
 import { FileSpreadsheet, UserPlus } from "lucide-react";
 import React from "react";
+import { Organizer } from "@/types/organizer";
 
 export default function OrganizersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,82 +52,94 @@ export default function OrganizersPage() {
     }, 0);
   }, []);
 
-  const handleAddOrganizer = useCallback((newOrganizer: Organizer) => {
-    // Only handle adding new organizers here
-    setOrganizersList((prevOrganizers) => [
-      ...prevOrganizers,
-      {
-        ...newOrganizer,
-        avatarUrl: newOrganizer.avatarUrl || "/placeholder-avatar.jpg",
-      },
-    ]);
-    handleCloseModal();
-  }, [handleCloseModal]);
+  const handleAddOrganizer = useCallback(
+    (newOrganizer: Organizer) => {
+      // Only handle adding new organizers here
+      setOrganizersList((prevOrganizers) => [
+        ...prevOrganizers,
+        {
+          ...newOrganizer,
+          avatarUrl: newOrganizer.avatarUrl || "/placeholder-avatar.jpg",
+        },
+      ]);
+      handleCloseModal();
+    },
+    [handleCloseModal]
+  );
 
-  const handleUpdateOrganizer = useCallback((updatedOrganizer: Organizer) => {
-    // Handle updating existing organizers
-    setOrganizersList((prevOrganizers) =>
-      prevOrganizers.map((org) =>
-        org.id === updatedOrganizer.id
-          ? {
-              ...updatedOrganizer,
-              avatarUrl:
-                updatedOrganizer.avatarUrl || "/placeholder-avatar.jpg",
-            }
-          : org
-      )
-    );
-    handleCloseModal();
-  }, [handleCloseModal]);
-
-  const handleEditOrganizer = useCallback((organizerId: string) => {
-    const organizerToEdit = organizersList.find(
-      (org) => org.id === organizerId
-    );
-    if (organizerToEdit) {
-      setEditingOrganizer(organizerToEdit);
-      setIsEditMode(true);
-      setTimeout(() => {
-        setIsModalOpen(true);
-      }, 100);
-    }
-  }, [organizersList]);
-
-  const handleRemoveOrganizer = useCallback((organizerId: string) => {
-    const organizerToRemove = organizersList.find(
-      (org) => org.id === organizerId
-    );
-    if (organizerToRemove) {
-      const isConfirmed = window.confirm(
-        `Are you sure you want to remove ${organizerToRemove.name}?`
+  const handleUpdateOrganizer = useCallback(
+    (updatedOrganizer: Organizer) => {
+      // Handle updating existing organizers
+      setOrganizersList((prevOrganizers) =>
+        prevOrganizers.map((org) =>
+          org.id === updatedOrganizer.id
+            ? {
+                ...updatedOrganizer,
+                avatarUrl:
+                  updatedOrganizer.avatarUrl || "/placeholder-avatar.jpg",
+              }
+            : org
+        )
       );
+      handleCloseModal();
+    },
+    [handleCloseModal]
+  );
 
-      if (isConfirmed) {
-        setOrganizersList((prevOrganizers) =>
-          prevOrganizers.filter((org) => org.id !== organizerId)
-        );
+  const handleEditOrganizer = useCallback(
+    (organizerId: string) => {
+      const organizerToEdit = organizersList.find(
+        (org) => org.id === organizerId
+      );
+      if (organizerToEdit) {
+        setEditingOrganizer(organizerToEdit as Organizer);
+        setIsEditMode(true);
+        setTimeout(() => {
+          setIsModalOpen(true);
+        }, 100);
       }
-    }
-  }, [organizersList]);
+    },
+    [organizersList]
+  );
+
+  const handleRemoveOrganizer = useCallback(
+    (organizerId: string) => {
+      const organizerToRemove = organizersList.find(
+        (org) => org.id === organizerId
+      );
+      if (organizerToRemove) {
+        const isConfirmed = window.confirm(
+          `Are you sure you want to remove ${organizerToRemove.name}?`
+        );
+
+        if (isConfirmed) {
+          setOrganizersList((prevOrganizers) =>
+            prevOrganizers.filter((org) => org.id !== organizerId)
+          );
+        }
+      }
+    },
+    [organizersList]
+  );
 
   // Handle successful Excel upload
   const handleExcelUploadSuccess = useCallback((file: File) => {
     // In a real app, you would process the Excel file here
-    console.log(file)
+    console.log(file);
   }, []);
 
   // Memoize dropdown options to prevent unnecessary re-renders
   const addOptions = React.useMemo(
     () => [
-      { 
-        label: "Enter Manually", 
+      {
+        label: "Enter Manually",
         onClick: handleOpenModal,
-        icon: <UserPlus className="h-4 w-4" />
+        icon: <UserPlus className="h-4 w-4" />,
       },
-      { 
-        label: "Upload Excel File", 
+      {
+        label: "Upload Excel File",
         onClick: handleOpenExcelModal,
-        icon: <FileSpreadsheet className="h-4 w-4" />
+        icon: <FileSpreadsheet className="h-4 w-4" />,
       },
     ],
     [handleOpenModal, handleOpenExcelModal]
@@ -140,7 +151,7 @@ export default function OrganizersPage() {
         <Header onAddClick={null} addOptions={addOptions} />
         <div className="p-6">
           <OrganizerTable
-            organizers={organizersList}
+            organizers={organizersList as Organizer[]}
             onEditOrganizer={handleEditOrganizer}
             onRemoveOrganizer={handleRemoveOrganizer}
           />
@@ -155,7 +166,7 @@ export default function OrganizersPage() {
           editMode={isEditMode}
           organizerToEdit={editingOrganizer}
         />
-        
+
         <UploadExcelModal
           isOpen={isExcelModalOpen}
           onClose={handleCloseExcelModal}
@@ -166,7 +177,7 @@ export default function OrganizersPage() {
             "Download the template file for correct formatting",
             "Fill in organizer details in the template",
             "Save the file as .xlsx or .xls format",
-            "Upload the file using the dropzone below"
+            "Upload the file using the dropzone below",
           ]}
           onUploadSuccess={handleExcelUploadSuccess}
           entityName="Organizer"

@@ -1,5 +1,13 @@
 export const studentData = {
   name: "Subhajit Sarkar",
   email: "ss@gmail.com",
-  avatar: undefined,
+  avatarUrl: undefined,
+  id: "1",
+
+  phone: "+91 9876543210",
+  rollno: "123456789012",
+
+  course: "BCA",
+  department: "Computer Applications",
+  year: 3,
 };

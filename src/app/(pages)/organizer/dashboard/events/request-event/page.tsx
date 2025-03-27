@@ -238,7 +238,18 @@ const RequestEventPage = () => {
       department: formData.department || [],
       year: formData.year || [],
       createdAt: new Date().toISOString(),
-      organizer: formData.clubName || "My Club", // For backward compatibility
+      organizer: formData.organizer || {
+        id: "3",
+        name: "Ananya Roy",
+        role: "organizer",
+        clubName: "Takshila",
+        email: "takshila7890@gmail.com",
+        phone: "+91 99876 54321",
+        eventCount: 13,
+        avatarUrl: "/path/to/ananya-avatar.jpg",
+      }, // For backward compatibility
+      progress: "none",
+      studentsBooked: null,
     };
 
     console.log("Submitting event:", newEvent);

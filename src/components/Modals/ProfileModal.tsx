@@ -39,18 +39,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Organizer } from "@/types/organizer";
 
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: {
-    name: string;
-    email: string;
-    avatar: string | undefined;
-    role: string;
-    phone?: string;
-    organization?: string;
-  };
+  user: Organizer;
 }
 
 // Define the form schema with Zod - making password optional
@@ -87,10 +81,10 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
-    user.avatar || null
+    user.avatarUrl || null
   );
   const [initialAvatar, setInitialAvatar] = useState<string | null>(
-    user.avatar || null
+    user.avatarUrl || null
   );
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -245,7 +239,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
         onClose();
         setIsEditing(false);
         form.reset();
-        setAvatarPreview(user.avatar || null);
+        setAvatarPreview(user.avatarUrl || null);
       }, 0);
     }
   };
@@ -390,15 +384,15 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                 </div>
               </div>
 
-              {user.role === "Organizer" && user.organization && (
+              {user.role === "organizer" && user.clubName && (
                 <div className="grid gap-3">
                   <Label className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center">
                     <Building className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
-                    Organization
+                    Club Name
                   </Label>
                   <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900 shadow-sm">
                     <span className="font-medium text-gray-800 dark:text-gray-200">
-                      {user.organization}
+                      {user.clubName}
                     </span>
                   </div>
                 </div>
@@ -538,15 +532,15 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                   )}
                 />
 
-                {user.role === "Organizer" && user.organization && (
+                {user.role === "organizer" && user.clubName && (
                   <div className="grid gap-3">
                     <Label className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center">
                       <Building className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
-                      Organization (Cannot be changed)
+                      ClubName (Cannot be changed)
                     </Label>
                     <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-100 dark:bg-gray-900 h-12 shadow-inner">
                       <span className="font-medium text-gray-500 dark:text-gray-400">
-                        {user.organization}
+                        {user.clubName}
                       </span>
                     </div>
                   </div>

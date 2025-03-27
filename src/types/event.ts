@@ -1,3 +1,6 @@
+import { Organizer } from "./organizer";
+import { Student } from "./student";
+
 // Update the Event interface to match the new requirements
 export interface Event {
   id: string;
@@ -16,11 +19,13 @@ export interface Event {
   coverImage: string; // Landscape image
   clubName: string; // Organization name
   category: string; // Event category
-  status: "pending" | "approved" | "rejected" | "cancelled";
+  status: "pending" | "approved" | "rejected";
   capacity: string; // Number of seats
   course: string[]; // Array of courses
   department: string[]; // Array of departments
   year: string[]; // Array of years
   createdAt?: string;
-  organizer: string; // For backward compatibility
+  organizer: Organizer;
+  progress: "active" | "completed" | "upcoming" | "cancelled" | "none";
+  studentsBooked: Student[] | null;
 }

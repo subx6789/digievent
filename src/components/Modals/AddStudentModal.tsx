@@ -37,7 +37,6 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Student } from "../Table/StudentTable";
 import {
   Select,
   SelectContent,
@@ -47,6 +46,7 @@ import {
 } from "../ui/select";
 import { courses } from "@/utils/data/courses";
 import { useDropzone } from "react-dropzone";
+import { Student } from "@/types/student";
 
 interface AddStudentModalProps {
   isOpen: boolean;
@@ -124,7 +124,9 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
 }) => {
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
-  const [avatarUrlPreview, setAvatarUrlPreview] = useState<string | null>(null);
+  const [avatarUrlPreview, setAvatarUrlPreview] = useState<string | undefined>(
+    undefined
+  );
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
 
@@ -170,7 +172,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
         course: studentToEdit.course,
         department: studentToEdit.department,
         year: studentToEdit.year || 1,
-        avatarUrl: studentToEdit.avatarUrl,
+        avatarUrl: studentToEdit.avatarUrl || undefined,
       });
 
       // Set the avatar preview
@@ -191,7 +193,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
         avatarUrl: "",
         password: "",
       });
-      setAvatarUrlPreview(null);
+      setAvatarUrlPreview(undefined);
       setSelectedCourse(null);
     }
   }, [isEditMode, studentToEdit, form]);
@@ -328,7 +330,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
 
     // Reset form and close modal
     form.reset(defaultFormValues);
-    setAvatarUrlPreview(null);
+    setAvatarUrlPreview(undefined);
     onClose();
   };
 

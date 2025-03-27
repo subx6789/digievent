@@ -22,16 +22,7 @@ import {
 } from "@/components/ui/pagination";
 import { Trash2, Search, UserRoundPen } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-
-export interface Organizer {
-  id: string;
-  name: string;
-  organization: string;
-  email: string;
-  phone: string;
-  eventCount: number;
-  avatarUrl: string;
-}
+import { Organizer } from "@/types/organizer";
 
 interface OrganizerTableProps {
   organizers: Organizer[];
@@ -56,9 +47,7 @@ export default function OrganizerTable({
     const filtered = organizers.filter(
       (organizer) =>
         organizer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        organizer.organization
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
+        organizer.clubName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         organizer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         organizer.phone.includes(searchTerm)
     );
@@ -173,7 +162,7 @@ export default function OrganizerTable({
                               {organizer.name}
                             </div>
                             <div className="text-sm text-gray-500 dark:text-gray-400">
-                              {organizer.organization}
+                              {organizer.clubName}
                             </div>
                           </div>
                         </div>

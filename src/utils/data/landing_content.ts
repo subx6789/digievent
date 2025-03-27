@@ -1,7 +1,7 @@
 export const landing_content = {
   hero: {
     badge: "Welcome",
-    title: "One Platform Every College Event",
+    title: "One Platform for all College Events",
     description:
       "Effortlessly create, manage, and promote college events. From registration to attendance tracking, Digievent simplifies the entire process.",
     primaryButton: "Get started",
@@ -37,7 +37,7 @@ export const landing_content = {
     badge: "Streamlined workflow",
     title: "Manage your events with ease",
     description:
-      "DigiEvent streamlines the entire event management process, saving you time and reducing stress.",
+      "Digievent streamlines the entire event management process, saving you time and reducing stress.",
     items: [
       "Create events in minutes with intuitive forms",
       "Automate attendee communications and reminders",
@@ -50,7 +50,7 @@ export const landing_content = {
     badge: "Limited time offer",
     title: "Ready to simplify your event management?",
     description:
-      "Try DigiEvent today and see the difference it makes for your college events.",
+      "Try Digievent today and see the difference it makes for your college events.",
     primaryButton: "Get Started Free",
     secondaryButton: "Watch Demo",
   },
@@ -125,7 +125,7 @@ export const landing_content = {
       { href: "#contact", text: "Contact" },
     ],
     loginButton: "Login",
-    statusBar: "DigiEvent",
+    statusBar: "Digievent",
     notifications: {
       eventCreated: {
         title: "Event Created",

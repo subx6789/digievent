@@ -72,7 +72,7 @@ const StudentSideEventsPage = () => {
         (event) =>
           event.title.toLowerCase().includes(query) ||
           event.description.toLowerCase().includes(query) ||
-          event.organizer.toLowerCase().includes(query)
+          event.clubName.toLowerCase().includes(query)
       );
     }
 
@@ -84,10 +84,10 @@ const StudentSideEventsPage = () => {
       );
     }
 
-    // Apply organizer filter
+    // Apply clubName filter
     if (selectedOrganizer !== "all") {
       filtered = filtered.filter((event) =>
-        event.organizer.toLowerCase().includes(selectedOrganizer.toLowerCase())
+        event.clubName.toLowerCase().includes(selectedOrganizer.toLowerCase())
       );
     }
 

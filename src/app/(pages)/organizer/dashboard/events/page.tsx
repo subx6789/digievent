@@ -53,7 +53,7 @@ const OrganizerEvents = () => {
 
     if (eventToCancel) {
       // Update event status to cancelled in Zustand store
-      const updatedEvent: Event = { ...eventToCancel, status: "cancelled" };
+      const updatedEvent: Event = { ...eventToCancel, progress: "cancelled" };
       updateEvent(updatedEvent);
 
       toast({

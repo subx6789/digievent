@@ -20,6 +20,7 @@ import {
   Ban,
   Ellipsis,
   Info,
+  Download,
 } from "lucide-react";
 import Image from "next/image";
 import { Event } from "@/types/event";
@@ -41,6 +42,8 @@ interface EventCardProps {
   onEdit?: (event: Event) => void;
   onView?: (eventId: string) => void;
   onCancel?: (eventId: string) => void;
+  onDownload?: (eventId: string) => void;
+  isBookingHistory?: boolean;
 }
 
 const EventCard = ({
@@ -49,10 +52,17 @@ const EventCard = ({
   onEdit,
   onView,
   onCancel,
+  onDownload,
+  isBookingHistory = false,
 }: EventCardProps) => {
   const pathname = usePathname();
   const isAdmin = pathname?.includes("/admin");
   const isOrganizer = pathname?.includes("/organizer");
+
+  const handleDownloadTicket = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDownload?.(event.id);
+  };
 
   const handleApprove = (id: string) => {
     console.log(`Approved Event with ID: ${id}`);
@@ -87,6 +97,21 @@ const EventCard = ({
 
   // Style variants for different event states
   const getCardStyle = () => {
+    if (isBookingHistory) {
+      switch (event.progress) {
+        case "cancelled":
+          return "opacity-80 grayscale-[40%] border-red-200 dark:border-red-900";
+        case "completed":
+          return "border-green-200 dark:border-green-900";
+        case "active":
+          return "border-blue-200 dark:border-blue-900";
+        case "upcoming":
+          return "border-yellow-200 dark:border-yellow-900";
+        default:
+          return "";
+      }
+    }
+
     if (!isOrganizer) return "";
 
     switch (event.status) {
@@ -94,8 +119,6 @@ const EventCard = ({
         return "opacity-85 grayscale-[30%] border-yellow-200 dark:border-yellow-900";
       case "rejected":
         return "opacity-80 grayscale-[40%] border-red-200 dark:border-red-900";
-      case "cancelled":
-        return "opacity-75 grayscale-[50%] border-gray-300 dark:border-gray-700";
       default:
         return "";
     }
@@ -133,6 +156,36 @@ const EventCard = ({
             {event.category}
           </Badge>
 
+          {/* Show booking status badge for booking history */}
+          {isBookingHistory && (
+            <Badge
+              variant="secondary"
+              className={cn(
+                "py-2 px-3 font-medium text-sm",
+                event.progress === "active"
+                  ? "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300"
+                  : event.progress === "completed"
+                  ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300"
+                  : event.progress === "upcoming"
+                  ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300"
+                  : event.progress === "cancelled"
+                  ? "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300"
+                  : ""
+              )}
+            >
+              <Clock className="h-3.5 w-3.5 mr-1" />
+              {event.progress === "active"
+                ? "Active"
+                : event.progress === "completed"
+                ? "Completed"
+                : event.progress === "upcoming"
+                ? "Upcoming"
+                : event.progress === "cancelled"
+                ? "Cancelled"
+                : ""}
+            </Badge>
+          )}
+
           {/* Show three-dot menu for approved events in organizer view with updated styling */}
           {isOrganizer && event.status === "approved" && (
             <DropdownMenu>
@@ -158,7 +211,6 @@ const EventCard = ({
           )}
         </div>
       </div>
-
       {/* Content Section with fixed heights */}
       <div className="flex flex-col flex-grow">
         <CardHeader className="p-4">
@@ -296,7 +348,7 @@ const EventCard = ({
               )}
 
               {/* Enhanced cancelled status styling */}
-              {event.status === "cancelled" && (
+              {event.progress === "cancelled" && (
                 <div className="w-full">
                   <div className="flex items-center justify-center gap-2 mb-3 text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800/60 py-2 rounded-md h-11 border border-gray-200 dark:border-gray-700">
                     <Ban className="h-5 w-5" />
@@ -315,11 +367,33 @@ const EventCard = ({
             </>
           )}
 
-          {!isAdmin && !isOrganizer && (
+          {/* Booking history view */}
+          {isBookingHistory && (
+            <div className="flex items-center justify-between gap-3 w-full">
+              <Button
+                className="flex-1 h-11 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 shadow-sm hover:shadow transition-all duration-150 hover:scale-[1.02]"
+                onClick={() => handleViewDetails(event.id)}
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                View Event
+              </Button>
+              {event.progress !== "cancelled" && (
+                <Button
+                  className="h-11 w-11 rounded-lg text-sm font-medium text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 shadow-sm hover:shadow transition-all duration-150 hover:scale-[1.02] flex items-center justify-center"
+                  onClick={handleDownloadTicket}
+                  variant="default"
+                >
+                  <Download className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+          )}
+
+          {!isAdmin && !isOrganizer && !isBookingHistory && (
             <Button
               size="sm"
               variant="default"
-              className="w-full h-11 hover:scale-105 duration-150 transition-all  bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow text rounded-lg text-sm font-medium"
+              className="w-full h-11 hover:scale-105 duration-150 transition-all bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow text rounded-lg text-sm font-medium"
               onClick={() => handleViewDetails(event.id)}
             >
               <Info className="h-5 w-5 mr-1" />

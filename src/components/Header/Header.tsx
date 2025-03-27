@@ -46,7 +46,7 @@ const Header: React.FC<HeaderProps> = ({ onAddClick, addOptions }) => {
 
   return (
     <section>
-      <header className="flex h-16 items-center justify-between">
+      <header className="flex h-16 items-center md:justify-between justify-start md:gap-0 gap-3">
         <div className="flex gap-2 items-center">
           <SidebarTrigger className="-ml-1" />
           <ModeToggle />
@@ -65,7 +65,7 @@ const Header: React.FC<HeaderProps> = ({ onAddClick, addOptions }) => {
         </h1>
         <Button
           className={clsx(
-            "hover:scale-105 px-8 transition-all duration-150 hover:bg-blue-700 dark:hover:bg-blue-700 h-11 bg-blue-600 text-white"
+            "hover:scale-105 px-8 transition-all duration-150 hover:bg-blue-700 dark:hover:bg-blue-700 h-11 bg-blue-600 text-white md:block hidden"
           )}
         >
           <span className="flex items-center gap-2">

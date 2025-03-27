@@ -35,17 +35,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useDropzone } from "react-dropzone";
-
-// Define the Organizer type
-export type Organizer = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  organization: string;
-  avatarUrl?: string | undefined;
-  eventCount: number;
-};
+import { Organizer } from "@/types/organizer";
 
 interface AddOrganizerModalProps {
   isOpen: boolean;
@@ -93,9 +83,7 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
             "Please enter a valid 10-digit mobile number or a valid landline number with area code.",
         }
       ),
-    organization: z
-      .string()
-      .min(2, { message: "Organization name is required" }),
+    clubName: z.string().min(2, { message: "ClubName name is required" }),
     avatarUrl: z.string().optional(),
     password: editMode
       ? z.string().optional() // Password is optional in edit mode
@@ -112,7 +100,7 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
           name: organizerToEdit.name,
           email: organizerToEdit.email,
           phone: organizerToEdit.phone,
-          organization: organizerToEdit.organization,
+          clubName: organizerToEdit.clubName,
           avatarUrl: organizerToEdit.avatarUrl || "",
           password: "", // Empty in edit mode
         }
@@ -120,7 +108,7 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
           name: "",
           email: "",
           phone: "+91 ",
-          organization: "",
+          clubName: "",
           avatarUrl: "",
           password: "",
         };
@@ -138,7 +126,7 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
         name: organizerToEdit.name,
         email: organizerToEdit.email,
         phone: organizerToEdit.phone,
-        organization: organizerToEdit.organization,
+        clubName: organizerToEdit.clubName,
         avatarUrl: organizerToEdit.avatarUrl || "",
         password: "", // Empty in edit mode
       });
@@ -149,7 +137,7 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
         name: "",
         email: "",
         phone: "+91 ",
-        organization: "",
+        clubName: "",
         avatarUrl: "",
         password: "",
       });
@@ -193,7 +181,8 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
       name: values.name,
       email: values.email,
       phone: values.phone,
-      organization: values.organization,
+      role: "organizer",
+      clubName: values.clubName,
       avatarUrl: values.avatarUrl || "/placeholder-avatar.jpg",
       eventCount: editMode && organizerToEdit ? organizerToEdit.eventCount : 0,
     };
@@ -279,19 +268,19 @@ const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
               )}
             />
 
-            {/* Organization */}
+            {/* ClubName */}
             <FormField
               control={form.control}
-              name="organization"
+              name="clubName"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                     <Building className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
-                    Name of the Organization
+                    Name of the Club
                   </FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter organization name"
+                      placeholder="Enter club name"
                       {...field}
                       className="h-10 pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                     />
