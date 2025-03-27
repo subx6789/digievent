@@ -145,7 +145,7 @@ const Navbar = () => {
                     <Button variant="ghost" className="rounded-md p-0">
                       <Avatar className="h-9 w-9 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 rounded-md">
                         <AvatarImage
-                          src={studentData.avatar}
+                          src={studentData.avatarUrl}
                           alt={studentData.name}
                           className="object-cover rounded-md"
                         />
