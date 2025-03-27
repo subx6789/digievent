@@ -39,12 +39,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Organizer } from "@/types/organizer";
 
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: Organizer;
+  user: {
+    name: string;
+    email: string;
+    avatar: string | undefined;
+    role: string;
+    phone?: string;
+    clubName?: string;
+  };
 }
 
 // Define the form schema with Zod - making password optional
@@ -81,10 +87,10 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
-    user.avatarUrl || null
+    user.avatar || null
   );
   const [initialAvatar, setInitialAvatar] = useState<string | null>(
-    user.avatarUrl || null
+    user.avatar || null
   );
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -239,7 +245,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
         onClose();
         setIsEditing(false);
         form.reset();
-        setAvatarPreview(user.avatarUrl || null);
+        setAvatarPreview(user.avatar || null);
       }, 0);
     }
   };
@@ -384,7 +390,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                 </div>
               </div>
 
-              {user.role === "organizer" && user.clubName && (
+              {user.role === "Organizer" && user.clubName && (
                 <div className="grid gap-3">
                   <Label className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center">
                     <Building className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
@@ -532,11 +538,11 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                   )}
                 />
 
-                {user.role === "organizer" && user.clubName && (
+                {user.role === "Organizer" && user.clubName && (
                   <div className="grid gap-3">
                     <Label className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center">
                       <Building className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
-                      ClubName (Cannot be changed)
+                      Club Name (Cannot be changed)
                     </Label>
                     <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-100 dark:bg-gray-900 h-12 shadow-inner">
                       <span className="font-medium text-gray-500 dark:text-gray-400">

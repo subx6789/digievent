@@ -174,7 +174,13 @@ export function NavUser({
       <ProfileModal
         isOpen={isProfileModalOpen}
         onClose={handleCloseProfileModal}
-        user={user}
+        user={{
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar,
+          role: user.role,
+          phone: user.phone,
+        }}
       />
     </>
   );
