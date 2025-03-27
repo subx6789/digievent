@@ -125,10 +125,19 @@ export function AppSidebar({ role }: { role: string }) {
         <NavUser
           user={
             role === "admin"
-              ? sidebarDataAdmin.user
+              ? {
+                  ...sidebarDataAdmin.user,
+                  avatar: sidebarDataAdmin.user.avatar || undefined,
+                }
               : role === "super-admin"
-              ? sidebarDataSuperAdmin.user
-              : sidebarDataOrganizer.user
+              ? {
+                  ...sidebarDataSuperAdmin.user,
+                  avatar: sidebarDataSuperAdmin.user.avatar || undefined,
+                }
+              : {
+                  ...sidebarDataOrganizer.user,
+                  avatar: sidebarDataOrganizer.user.avatarUrl || undefined,
+                }
           }
         />
       </SidebarFooter>
