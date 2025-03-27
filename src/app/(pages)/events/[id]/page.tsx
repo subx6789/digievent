@@ -662,22 +662,20 @@ const EventDetails = () => {
                 >
                   {event.clubName
                     ? event.clubName.charAt(0)
-                    : event.organizer.charAt(0)}
+                    : event.clubName.charAt(0)}
                 </motion.div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium mb-2 md:mb-0 text-gray-900 dark:text-white text-lg truncate">
-                    {event.clubName || event.organizer}
+                    {event.clubName}
                   </h4>
                   <p className="text-sm mb-2 md:mb-1 text-gray-500 dark:text-gray-400 sm:mb-2">
-                    Event Organizer
+                    {event.organizer.name}
                   </p>
                   <div className="flex items-center mb-2 md:mb-0 text-gray-700 dark:text-gray-300">
                     <Mail className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0 text-sm" />
                     <span className="text-sm truncate">
                       contact@
-                      {(event.clubName || event.organizer)
-                        .toLowerCase()
-                        .replace(/\s+/g, "")}
+                      {event.clubName.toLowerCase().replace(/\s+/g, "")}
                       .com
                     </span>
                   </div>
