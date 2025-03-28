@@ -9,5 +9,6 @@ export const sidebarDataSuperAdmin = {
   navMain: [
     { title: "Overview", url: "/super-admin/dashboard/overview" },
     { title: "Manage Colleges", url: "/super-admin/dashboard/manage-colleges" },
+    { title: "Help Requests", url: "/super-admin/dashboard/help-requests" },
   ],
 };

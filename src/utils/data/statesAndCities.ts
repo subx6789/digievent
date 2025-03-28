@@ -128,7 +128,7 @@ const cityMap: Record<string, string[]> = {
     "Likabali",
     "Ziro",
     "Lemmi",
-    "Itanagar",
+
     "Naharlagun",
     "Doimukh",
     "Sagalee",
@@ -466,7 +466,7 @@ const cityMap: Record<string, string[]> = {
     "Chirkunda",
     "Chaibasa",
     "Jhumri Tilaiya",
-    "Mango",
+
     "Adityapur",
     "Gumia",
     "Jugsalai",
@@ -553,7 +553,7 @@ const cityMap: Record<string, string[]> = {
     "Madikeri",
     "Shravanabelagola",
     "Shrirangapattana",
-    "Yelahanka",
+
     "Jamkhandi",
     "Koppal",
     "Karwar",
@@ -1173,13 +1173,13 @@ const cityMap: Record<string, string[]> = {
     "Madurai",
     "Tiruchirappalli",
     "Salem",
-    "Tiruppur",
+
     "Erode",
-    "Tirunelveli",
+
     "Vellore",
     "Thoothukkudi",
     "Dindigul",
-    "Thanjavur",
+
     "Ranipet",
     "Nagercoil",
     "Kanchipuram",
@@ -1194,7 +1194,7 @@ const cityMap: Record<string, string[]> = {
     "Kumbakonam",
     "Neyveli",
     "Sivakasi",
-    "Tiruvannamalai",
+
     "Nagapattinam",
     "Pudukkottai",
     "Rajapalayam",
@@ -1242,10 +1242,7 @@ const cityMap: Record<string, string[]> = {
     "Tiruvannamalai",
     "Udagamandalam",
     "Usilampatti",
-    "Vellore",
     "Virudhachalam",
-    "Virudhunagar",
-    "Walajapet",
     "Yercaud",
   ],
 
@@ -1572,5 +1569,7 @@ const cityMap: Record<string, string[]> = {
 export { cityMap, STATES };
 
 export const getCitiesForState = (state: string): string[] => {
-  return cityMap[state] ?? ["Select State First"];
+  const cities = cityMap[state] || [];
+  // Remove duplicates before returning
+  return [...new Set(cities)];
 };

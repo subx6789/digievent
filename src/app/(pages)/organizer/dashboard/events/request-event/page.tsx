@@ -32,16 +32,30 @@ import LocationForm from "@/components/Forms/EventForms/LocationForm";
 import MediaForm from "@/components/Forms/EventForms/MediaForm";
 import AudienceForm from "@/components/Forms/EventForms/AudienceForm";
 import { useEventFormStore } from "@/store/eventFormStore";
+import { useEventsStore } from "@/store/eventsStore";
 
 const RequestEventPage = () => {
+  // Get everything from the Zustand form store
+  const {
+    formData,
+    currentStep,
+    isFormComplete,
+    saveStatus,
+    lastSaved,
+    setFormData,
+
+    setCurrentStep,
+    setIsFormComplete,
+    setSaveStatus,
+    setLastSaved,
+    resetFormData,
+  } = useEventFormStore();
+
+  // Get collection management from eventsStore
+  const { addEvent } = useEventsStore();
+
   const router = useRouter();
   const { toast } = useToast();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isFormComplete, setIsFormComplete] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<"saving" | "saved" | "error">(
-    "saved"
-  );
-  const [lastSaved, setLastSaved] = useState<string>("");
   const [formKey, setFormKey] = useState(Date.now()); // Add a key for forcing re-render
 
   // Animation variants
@@ -71,13 +85,6 @@ const RequestEventPage = () => {
     },
   };
 
-  // Get form data from Zustand store
-  const {
-    formData,
-    setFormData: setStoreFormData,
-    resetFormData,
-  } = useEventFormStore();
-
   // Debounce function for auto-save
   const debounce = (func: Function, delay: number) => {
     let timeoutId: NodeJS.Timeout;
@@ -95,7 +102,7 @@ const RequestEventPage = () => {
   // Debounced save function
   const debouncedSave = useCallback(
     debounce((data: Partial<Event>) => {
-      setStoreFormData(data);
+      setFormData(data);
       localStorage.setItem("eventFormData", JSON.stringify(data));
     }, 1000),
     []
@@ -107,7 +114,7 @@ const RequestEventPage = () => {
     if (savedData) {
       try {
         const parsedData = JSON.parse(savedData);
-        setStoreFormData(parsedData);
+        setFormData(parsedData);
         setLastSaved("Previously saved data loaded");
         // Force re-render of form components
         setFormKey(Date.now());
@@ -116,7 +123,7 @@ const RequestEventPage = () => {
         setSaveStatus("error");
       }
     }
-  }, [setStoreFormData]);
+  }, []);
 
   // Check if form is complete enough to submit
   useEffect(() => {
@@ -189,7 +196,7 @@ const RequestEventPage = () => {
       updatedData.clubName = "My Club";
     }
 
-    setStoreFormData(updatedData);
+    setFormData(updatedData);
     debouncedSave(updatedData);
   };
 
@@ -253,6 +260,9 @@ const RequestEventPage = () => {
     };
 
     console.log("Submitting event:", newEvent);
+
+    // Add the event to the events store
+    addEvent(newEvent);
 
     // Simulate API call success
     // In the future, replace with actual API call

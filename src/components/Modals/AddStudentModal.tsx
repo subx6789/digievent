@@ -47,6 +47,7 @@ import {
 import { courses } from "@/utils/data/courses";
 import { useDropzone } from "react-dropzone";
 import { Student } from "@/types/student";
+import { generatePassword } from "@/utils/functions/generateRandomPassword";
 
 interface AddStudentModalProps {
   isOpen: boolean;
@@ -56,19 +57,6 @@ interface AddStudentModalProps {
   studentToEdit?: Student | null;
   isEditMode?: boolean;
 }
-
-// Generate a random password
-const generatePassword = () => {
-  const length = 12;
-  const charset =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
-  let password = "";
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * charset.length);
-    password += charset[randomIndex];
-  }
-  return password;
-};
 
 // Form validation schema - base schema
 const baseSchema = {

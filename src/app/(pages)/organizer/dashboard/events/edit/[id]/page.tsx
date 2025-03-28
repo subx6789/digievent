@@ -21,7 +21,10 @@ import { ModeToggle } from "@/components/ThemeToggler/ThemeToggler";
 import StepIndicator from "@/components/Customs/StepIndicator";
 import { formSteps } from "@/utils/functions/formSteps";
 import { format } from "date-fns";
+
+// Import Zustand stores
 import { useEventFormStore } from "@/store/eventFormStore";
+import { useEventsStore } from "@/store/eventsStore";
 
 // Import form sections
 import BasicDetailsForm from "@/components/Forms/EventForms/BasicDetailsForm";
@@ -49,36 +52,41 @@ const EditEventPage = () => {
   const params = useParams();
   const eventId = params.id as string;
   const { toast } = useToast();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [eventData, setEventData] = useState<Event | null>(null);
-  const [originalEvent, setOriginalEvent] = useState<Event | null>(null);
-  const [saveStatus, setSaveStatus] = useState<"saving" | "saved" | "error">(
-    "saved"
-  );
-  const [lastSaved, setLastSaved] = useState<string | null>(null);
 
-  // Use Zustand stores instead of services
-  const { updateEvent, getEventById } = useEventFormStore();
+  // Local UI state
+  const [isLoading, setIsLoading] = useState(true);
+  const [originalEvent, setOriginalEvent] = useState<Event | null>(null);
+
+  // Get state and actions from Zustand stores
+  const {
+    formData,
+    currentStep,
+    saveStatus,
+    lastSaved,
+    setFormData,
+    updateField,
+    setCurrentStep,
+    setSaveStatus,
+    setLastSaved,
+  } = useEventFormStore();
+
+  const { getEventById, updateEvent } = useEventsStore();
 
   // When loading the event data, ensure capacity is properly parsed
   useEffect(() => {
-    if (eventData && originalEvent) {
+    if (formData && originalEvent) {
       // Only update if the capacity format needs to be fixed and we haven't already updated it
-      const currentCapacity = eventData.capacity;
+      const currentCapacity = formData.capacity;
       const parsedCapacity = currentCapacity
-        ? String(parseInt(currentCapacity))
+        ? String(parseInt(currentCapacity as string))
         : currentCapacity;
 
       // Only update if the format is different to avoid infinite loops
       if (currentCapacity && parsedCapacity !== currentCapacity) {
-        setEventData({
-          ...eventData,
-          capacity: parsedCapacity,
-        });
+        updateField("capacity", parsedCapacity as string);
       }
     }
-  }, [originalEvent]);
+  }, [originalEvent, formData]);
 
   // Fetch event data
   useEffect(() => {
@@ -89,8 +97,11 @@ const EditEventPage = () => {
         const event = getEventById(eventId);
 
         if (event) {
-          setEventData(event);
-          setOriginalEvent(JSON.parse(JSON.stringify(event))); // Deep copy for comparison
+          // Set form data in the form store
+          setFormData(event);
+
+          // Keep original event for comparison
+          setOriginalEvent(JSON.parse(JSON.stringify(event)));
         } else {
           toast({
             title: "Error",
@@ -111,14 +122,14 @@ const EditEventPage = () => {
     };
 
     loadEventData();
-  }, [eventId, router, toast, getEventById]);
+  }, [eventId, router, toast, getEventById, setFormData]);
 
   // Debounced save function using Zustand
   const debouncedSave = useCallback(
     (() => {
       let timeoutId: NodeJS.Timeout | null = null;
 
-      return (updatedData: Event) => {
+      return (updatedData: Partial<Event>) => {
         if (timeoutId) {
           clearTimeout(timeoutId);
         }
@@ -127,19 +138,26 @@ const EditEventPage = () => {
 
         timeoutId = setTimeout(() => {
           try {
+            // Create a complete event object
+            const completeEvent = {
+              ...formData,
+              ...updatedData,
+            } as Event;
+
             // Preserve original isFree value
             if (originalEvent) {
-              updatedData.isFree = originalEvent.isFree;
+              completeEvent.isFree = originalEvent.isFree;
             }
 
             // Ensure capacity doesn't decrease
             if (
               originalEvent &&
               originalEvent.capacity &&
-              updatedData.capacity &&
-              parseInt(updatedData.capacity) < parseInt(originalEvent.capacity)
+              completeEvent.capacity &&
+              parseInt(completeEvent.capacity) <
+                parseInt(originalEvent.capacity)
             ) {
-              updatedData.capacity = originalEvent.capacity;
+              completeEvent.capacity = originalEvent.capacity;
 
               toast({
                 title: "Capacity Restriction",
@@ -149,8 +167,12 @@ const EditEventPage = () => {
               });
             }
 
-            // Update event in Zustand store
-            updateEvent(updatedData);
+            // Update form data in the form store
+            setFormData(completeEvent);
+
+            // Update event in the events store
+            updateEvent(completeEvent);
+
             setSaveStatus("saved");
             setLastSaved(format(new Date(), "h:mm a"));
           } catch (error) {
@@ -160,49 +182,55 @@ const EditEventPage = () => {
         }, 1500);
       };
     })(),
-    [updateEvent, originalEvent, toast]
+    [
+      formData,
+      updateEvent,
+      originalEvent,
+      toast,
+      setFormData,
+      setSaveStatus,
+      setLastSaved,
+    ]
   );
 
   // Handle form updates with autosave
   const updateFormData = useCallback(
     (data: Partial<Event>) => {
-      if (eventData) {
-        const updatedData = { ...eventData, ...data };
-
-        // Preserve original isFree value
-        if (originalEvent) {
-          updatedData.isFree = originalEvent.isFree;
-        }
-
-        setEventData(updatedData);
-        debouncedSave(updatedData as Event);
+      // Apply updates to form data
+      for (const [key, value] of Object.entries(data)) {
+        updateField(key as keyof Event, value);
       }
+
+      // Trigger debounced save
+      debouncedSave(data);
     },
-    [eventData, debouncedSave, originalEvent]
+    [updateField, debouncedSave]
   );
 
   // Handle final save
   const handleSave = async () => {
-    if (!eventData || !originalEvent) return;
+    if (!formData || !originalEvent) return;
 
     setSaveStatus("saving");
     try {
       // Create final event data with restrictions applied
       const finalEventData = {
-        ...eventData,
+        ...formData,
         // Preserve original isFree value
         isFree: originalEvent.isFree,
         // Ensure capacity doesn't decrease
         capacity:
           originalEvent.capacity &&
-          eventData.capacity &&
-          parseInt(eventData.capacity) < parseInt(originalEvent.capacity)
+          formData.capacity &&
+          parseInt(formData.capacity as string) <
+            parseInt(originalEvent.capacity)
             ? originalEvent.capacity
-            : eventData.capacity,
-      };
+            : formData.capacity,
+      } as Event;
 
-      // Update event in Zustand store
+      // Update event in events store
       updateEvent(finalEventData);
+
       setSaveStatus("saved");
       setLastSaved(format(new Date(), "h:mm a"));
 
@@ -264,7 +292,7 @@ const EditEventPage = () => {
     );
   }
 
-  if (!eventData) {
+  if (!formData || !formData.id) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center space-y-4">
@@ -390,21 +418,21 @@ const EditEventPage = () => {
               >
                 {currentStep === 0 && (
                   <BasicDetailsForm
-                    formData={eventData}
+                    formData={formData}
                     updateFormData={updateFormData}
                   />
                 )}
 
                 {currentStep === 1 && (
                   <DateTimeForm
-                    formData={eventData}
+                    formData={formData}
                     updateFormData={updateFormData}
                   />
                 )}
 
                 {currentStep === 2 && (
                   <LocationForm
-                    formData={eventData}
+                    formData={formData}
                     updateFormData={updateFormData}
                     editMode={true}
                     restrictions={locationRestrictions}
@@ -413,14 +441,14 @@ const EditEventPage = () => {
 
                 {currentStep === 3 && (
                   <MediaForm
-                    formData={eventData}
+                    formData={formData}
                     updateFormData={updateFormData}
                   />
                 )}
 
                 {currentStep === 4 && (
                   <AudienceForm
-                    formData={eventData}
+                    formData={formData}
                     updateFormData={updateFormData}
                     courses={courses}
                     editMode={true}

@@ -1,19 +1,23 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Event } from "@/types/event";
-import { organizerEvents } from "@/utils/data/organizerEvents";
 
 interface EventFormState {
+  // Form data
   formData: Partial<Event>;
-  events: Event[];
+  currentStep: number;
+  isFormComplete: boolean;
+  saveStatus: "idle" | "saving" | "saved" | "error";
+  lastSaved: string | null;
+
+  // Form actions
   setFormData: (data: Partial<Event>) => void;
   updateField: <K extends keyof Event>(key: K, value: Event[K]) => void;
   resetFormData: () => void;
-  // Add these new methods
-  updateEvent: (event: Event) => void;
-  getEventById: (id: string) => Event | undefined;
-  addEvent: (event: Event) => void;
-  initializeEvents: () => void; // Add this function
+  setCurrentStep: (step: number) => void;
+  setIsFormComplete: (isComplete: boolean) => void;
+  setSaveStatus: (status: "idle" | "saving" | "saved" | "error") => void;
+  setLastSaved: (time: string | null) => void;
 }
 
 // Initial form data
@@ -30,54 +34,55 @@ const initialFormData: Partial<Event> = {
 
 export const useEventFormStore = create<EventFormState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
+      // Initial state
       formData: initialFormData,
-      events: organizerEvents,
+      currentStep: 0,
+      isFormComplete: false,
+      saveStatus: "idle",
+      lastSaved: null,
 
+      // Set entire form data
       setFormData: (data) => set({ formData: data }),
 
+      // Update a single field
       updateField: (key, value) =>
         set((state) => ({
           formData: {
             ...state.formData,
             [key]: value,
           },
+          saveStatus: "saving",
         })),
 
-      resetFormData: () => set({ formData: initialFormData }),
+      // Reset form to initial state
+      resetFormData: () =>
+        set({
+          formData: initialFormData,
+          currentStep: 0,
+          isFormComplete: false,
+          saveStatus: "idle",
+          lastSaved: null,
+        }),
 
-      // Add event to events array
-      addEvent: (event) =>
-        set((state) => ({
-          events: [...state.events, event],
-        })),
+      // Set current form step
+      setCurrentStep: (step) => set({ currentStep: step }),
 
-      // Get event by ID
-      getEventById: (id) => {
-        const state = get();
-        return state.events.find((event) => event.id === id);
-      },
+      // Set form completion status
+      setIsFormComplete: (isComplete) => set({ isFormComplete: isComplete }),
 
-      // Update existing event
-      updateEvent: (updatedEvent) =>
-        set((state) => ({
-          events: state.events.map((event) =>
-            event.id === updatedEvent.id ? updatedEvent : event
-          ),
-        })),
-      // Initialize events with sample data if empty
-      initializeEvents: () => {
-        const state = get();
-        if (state.events.length === 0) {
-          set({ events: organizerEvents });
-        }
-      },
+      // Set save status
+      setSaveStatus: (status) => set({ saveStatus: status }),
+
+      // Set last saved timestamp
+      setLastSaved: (time) => set({ lastSaved: time }),
     }),
     {
       name: "event-form-storage",
       partialize: (state) => ({
         formData: state.formData,
-        events: state.events,
+        currentStep: state.currentStep,
+        isFormComplete: state.isFormComplete,
       }),
     }
   )

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, useScroll, useSpring } from "framer-motion";
-import { LogOut, History, User, TicketCheck } from "lucide-react";
+import { LogOut, History, User, TicketCheck, Ticket } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "@/components/ThemeToggler/ThemeToggler";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { studentData } from "@/utils/data/studentData";
 import { landing_content } from "@/utils/data/landing_content";
 
@@ -26,6 +26,8 @@ const Navbar = () => {
     damping: 30,
     restDelta: 0.001,
   });
+
+  const pathname = usePathname();
 
   // State for scroll behavior
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -173,20 +175,40 @@ const Navbar = () => {
                       </p>
                     </motion.div>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      className="cursor-pointer flex items-center gap-2 py-2"
-                      onClick={handleViewProfile}
-                    >
-                      <User className="h-4 w-4" />
-                      <span>View Profile</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="cursor-pointer flex items-center gap-2 py-2"
-                      onClick={handleBookingHistory}
-                    >
-                      <History className="h-4 w-4" />
-                      <span>Booking History</span>
-                    </DropdownMenuItem>
+                    {!pathname.includes("/profile") ? (
+                      <DropdownMenuItem
+                        className="cursor-pointer flex items-center gap-2 py-2"
+                        onClick={handleViewProfile}
+                      >
+                        <User className="h-4 w-4" />
+                        <span>View Profile</span>
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem
+                        className="cursor-pointer flex items-center gap-2 py-2"
+                        onClick={() => router.push("/events")}
+                      >
+                        <Ticket className="h-4 w-4" />
+                        <span>All events</span>
+                      </DropdownMenuItem>
+                    )}
+                    {!pathname.includes("/booking-history") ? (
+                      <DropdownMenuItem
+                        className="cursor-pointer flex items-center gap-2 py-2"
+                        onClick={handleBookingHistory}
+                      >
+                        <History className="h-4 w-4" />
+                        <span>Booking History</span>
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem
+                        className="cursor-pointer flex items-center gap-2 py-2"
+                        onClick={() => router.push("/events")}
+                      >
+                        <Ticket className="h-4 w-4" />
+                        <span>All events</span>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       className="cursor-pointer flex items-center gap-2 py-2 text-red-500 dark:text-red-400"

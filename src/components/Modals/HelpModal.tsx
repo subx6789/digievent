@@ -27,12 +27,21 @@ import {
 
 // Define the form schema with Zod
 const formSchema = z.object({
+  collegeName: z.string().min(3, {
+    message: "College name must be at least 3 characters.",
+  }),
+  email: z.string().email({ message: "Invalid email address." }),
+  location: z.string().min(3, {
+    message: "Location must be at least 3 characters.",
+  }),
   subject: z.string().min(3, {
     message: "Subject must be at least 3 characters.",
   }),
   message: z.string().min(10, {
     message: "Message must be at least 10 characters.",
   }),
+  status: z.string(),
+  date: z.date(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -50,8 +59,13 @@ const HelpModal = ({ isOpen, onClose, userEmail }: HelpModalProps) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      collegeName: "Techno India University",
+      email: "tiu@gmail.com",
+      location: "Kolkata",
       subject: "",
       message: "",
+      status: "unread",
+      date: new Date(),
     },
     mode: "onChange",
   });
@@ -93,7 +107,8 @@ const HelpModal = ({ isOpen, onClose, userEmail }: HelpModalProps) => {
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-            <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" /> Contact Support
+            <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" />{" "}
+            Contact Support
           </DialogTitle>
           <DialogDescription className="text-gray-600 dark:text-gray-300">
             Send a message to our support team. We&apos;ll get back to you as
@@ -104,23 +119,16 @@ const HelpModal = ({ isOpen, onClose, userEmail }: HelpModalProps) => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSendMessage)}
-            className="space-y-4 py-4"
+            className="space-y-4"
           >
-            <div className="mb-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-100 dark:border-blue-800">
-              <p className="text-sm text-blue-700 dark:text-blue-300 flex items-start">
-                <Mail className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
-                <span>
-                  Your message will be sent from: <strong className="font-medium">{userEmail}</strong>
-                </span>
-              </p>
-            </div>
-            
             <FormField
               control={form.control}
               name="subject"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Subject</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">
+                    Subject
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="How can we help you?"
@@ -138,7 +146,9 @@ const HelpModal = ({ isOpen, onClose, userEmail }: HelpModalProps) => {
               name="message"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Message</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">
+                    Message
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Please describe your issue in detail..."

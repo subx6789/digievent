@@ -44,6 +44,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { College } from "../Table/CollegeTable";
 import { getCitiesForState, STATES } from "@/utils/data/statesAndCities";
 import { useDropzone } from "react-dropzone";
+import { generatePassword } from "@/utils/functions/generateRandomPassword";
 
 interface AddCollegeModalProps {
   isOpen: boolean;
@@ -113,24 +114,8 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
     }
   }, [state, form]);
 
-  // Generate password from name and location
-  const generatePassword = () => {
-    if (!name || !state) return;
-
-    // Generate a random 8+ character password
-    const chars = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()${name}${state}`;
-    let generatedPassword = "";
-
-    for (let i = 0; i < 11; i++) {
-      const randomIndex = Math.floor(Math.random() * chars.length);
-      generatedPassword += chars[randomIndex];
-    }
-
-    // Set the generated password
-    form.setValue("password", generatedPassword, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
+  const generateAndSetPassword = () => {
+    form.setValue("password", generatePassword());
   };
 
   // Handle logo file upload
@@ -430,7 +415,7 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                       type="button"
                       variant="outline"
                       size="default"
-                      onClick={generatePassword}
+                      onClick={generateAndSetPassword}
                       disabled={!name || !state}
                       className={`h-10 whitespace-nowrap bg-white hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors ${
                         !name || !state ? "opacity-70 cursor-not-allowed" : ""

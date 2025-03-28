@@ -28,6 +28,8 @@ const TitleAndDescription = () => {
     "/super-admin/dashboard/overview": "Overview of super admin dashboard",
     "/super-admin/dashboard/manage-colleges":
       "Manage colleges of super admin dashboard",
+    "/super-admin/dashboard/help-requests":
+      "Manage and respond to college support requests",
     "/organizer/dashboard/events": "Events of organizers dashboard",
     "/organizer/dashboard/metrics": "Metrics of organizer dashboard",
   };

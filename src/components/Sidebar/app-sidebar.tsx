@@ -12,6 +12,7 @@ import {
   ChartNoAxesCombined,
   SquareUserRound,
   BookOpen,
+  HelpCircle,
 } from "lucide-react";
 
 import { NavMain } from "@/components/Sidebar/nav-main";
@@ -38,6 +39,7 @@ const roleIcons: Record<Role, Record<string, LucideIcon>> = {
   "Super Admin": {
     Overview: LayoutDashboard,
     "Manage Colleges": Building2,
+    "Help Requests": HelpCircle,
   },
   Admin: {
     Overview: LayoutDashboard,

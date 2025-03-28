@@ -15,22 +15,20 @@ import { eventStates } from "@/utils/data/eventStates";
 import { Calendar } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { useEventFormStore } from "@/store/eventFormStore";
+import { useEventsStore } from "@/store/eventsStore";
 
 const OrganizerEvents = () => {
   // Use Zustand store instead of local state
-  const { events, updateEvent, initializeEvents } = useEventFormStore();
+  const { events, updateEvent, initializeEvents, getFilteredEvents } =
+    useEventsStore();
   const [selectedState, setSelectedState] = useState("approved"); // Default filter state
   const { toast } = useToast();
   const router = useRouter();
 
   // Initialize events if empty
   useEffect(() => {
-    if (events.length === 0) {
-      initializeEvents();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    initializeEvents();
+  }, [initializeEvents]);
 
   // Navigate to create event page
   const handleCreateEvent = () => {
@@ -65,10 +63,7 @@ const OrganizerEvents = () => {
   };
 
   // Get filtered events based on selected state
-  const filteredEvents =
-    selectedState === "all"
-      ? events
-      : events.filter((event) => event.status === selectedState);
+  const filteredEvents = getFilteredEvents(selectedState);
 
   return (
     <Sidebar role="organizer">

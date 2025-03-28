@@ -36,6 +36,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useDropzone } from "react-dropzone";
 import { Organizer } from "@/types/organizer";
+import { generatePassword } from "@/utils/functions/generateRandomPassword";
 
 interface AddOrganizerModalProps {
   isOpen: boolean;
@@ -44,19 +45,6 @@ interface AddOrganizerModalProps {
   editMode?: boolean;
   organizerToEdit?: Organizer | null;
 }
-
-// Generate a random password
-const generatePassword = () => {
-  const length = 12;
-  const charset =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
-  let password = "";
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * charset.length);
-    password += charset[randomIndex];
-  }
-  return password;
-};
 
 const AddOrganizerModal: React.FC<AddOrganizerModalProps> = ({
   isOpen,

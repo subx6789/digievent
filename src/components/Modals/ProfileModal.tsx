@@ -56,7 +56,13 @@ interface ProfileModalProps {
 // Define the form schema with Zod - making password optional
 const formSchema = z
   .object({
-    password: z
+    oldPassword: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(12, "Password must not exceed 12 characters")
+      .optional()
+      .or(z.literal("")),
+    newPassword: z
       .string()
       .min(8, "Password must be at least 8 characters")
       .max(12, "Password must not exceed 12 characters")
@@ -76,10 +82,13 @@ const formSchema = z
       )
       .optional(),
   })
-  .refine((data) => !data.password || data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
+  .refine(
+    (data) => !data.newPassword || data.newPassword === data.confirmPassword,
+    {
+      message: "Passwords don't match",
+      path: ["confirmPassword"],
+    }
+  );
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -103,7 +112,8 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      password: "",
+      oldPassword: "",
+      newPassword: "",
       confirmPassword: "",
       phone: user.phone || "",
     },
@@ -112,13 +122,13 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
 
   // Check for changes in form values or avatar
   useEffect(() => {
-    const passwordChanged = !!form.watch("password");
+    const passwordChanged = !!form.watch("newPassword");
     const phoneChanged = form.watch("phone") !== user.phone;
     const avatarChanged = avatarPreview !== initialAvatar;
 
     setHasChanges(passwordChanged || phoneChanged || avatarChanged);
   }, [
-    form.watch("password"),
+    form.watch("newPassword"),
     form.watch("phone"),
     avatarPreview,
     initialAvatar,
@@ -160,7 +170,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
   const handleSaveChanges = (values: FormValues) => {
     // Prepare data for backend. Only include fields that have changed.
     const updatedData = {
-      ...(values.password ? { password: values.password } : {}),
+      ...(values.newPassword ? { password: values.newPassword } : {}),
       ...(values.phone !== user.phone ? { phone: values.phone } : {}),
       ...(avatarPreview !== initialAvatar ? { avatar: avatarPreview } : {}),
     };
@@ -178,7 +188,8 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
     setInitialAvatar(avatarPreview);
     setIsEditing(false);
     form.reset({
-      password: "",
+      oldPassword: "",
+      newPassword: "",
       confirmPassword: "",
       phone: values.phone,
     });
@@ -463,12 +474,49 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
 
                 <FormField
                   control={form.control}
-                  name="password"
+                  name="oldPassword"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center">
                         <Key className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
-                        New Password (Optional)
+                        Old Password
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative flex items-center rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-blue-500 dark:focus-within:ring-blue-400 transition-all duration-200">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Enter new password"
+                            className="border-0 focus:ring-0 focus-visible:ring-0 h-12 pr-12 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                            {...field}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute inset-y-0 right-[5px] top-[5.5px] flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage className="text-red-500 dark:text-red-400 text-sm mt-1" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="newPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center">
+                        <Key className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />{" "}
+                        New Password
                       </FormLabel>
                       <FormControl>
                         <div className="relative flex items-center rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-blue-500 dark:focus-within:ring-blue-400 transition-all duration-200">
@@ -514,7 +562,7 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                             placeholder="Confirm new password"
                             className="border-0 focus:ring-0 focus-visible:ring-0 h-12 pr-12 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                             {...field}
-                            disabled={!form.watch("password")}
+                            disabled={!form.watch("newPassword")}
                           />
                           <Button
                             type="button"
@@ -561,7 +609,8 @@ const ProfileModal = ({ isOpen, onClose, user }: ProfileModalProps) => {
                       setIsEditing(false);
                       setAvatarPreview(initialAvatar);
                       form.reset({
-                        password: "",
+                        oldPassword: "",
+                        newPassword: "",
                         confirmPassword: "",
                         phone: user.phone || "",
                       });
