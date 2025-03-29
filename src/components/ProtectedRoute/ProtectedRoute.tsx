@@ -4,33 +4,58 @@
 import { useAuth } from "@/context/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { usePermissions } from "@/hooks/usePermissions";
+import { UserRole } from "@/utils/auth/roleHierarchy";
+import Loading from "@/components/Loading/Loading";
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requiredRole?: UserRole | string;
+  fallback?: React.ReactNode;
+  redirectTo?: string;
+}
 
 export default function ProtectedRoute({
   children,
-  requiredRole = "admin",
-}: {
-  children: React.ReactNode;
-  requiredRole?: string;
-}) {
+  requiredRole = "user",
+  fallback = <Loading />,
+  redirectTo,
+}: ProtectedRouteProps) {
   const { user, isInitialized } = useAuth();
   const router = useRouter();
-
-  // Map roles to their respective login routes
-  const loginRoutes: { [key: string]: string } = {
-    admin: "/admin/auth/login",
-    "super-admin": "/super-admin/auth/login",
-    organizer: "/organizer/auth/login",
+  const { hasRole } = usePermissions();
+  
+  // Determine where to redirect if access is denied
+  const determineRedirectPath = (): string => {
+    // If a specific redirect is provided, use it
+    if (redirectTo) return redirectTo;
+    
+    // Otherwise use role-based login routes
+    const loginRoutes: Record<string, string> = {
+      "super-admin": "/super-admin/auth/login",
+      admin: "/admin/auth/login",
+      organizer: "/organizer/auth/login",
+      user: "/",
+      student: "/",
+    };
+    
+    return loginRoutes[requiredRole as string] || "/";
   };
 
   useEffect(() => {
-    if (isInitialized && (!user || user.role !== requiredRole)) {
-      const redirectTo = loginRoutes[requiredRole] || "/";
-      router.replace(redirectTo);
+    if (isInitialized) {
+      // If user is not authenticated or doesn't have required role
+      if (!user || !hasRole(requiredRole)) {
+        const redirectPath = determineRedirectPath();
+        router.replace(redirectPath);
+      }
     }
-  }, [user, isInitialized, requiredRole, router]);
+  }, [user, isInitialized, requiredRole, router, hasRole]);
 
-  // While auth is being initialized or if user is missing, don't render children
-  if (!isInitialized || !user) return null;
+  // While auth is being initialized or if user is missing, show fallback
+  if (!isInitialized || !user || !hasRole(requiredRole)) {
+    return <>{fallback}</>;
+  }
 
   return <>{children}</>;
 }

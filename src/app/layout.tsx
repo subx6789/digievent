@@ -5,6 +5,7 @@ import TanstackProvider from "@/components/Providers/TanstackProvider";
 import { AuthProvider } from "@/context/AuthProvider";
 import { ThemeProvider } from "@/components/Providers/Theme-Provider";
 import { Toaster } from "@/components/ui/toaster";
+import APIErrorBoundary from "@/error/APIErrorBoundary";
 
 const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700", "800"],
@@ -31,10 +32,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TanstackProvider>
-            <AuthProvider>
-              {children}
-              <Toaster />
-            </AuthProvider>
+            <APIErrorBoundary>
+              <AuthProvider>
+                {children}
+                <Toaster />
+              </AuthProvider>
+            </APIErrorBoundary>
           </TanstackProvider>
         </ThemeProvider>
       </body>
