@@ -16,7 +16,6 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
-import { Course } from "@/utils/data/courses";
 import { Button } from "../ui/button";
 import {
   Collapsible,
@@ -25,6 +24,7 @@ import {
 } from "../ui/collapsible";
 import { cn } from "@/lib/utils";
 import { toast } from "../ui/use-toast";
+import { Course } from "@/types/course";
 
 interface CourseCardProps {
   course: Course;
