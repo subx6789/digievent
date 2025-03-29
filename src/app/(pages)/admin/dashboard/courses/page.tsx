@@ -5,15 +5,31 @@ import AddCourseModal from "@/components/Modals/AddCourseModal";
 import UploadExcelModal from "@/components/Modals/UploadExcelModal";
 import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import Sidebar from "@/components/Sidebar/Sidebar";
-import { Course, courses } from "@/utils/data/courses";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { FileSpreadsheet, BookOpen } from "lucide-react";
+import { Course } from "@/types/course";
+import { useCoursesStore } from "@/store/coursesStore";
 
 const AdminCollegeCourses = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isExcelModalOpen, setIsExcelModalOpen] = useState(false);
-  const [coursesList, setCoursesList] = useState(courses);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+
+  // Use the courses store
+  const {
+    courses,
+    isLoading,
+    error,
+    fetchCourses,
+    addCourse,
+    updateCourse,
+    removeCourse,
+  } = useCoursesStore();
+
+  // Fetch courses when component mounts
+  useEffect(() => {
+    fetchCourses();
+  }, [fetchCourses]);
 
   // Handle opening the add course modal
   const handleOpenModal = useCallback(() => {
@@ -47,15 +63,10 @@ const AdminCollegeCourses = () => {
 
   const handleAddCourse = useCallback(
     (newCourse: Course) => {
-      setCoursesList((prevCourses) => [
-        ...prevCourses,
-        {
-          ...newCourse,
-        },
-      ]);
+      addCourse(newCourse);
       handleCloseModal();
     },
-    [handleCloseModal]
+    [addCourse, handleCloseModal]
   );
 
   const handleEditCourse = useCallback((course: Course) => {
@@ -67,21 +78,23 @@ const AdminCollegeCourses = () => {
 
   const handleUpdateCourse = useCallback(
     (updatedCourse: Course, originalCourseId: string) => {
-      setCoursesList((prevCourses) =>
-        prevCourses.map((course) =>
-          course.course === originalCourseId ? updatedCourse : course
-        )
-      );
+      // Need to adapt the course to match the store's expected format
+      const adaptedCourse = {
+        ...updatedCourse,
+        id: originalCourseId, // Ensure the ID is set correctly
+      };
+      updateCourse(adaptedCourse);
       handleCloseModal();
     },
-    [handleCloseModal]
+    [updateCourse, handleCloseModal]
   );
 
-  const handleRemoveCourse = useCallback((courseId: string) => {
-    setCoursesList((prevCourses) =>
-      prevCourses.filter((course) => course.course !== courseId)
-    );
-  }, []);
+  const handleRemoveCourse = useCallback(
+    (courseId: string) => {
+      removeCourse(courseId);
+    },
+    [removeCourse]
+  );
 
   // Handle successful Excel upload
   const handleExcelUploadSuccess = useCallback((file: File) => {
@@ -112,16 +125,27 @@ const AdminCollegeCourses = () => {
         <Header onAddClick={null} addOptions={addOptions} />
         <div className="p-5">
           <h1 className="mb-5 text-xl font-semibold">All Courses</h1>
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {coursesList.map((course) => (
-              <CourseCard
-                key={course.course}
-                course={course}
-                onEdit={handleEditCourse}
-                onRemove={handleRemoveCourse}
-              />
-            ))}
-          </div>
+
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : error ? (
+            <div className="text-red-500 text-center p-4">
+              Error: {error}. Please try refreshing the page.
+            </div>
+          ) : (
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {courses.map((course) => (
+                <CourseCard
+                  key={course.course}
+                  course={course}
+                  onEdit={handleEditCourse}
+                  onRemove={handleRemoveCourse}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Add/edit course modal */}
           <AddCourseModal

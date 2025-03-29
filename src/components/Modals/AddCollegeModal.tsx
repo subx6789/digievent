@@ -101,7 +101,7 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
   });
 
   // Watch form values to enable/disable generate password button
-  const { name, state } = form.watch();
+  const { state } = form.watch();
 
   // Update available cities when state changes
   useEffect(() => {
@@ -116,6 +116,7 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
 
   const generateAndSetPassword = () => {
     form.setValue("password", generatePassword());
+    form.trigger("password");
   };
 
   // Handle logo file upload
@@ -416,10 +417,7 @@ const AddCollegeModal: React.FC<AddCollegeModalProps> = ({
                       variant="outline"
                       size="default"
                       onClick={generateAndSetPassword}
-                      disabled={!name || !state}
-                      className={`h-10 whitespace-nowrap bg-white hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors ${
-                        !name || !state ? "opacity-70 cursor-not-allowed" : ""
-                      }`}
+                      className={`h-10 whitespace-nowrap bg-white hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors`}
                     >
                       <RefreshCw className="h-4 w-4 mr-1" /> Generate
                     </Button>

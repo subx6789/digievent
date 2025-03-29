@@ -171,7 +171,7 @@ const UploadExcelModal: React.FC<UploadExcelModalProps> = ({
                 height="315"
                 src={`https://www.youtube.com/embed/${youtubeEmbedId}`}
                 title="Excel Upload Tutorial"
-                loading="lazy"
+                loading="eager"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 className="aspect-video"

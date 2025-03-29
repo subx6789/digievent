@@ -1,24 +1,39 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Header from "@/components/Header/Header";
 import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import OrganizerTable from "@/components/Table/OrganiserTable";
-import { organizers } from "@/utils/data/organizers";
 import AddOrganizerModal from "@/components/Modals/AddOrganizerModal";
 import UploadExcelModal from "@/components/Modals/UploadExcelModal";
 import { FileSpreadsheet, UserPlus } from "lucide-react";
 import React from "react";
 import { Organizer } from "@/types/organizer";
+import { useOrganizersStore } from "@/store/organizersStore";
 
 export default function OrganizersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isExcelModalOpen, setIsExcelModalOpen] = useState(false);
-  const [organizersList, setOrganizersList] = useState(organizers);
   const [editingOrganizer, setEditingOrganizer] = useState<Organizer | null>(
     null
   );
   const [isEditMode, setIsEditMode] = useState(false);
+
+  // Use the organizers store
+  const {
+    organizers,
+    isLoading,
+    error,
+    fetchOrganizers,
+    addOrganizer,
+    updateOrganizer,
+    removeOrganizer,
+  } = useOrganizersStore();
+
+  // Fetch organizers when component mounts
+  useEffect(() => {
+    fetchOrganizers();
+  }, [fetchOrganizers]);
 
   // Handle opening the add organizer modal
   const handleOpenModal = useCallback(() => {
@@ -54,43 +69,31 @@ export default function OrganizersPage() {
 
   const handleAddOrganizer = useCallback(
     (newOrganizer: Organizer) => {
-      // Only handle adding new organizers here
-      setOrganizersList((prevOrganizers) => [
-        ...prevOrganizers,
-        {
-          ...newOrganizer,
-          avatarUrl: newOrganizer.avatarUrl || "/placeholder-avatar.jpg",
-        },
-      ]);
+      // Use the store to add a new organizer
+      addOrganizer({
+        ...newOrganizer,
+        avatarUrl: newOrganizer.avatarUrl || "/placeholder-avatar.jpg",
+      });
       handleCloseModal();
     },
-    [handleCloseModal]
+    [addOrganizer, handleCloseModal]
   );
 
   const handleUpdateOrganizer = useCallback(
     (updatedOrganizer: Organizer) => {
-      // Handle updating existing organizers
-      setOrganizersList((prevOrganizers) =>
-        prevOrganizers.map((org) =>
-          org.id === updatedOrganizer.id
-            ? {
-                ...updatedOrganizer,
-                avatarUrl:
-                  updatedOrganizer.avatarUrl || "/placeholder-avatar.jpg",
-              }
-            : org
-        )
-      );
+      // Use the store to update an existing organizer
+      updateOrganizer({
+        ...updatedOrganizer,
+        avatarUrl: updatedOrganizer.avatarUrl || "/placeholder-avatar.jpg",
+      });
       handleCloseModal();
     },
-    [handleCloseModal]
+    [updateOrganizer, handleCloseModal]
   );
 
   const handleEditOrganizer = useCallback(
     (organizerId: string) => {
-      const organizerToEdit = organizersList.find(
-        (org) => org.id === organizerId
-      );
+      const organizerToEdit = organizers.find((org) => org.id === organizerId);
       if (organizerToEdit) {
         setEditingOrganizer(organizerToEdit as Organizer);
         setIsEditMode(true);
@@ -99,12 +102,12 @@ export default function OrganizersPage() {
         }, 100);
       }
     },
-    [organizersList]
+    [organizers]
   );
 
   const handleRemoveOrganizer = useCallback(
     (organizerId: string) => {
-      const organizerToRemove = organizersList.find(
+      const organizerToRemove = organizers.find(
         (org) => org.id === organizerId
       );
       if (organizerToRemove) {
@@ -113,13 +116,12 @@ export default function OrganizersPage() {
         );
 
         if (isConfirmed) {
-          setOrganizersList((prevOrganizers) =>
-            prevOrganizers.filter((org) => org.id !== organizerId)
-          );
+          // Use the store to remove an organizer
+          removeOrganizer(organizerId);
         }
       }
     },
-    [organizersList]
+    [organizers, removeOrganizer]
   );
 
   // Handle successful Excel upload
@@ -150,11 +152,21 @@ export default function OrganizersPage() {
       <Sidebar role="admin">
         <Header onAddClick={null} addOptions={addOptions} />
         <div className="p-6">
-          <OrganizerTable
-            organizers={organizersList as Organizer[]}
-            onEditOrganizer={handleEditOrganizer}
-            onRemoveOrganizer={handleRemoveOrganizer}
-          />
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : error ? (
+            <div className="text-red-500 text-center p-4">
+              Error: {error}. Please try refreshing the page.
+            </div>
+          ) : (
+            <OrganizerTable
+              organizers={organizers}
+              onEditOrganizer={handleEditOrganizer}
+              onRemoveOrganizer={handleRemoveOrganizer}
+            />
+          )}
         </div>
 
         <AddOrganizerModal

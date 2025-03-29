@@ -6,15 +6,30 @@ import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import StudentTable from "@/components/Table/StudentTable";
 import { Student } from "@/types/student";
-import { students } from "@/utils/data/studentList";
+import { useStudentsStore } from "@/store/studentsStore";
 import { FileSpreadsheet, UserPlus } from "lucide-react";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 
 const AdminStudentPage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isExcelModalOpen, setIsExcelModalOpen] = useState(false);
-  const [studentsList, setStudentsList] = useState<Student[]>(students);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+
+  // Use the students store
+  const {
+    students,
+    isLoading,
+    error,
+    fetchStudents,
+    addStudent,
+    updateStudent,
+    removeStudent,
+  } = useStudentsStore();
+
+  // Fetch students when component mounts
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
 
   // Handle opening the add student modal
   const handleOpenAddModal = useCallback(() => {
@@ -48,16 +63,10 @@ const AdminStudentPage = () => {
 
   const handleAddStudent = useCallback(
     (newStudent: Student) => {
-      setStudentsList((prevStudents: Student[]) => [
-        ...prevStudents,
-        {
-          ...newStudent,
-          avatarUrl: newStudent.avatarUrl || "/placeholder-avatar.jpg",
-        },
-      ]);
+      addStudent(newStudent);
       handleCloseAddModal();
     },
-    [handleCloseAddModal]
+    [addStudent, handleCloseAddModal]
   );
 
   const handleEditStudent = useCallback((student: Student) => {
@@ -68,24 +77,19 @@ const AdminStudentPage = () => {
   }, []);
 
   const handleUpdateStudent = useCallback(
-    (updatedStudent: Student, originalStudentId?: string) => {
-      setStudentsList((prevStudents: Student[]) =>
-        prevStudents.map((student) =>
-          student.id === (originalStudentId || updatedStudent.id)
-            ? updatedStudent
-            : student
-        )
-      );
+    (updatedStudent: Student) => {
+      updateStudent(updatedStudent);
       handleCloseAddModal();
     },
-    [handleCloseAddModal]
+    [updateStudent, handleCloseAddModal]
   );
 
-  const handleRemoveStudent = useCallback((studentId: string) => {
-    setStudentsList((prevStudents: Student[]) =>
-      prevStudents.filter((student) => student.id !== studentId)
-    );
-  }, []);
+  const handleRemoveStudent = useCallback(
+    (studentId: string) => {
+      removeStudent(studentId);
+    },
+    [removeStudent]
+  );
 
   const handleExcelUploadSuccess = useCallback((file: File) => {
     // Handle the uploaded file here
@@ -98,12 +102,12 @@ const AdminStudentPage = () => {
       {
         label: "Enter Manually",
         onClick: handleOpenAddModal,
-        icon: <UserPlus className="h-4 w-4" />, // Placeholder to match expected structure
+        icon: <UserPlus className="h-4 w-4" />,
       },
       {
         label: "Upload Excel File",
         onClick: handleOpenExcelModal,
-        icon: <FileSpreadsheet className="h-4 w-4" />, // Placeholder to match expected structure
+        icon: <FileSpreadsheet className="h-4 w-4" />,
       },
     ],
     [handleOpenAddModal, handleOpenExcelModal]
@@ -114,11 +118,21 @@ const AdminStudentPage = () => {
       <Sidebar role="admin">
         <Header onAddClick={null} addOptions={addOptions} />
         <div className="p-6">
-          <StudentTable
-            students={studentsList}
-            onEditStudent={handleEditStudent}
-            onDeleteStudent={handleRemoveStudent}
-          />
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : error ? (
+            <div className="text-red-500 text-center p-4">
+              Error: {error}. Please try refreshing the page.
+            </div>
+          ) : (
+            <StudentTable
+              students={students}
+              onEditStudent={handleEditStudent}
+              onDeleteStudent={handleRemoveStudent}
+            />
+          )}
         </div>
 
         {/* Modals */}

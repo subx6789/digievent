@@ -325,6 +325,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
   const generateAndSetPassword = () => {
     const newPassword = generatePassword();
     form.setValue("password", newPassword);
+    form.trigger("password");
   };
 
   return (

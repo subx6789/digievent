@@ -31,16 +31,18 @@ type CollegeTableProps = {
   colleges: College[];
 };
 
-export const CollegeTable = ({ colleges }: CollegeTableProps) => {
+export const CollegeTable = ({
+  colleges: initialColleges,
+}: CollegeTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [collegeData, setCollegeData] = useState(colleges);
+  const [colleges, setColleges] = useState(initialColleges);
   const itemsPerPage = 5;
 
   // Handle search filter across all fields
-  const filteredColleges = collegeData.filter((college) =>
+  const filteredColleges = colleges.filter((college) =>
     Object.values(college).some((value) =>
-      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+      value?.toString().toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
 
@@ -51,7 +53,7 @@ export const CollegeTable = ({ colleges }: CollegeTableProps) => {
   );
 
   const toggleStatus = (id: string) => {
-    setCollegeData((prev) =>
+    setColleges((prev) =>
       prev.map((college) =>
         college.id === id
           ? {
@@ -64,8 +66,13 @@ export const CollegeTable = ({ colleges }: CollegeTableProps) => {
   };
 
   useEffect(() => {
-    setCollegeData(colleges); // Ensure table updates when colleges state changes
-  }, [colleges]);
+    setColleges(initialColleges);
+    setCurrentPage(1); // Reset to first page when data changes
+  }, [initialColleges]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   return (
     <div className="w-full bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 hover:drop-shadow-md">

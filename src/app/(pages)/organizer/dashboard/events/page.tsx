@@ -19,16 +19,22 @@ import { useEventsStore } from "@/store/eventsStore";
 
 const OrganizerEvents = () => {
   // Use Zustand store instead of local state
-  const { events, updateEvent, initializeEvents, getFilteredEvents } =
-    useEventsStore();
+  const {
+    events,
+    isLoading,
+    error,
+    updateEvent,
+    fetchEvents,
+    getFilteredEvents,
+  } = useEventsStore();
   const [selectedState, setSelectedState] = useState("approved"); // Default filter state
   const { toast } = useToast();
   const router = useRouter();
 
-  // Initialize events if empty
+  // Fetch events when component mounts
   useEffect(() => {
-    initializeEvents();
-  }, [initializeEvents]);
+    fetchEvents();
+  }, [fetchEvents]);
 
   // Navigate to create event page
   const handleCreateEvent = () => {
@@ -102,31 +108,44 @@ const OrganizerEvents = () => {
           </div>
         </div>
 
-        {/* Events Section with conditional rendering for no results */}
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredEvents.length > 0 ? (
-            filteredEvents.map((event) => (
-              <div
-                key={event.id}
-                className="p-1 hover:drop-shadow-lg transition-all duration-150"
-              >
-                <EventCard
-                  event={event}
-                  className="w-full max-w-sm mx-auto"
-                  onEdit={handleEditEvent}
-                  onView={handleViewEvent}
-                  onCancel={handleCancelEvent}
-                />
+        {/* Loading and Error States */}
+        {isLoading ? (
+          <div className="col-span-full flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : error ? (
+          <div className="col-span-full text-center py-12">
+            <p className="text-red-500">
+              {error}. Please try refreshing the page.
+            </p>
+          </div>
+        ) : (
+          /* Events Section with conditional rendering for no results */
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredEvents.length > 0 ? (
+              filteredEvents.map((event) => (
+                <div
+                  key={event.id}
+                  className="p-1 hover:drop-shadow-lg transition-all duration-150"
+                >
+                  <EventCard
+                    event={event}
+                    className="w-full max-w-sm mx-auto"
+                    onEdit={handleEditEvent}
+                    onView={handleViewEvent}
+                    onCancel={handleCancelEvent}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400">
+                  No events match the selected filter.
+                </p>
               </div>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400">
-                No events match the selected filter.
-              </p>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
     </Sidebar>
   );

@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
-import { Course } from "@/utils/data/courses";
+import { Course } from "@/types/course";
 
 interface AddCourseModalProps {
   isOpen: boolean;
@@ -120,6 +120,7 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
       course: values.course,
       department: filteredDepartments,
       noOfYears: values.noOfYears,
+      id: isEditMode ? originalCourseId : values.course, // Use course name as ID for now
     };
 
     // Check if we're editing or adding

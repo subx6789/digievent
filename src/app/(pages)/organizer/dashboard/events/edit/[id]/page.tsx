@@ -33,6 +33,7 @@ import LocationForm from "@/components/Forms/EventForms/LocationForm";
 import MediaForm from "@/components/Forms/EventForms/MediaForm";
 import AudienceForm from "@/components/Forms/EventForms/AudienceForm";
 import { courses } from "@/utils/data/courses";
+import Loading from "@/components/Loading/Loading";
 
 // Animation variants
 const pageVariants = {
@@ -94,7 +95,15 @@ const EditEventPage = () => {
       setIsLoading(true);
       try {
         // Get event from Zustand store
-        const event = getEventById(eventId);
+        let event = getEventById(eventId);
+
+        // If event not found, try to fetch events first
+        if (!event) {
+          const { fetchEvents } = useEventsStore.getState();
+          await fetchEvents();
+          // Try to get the event again after fetching
+          event = getEventById(eventId);
+        }
 
         if (event) {
           // Set form data in the form store
@@ -124,87 +133,15 @@ const EditEventPage = () => {
     loadEventData();
   }, [eventId, router, toast, getEventById, setFormData]);
 
-  // Debounced save function using Zustand
-  const debouncedSave = useCallback(
-    (() => {
-      let timeoutId: NodeJS.Timeout | null = null;
-
-      return (updatedData: Partial<Event>) => {
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
-
-        setSaveStatus("saving");
-
-        timeoutId = setTimeout(() => {
-          try {
-            // Create a complete event object
-            const completeEvent = {
-              ...formData,
-              ...updatedData,
-            } as Event;
-
-            // Preserve original isFree value
-            if (originalEvent) {
-              completeEvent.isFree = originalEvent.isFree;
-            }
-
-            // Ensure capacity doesn't decrease
-            if (
-              originalEvent &&
-              originalEvent.capacity &&
-              completeEvent.capacity &&
-              parseInt(completeEvent.capacity) <
-                parseInt(originalEvent.capacity)
-            ) {
-              completeEvent.capacity = originalEvent.capacity;
-
-              toast({
-                title: "Capacity Restriction",
-                description:
-                  "Seat capacity cannot be decreased from the current capacity.",
-                variant: "destructive",
-              });
-            }
-
-            // Update form data in the form store
-            setFormData(completeEvent);
-
-            // Update event in the events store
-            updateEvent(completeEvent);
-
-            setSaveStatus("saved");
-            setLastSaved(format(new Date(), "h:mm a"));
-          } catch (error) {
-            console.error("Error saving event:", error);
-            setSaveStatus("error");
-          }
-        }, 1500);
-      };
-    })(),
-    [
-      formData,
-      updateEvent,
-      originalEvent,
-      toast,
-      setFormData,
-      setSaveStatus,
-      setLastSaved,
-    ]
-  );
-
-  // Handle form updates with autosave
+  // Handle form updates without autosave
   const updateFormData = useCallback(
     (data: Partial<Event>) => {
-      // Apply updates to form data
+      // Apply updates to form data store only (no auto-save)
       for (const [key, value] of Object.entries(data)) {
         updateField(key as keyof Event, value);
       }
-
-      // Trigger debounced save
-      debouncedSave(data);
     },
-    [updateField, debouncedSave]
+    [updateField]
   );
 
   // Handle final save
@@ -216,6 +153,7 @@ const EditEventPage = () => {
       // Create final event data with restrictions applied
       const finalEventData = {
         ...formData,
+        id: eventId, // Ensure ID is always set
         // Preserve original isFree value
         isFree: originalEvent.isFree,
         // Ensure capacity doesn't decrease
@@ -283,22 +221,24 @@ const EditEventPage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center space-y-4">
-          <RefreshCw className="h-12 w-12 animate-spin text-blue-500" />
-          <p className="text-lg font-medium">Loading event data...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen bg-white dark:bg-gray-900">
+        <Loading />
       </div>
     );
   }
 
   if (!formData || !formData.id) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-white dark:bg-gray-900">
         <div className="flex flex-col items-center space-y-4">
           <CircleX className="h-16 w-16 text-red-500" />
-          <p className="text-xl font-medium">Event not found</p>
-          <Button onClick={() => router.push("/organizer/dashboard/events")}>
+          <p className="text-xl font-medium text-black dark:text-white">
+            Event not found
+          </p>
+          <Button
+            className="h-11 hover:scale-105 transition-all duration-150 bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={() => router.push("/organizer/dashboard/events")}
+          >
             Back to Events
           </Button>
         </div>
@@ -369,43 +309,6 @@ const EditEventPage = () => {
 
         {/* Form content */}
         <Card className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg overflow-hidden">
-          {/* Auto-save status indicator */}
-          <div className="flex justify-end p-4 border-b border-gray-100 dark:border-gray-800">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={saveStatus}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-md bg-gray-100 dark:bg-gray-800 shadow-sm"
-              >
-                {saveStatus === "saving" && (
-                  <>
-                    <RefreshCw className="h-3.5 w-3.5 animate-spin text-amber-500" />
-                    <span className="text-amber-500">Saving...</span>
-                  </>
-                )}
-                {saveStatus === "saved" && (
-                  <>
-                    <CircleCheck className="h-3.5 w-3.5 text-green-500" />
-                    <span className="text-green-500">Saved</span>
-                    {lastSaved && (
-                      <span className="text-gray-500 text-xs">
-                        at {lastSaved}
-                      </span>
-                    )}
-                  </>
-                )}
-                {saveStatus === "error" && (
-                  <>
-                    <CircleX className="h-3.5 w-3.5 text-red-500" />
-                    <span className="text-red-500">Error saving</span>
-                  </>
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
           <CardContent className="p-6">
             <AnimatePresence mode="wait">
               <motion.div

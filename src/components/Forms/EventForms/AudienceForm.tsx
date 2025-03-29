@@ -16,9 +16,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Event } from "@/types/event";
-import { Course } from "@/utils/data/courses";
 import { Users } from "lucide-react";
 import { getOrdinalSuffix } from "@/utils/functions/getOrdinalSuffix";
+import { Course } from "@/types/course";
 
 interface AudienceFormProps {
   formData: Partial<Event>;
