@@ -1,6 +1,5 @@
 export type Course = {
   id?: string;
-  course: string;
-  department: string[];
+  courseName: string; // Changed from "course" to "courseName"
   noOfYears: number;
 };

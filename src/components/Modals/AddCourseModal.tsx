@@ -10,8 +10,7 @@ import {
 } from "@/components/ui/modal-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { GraduationCap, BookOpen, Calendar, X, Plus } from "lucide-react";
+import { GraduationCap, Calendar } from "lucide-react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -53,7 +52,6 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
   editCourse,
 }) => {
   const { toast } = useToast();
-  const [departments, setDepartments] = useState<string[]>([""]);
   const [originalCourseId, setOriginalCourseId] = useState<string>("");
   const isEditMode = !!editCourse;
 
@@ -62,6 +60,7 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
     mode: "onChange",
     defaultValues: {
       course: "",
+      noOfYears: 1,
     },
   });
 
@@ -69,56 +68,24 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
   useEffect(() => {
     if (editCourse) {
       form.reset({
-        course: editCourse.course,
+        course: editCourse.courseName,
         noOfYears: editCourse.noOfYears,
       });
-      setDepartments([...editCourse.department]);
-      setOriginalCourseId(editCourse.course);
+      setOriginalCourseId(editCourse.courseName);
     } else {
       form.reset({
         course: "",
+        noOfYears: 1,
       });
-      setDepartments([""]);
+
       setOriginalCourseId("");
     }
   }, [editCourse, form]);
 
-  const handleDepartmentChange = (index: number, value: string) => {
-    const newDepartments = [...departments];
-    newDepartments[index] = value;
-    setDepartments(newDepartments);
-  };
-
-  const addDepartmentField = () => {
-    setDepartments([...departments, ""]);
-  };
-
-  const removeDepartmentField = (index: number) => {
-    if (departments.length > 1) {
-      const newDepartments = departments.filter((_, i) => i !== index);
-      setDepartments(newDepartments);
-    }
-  };
-
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    // Filter out empty departments
-    const filteredDepartments = departments.filter(
-      (dept) => dept.trim() !== ""
-    );
-
-    if (filteredDepartments.length === 0) {
-      toast({
-        title: "Validation Error",
-        description: "At least one department is required",
-        variant: "destructive",
-      });
-      return;
-    }
-
     // Create a course object
     const courseData: Course = {
-      course: values.course,
-      department: filteredDepartments,
+      courseName: values.course,
       noOfYears: values.noOfYears,
       id: isEditMode ? originalCourseId : values.course, // Use course name as ID for now
     };
@@ -142,14 +109,13 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
     // Reset form and close modal
     form.reset();
-    setDepartments([""]);
+
     onClose();
   };
 
   const isFormValid = () => {
     const isFormFieldsValid = form.formState.isValid;
-    const hasDepartment = departments.some((dept) => dept.trim() !== "");
-    return isFormFieldsValid && hasDepartment;
+    return isFormFieldsValid;
   };
 
   return (
@@ -212,47 +178,6 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
                 </FormItem>
               )}
             />
-
-            {/* Departments */}
-            <div className="space-y-3">
-              <Label className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                <BookOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
-                Departments
-              </Label>
-
-              {departments.map((dept, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input
-                    value={dept}
-                    onChange={(e) =>
-                      handleDepartmentChange(index, e.target.value)
-                    }
-                    placeholder="e.g. Computer Science and Engineering"
-                    className="h-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeDepartmentField(index)}
-                    disabled={departments.length === 1}
-                    className="shrink-0 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 disabled:opacity-30 disabled:pointer-events-none"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addDepartmentField}
-                className="mt-2 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
-              >
-                <Plus className="h-4 w-4 mr-2" /> Add Department
-              </Button>
-            </div>
 
             <DialogFooter className="mt-6 flex flex-col sm:flex-row gap-3">
               <Button

@@ -3,31 +3,32 @@ import { Course } from "@/types/course";
 export const courses: Course[] = [
   {
     id: "1",
-    course: "BCA",
-    department: ["Computer Applications"],
+    courseName: "BCA",
     noOfYears: 3,
   },
   {
     id: "2",
-    course: "MCA",
-    department: ["Computer Applications"],
+    courseName: "MCA",
     noOfYears: 2,
   },
   {
     id: "3",
-    course: "MTech",
-    department: ["Computer Science and Engineering"],
-    noOfYears: 2,
+    courseName: "BTech-CSE",
+    noOfYears: 4,
   },
   {
     id: "4",
-    course: "BTech",
-    department: [
-      "Computer Science and Engineering",
-      "Mechanical Engineering",
-      "Chemical Engineering",
-    ],
+    courseName: "BTech-ME",
     noOfYears: 4,
   },
-  { id: "5", course: "BA-LLB", department: ["Law/Legal"], noOfYears: 5 },
+  {
+    id: "5",
+    courseName: "BTech-ECE",
+    noOfYears: 4,
+  },
+  {
+    id: "6",
+    courseName: "BA-LLB",
+    noOfYears: 5,
+  },
 ];

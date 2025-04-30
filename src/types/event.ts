@@ -21,9 +21,12 @@ export interface Event {
   category: string; // Event category
   status: "pending" | "approved" | "rejected";
   capacity: string; // Number of seats
-  course: string[]; // Array of courses
-  department: string[]; // Array of departments
-  year: string[]; // Array of years
+  // In the Event interface, update these fields:
+  course: string[]; // Array of courseNames
+  year: string[]; // Array of years (keep this)
+  targetAudience?: {
+    [courseName: string]: number[];
+  };
   createdAt?: string;
   organizer: Organizer;
   progress: "active" | "completed" | "upcoming" | "cancelled" | "none";

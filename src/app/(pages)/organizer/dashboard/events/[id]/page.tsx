@@ -15,6 +15,7 @@ import {
   Edit,
   ChevronLeft,
   Download,
+  GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -28,6 +29,7 @@ import Loading from "@/components/Loading/Loading";
 import { mockAttendees } from "@/utils/data/mockAttendees";
 import { Student } from "@/types/student";
 import AttendeeTableModal from "@/components/Modals/AttendeeTableModal";
+import { getOrdinalSuffix } from "@/utils/functions/getOrdinalSuffix";
 
 const OrganizerEventDetails = () => {
   const params = useParams();
@@ -637,79 +639,178 @@ const OrganizerEventDetails = () => {
               </div>
             </motion.div>
 
-            {/* Target Audience Card */}
+            {/* Target Audience Card - Enhanced */}
             <motion.div
               variants={fadeInUp}
               className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 md:col-span-6 lg:col-span-12 order-10"
               whileHover={{ y: -5, transition: { duration: 0.2 } }}
             >
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">
-                Target Audience
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Departments
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {event.department && event.department.length > 0 ? (
-                      event.department.map((dept, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                        >
-                          {dept}
-                        </span>
-                      ))
+              <div className="flex items-center gap-3 mb-5">
+                <div className="h-10 w-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                  <UserRound className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200">
+                  Target Audience
+                </h3>
+              </div>
+
+              {event.targetAudience ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Courses Section */}
+                  <div className="bg-indigo-50/50 dark:bg-indigo-900/10 rounded-lg p-4 border border-indigo-100 dark:border-indigo-800/30">
+                    <h4 className="text-sm font-medium text-indigo-700 dark:text-indigo-300 mb-3 flex items-center">
+                      <GraduationCap className="h-4 w-4 mr-2" />
+                      Courses
+                    </h4>
+
+                    {Object.keys(event.targetAudience).length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {Object.keys(event.targetAudience).map(
+                          (course, index) => (
+                            <motion.span
+                              key={index}
+                              initial={{ scale: 0.9, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ delay: index * 0.05 }}
+                              className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/50 shadow-sm"
+                            >
+                              {course}
+                            </motion.span>
+                          )
+                        )}
+                      </div>
                     ) : (
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        All departments
-                      </span>
+                      <div className="flex items-center justify-center h-16 bg-white dark:bg-gray-800 rounded-md border border-dashed border-gray-300 dark:border-gray-700">
+                        <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                          <Info className="h-4 w-4 mr-2 text-indigo-500" />
+                          All courses included
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Years Section - Dynamically generated from targetAudience */}
+                  <div className="bg-purple-50/50 dark:bg-purple-900/10 rounded-lg p-4 border border-purple-100 dark:border-purple-800/30">
+                    <h4 className="text-sm font-medium text-purple-700 dark:text-purple-300 mb-3 flex items-center">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Academic Years
+                    </h4>
+
+                    {Object.values(event.targetAudience).flat().length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {/* Get unique years from all courses */}
+                        {Array.from(
+                          new Set(Object.values(event.targetAudience).flat())
+                        )
+                          .sort()
+                          .map((year, index) => (
+                            <motion.span
+                              key={index}
+                              initial={{ scale: 0.9, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ delay: index * 0.05 }}
+                              className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800/50 shadow-sm"
+                            >
+                              {`${year}${getOrdinalSuffix(year)} Year`}
+                            </motion.span>
+                          ))}
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center h-16 bg-white dark:bg-gray-800 rounded-md border border-dashed border-gray-300 dark:border-gray-700">
+                        <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                          <Info className="h-4 w-4 mr-2 text-purple-500" />
+                          All years included
+                        </span>
+                      </div>
                     )}
                   </div>
                 </div>
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Courses
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
+              ) : (
+                // Fallback to the old structure if targetAudience is not available
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Courses Section - Fallback */}
+                  <div className="bg-indigo-50/50 dark:bg-indigo-900/10 rounded-lg p-4 border border-indigo-100 dark:border-indigo-800/30">
+                    <h4 className="text-sm font-medium text-indigo-700 dark:text-indigo-300 mb-3 flex items-center">
+                      <GraduationCap className="h-4 w-4 mr-2" />
+                      Courses
+                    </h4>
+
                     {event.course && event.course.length > 0 ? (
-                      event.course.map((course, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                        >
-                          {course}
-                        </span>
-                      ))
+                      <div className="flex flex-wrap gap-2">
+                        {event.course.map((course, index) => (
+                          <motion.span
+                            key={index}
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/50 shadow-sm"
+                          >
+                            {course}
+                          </motion.span>
+                        ))}
+                      </div>
                     ) : (
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        All courses
-                      </span>
+                      <div className="flex items-center justify-center h-16 bg-white dark:bg-gray-800 rounded-md border border-dashed border-gray-300 dark:border-gray-700">
+                        <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                          <Info className="h-4 w-4 mr-2 text-indigo-500" />
+                          All courses included
+                        </span>
+                      </div>
                     )}
                   </div>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Year
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
+
+                  {/* Years Section - Fallback */}
+                  <div className="bg-purple-50/50 dark:bg-purple-900/10 rounded-lg p-4 border border-purple-100 dark:border-purple-800/30">
+                    <h4 className="text-sm font-medium text-purple-700 dark:text-purple-300 mb-3 flex items-center">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Academic Years
+                    </h4>
+
                     {event.year && event.year.length > 0 ? (
-                      event.year.map((year, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
-                        >
-                          {year}
-                        </span>
-                      ))
+                      <div className="flex flex-wrap gap-2">
+                        {event.year.map((year, index) => (
+                          <motion.span
+                            key={index}
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800/50 shadow-sm"
+                          >
+                            {year}
+                          </motion.span>
+                        ))}
+                      </div>
                     ) : (
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        All years
-                      </span>
+                      <div className="flex items-center justify-center h-16 bg-white dark:bg-gray-800 rounded-md border border-dashed border-gray-300 dark:border-gray-700">
+                        <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                          <Info className="h-4 w-4 mr-2 text-purple-500" />
+                          All years included
+                        </span>
+                      </div>
                     )}
                   </div>
                 </div>
+              )}
+
+              {/* Summary Section */}
+              <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/10 rounded-md border border-blue-100 dark:border-blue-800/30">
+                <p className="text-sm text-blue-700 dark:text-blue-300 flex items-center">
+                  <Info className="h-4 w-4 mr-2" />
+                  {event.targetAudience ? (
+                    <>
+                      This event is targeted at{" "}
+                      {Object.keys(event.targetAudience).length || "all"}{" "}
+                      {Object.keys(event.targetAudience).length === 1
+                        ? "course"
+                        : "courses"}
+                    </>
+                  ) : (
+                    <>
+                      This event is targeted at {event.course?.length || "all"}{" "}
+                      {event.course?.length === 1 ? "course" : "courses"}
+                    </>
+                  )}
+                </p>
               </div>
             </motion.div>
           </motion.div>

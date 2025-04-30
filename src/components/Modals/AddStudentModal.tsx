@@ -19,7 +19,6 @@ import {
   Upload,
   RefreshCw,
   GraduationCap,
-  BookOpen,
   Calendar,
   BookUser,
   Phone,
@@ -48,6 +47,7 @@ import { courses } from "@/utils/data/courses";
 import { useDropzone } from "react-dropzone";
 import { Student } from "@/types/student";
 import { generatePassword } from "@/utils/functions/generateRandomPassword";
+import { getOrdinalSuffix } from "@/utils/functions/getOrdinalSuffix";
 
 interface AddStudentModalProps {
   isOpen: boolean;
@@ -149,6 +149,29 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
         : defaultFormValues,
   });
 
+  // Effect to update available years when course changes
+  useEffect(() => {
+    if (selectedCourse) {
+      const selectedCourseData = courses.find(
+        (course) => course.courseName === selectedCourse
+      );
+
+      if (selectedCourseData) {
+        const yearsCount = selectedCourseData.noOfYears || 1;
+        const years = Array.from({ length: yearsCount }, (_, i) => i + 1);
+        setAvailableYears(years);
+
+        // If current selected year is greater than available years, reset it
+        const currentYear = form.getValues("year");
+        if (currentYear > yearsCount) {
+          form.setValue("year", 1);
+        }
+      }
+    } else {
+      setAvailableYears([]);
+    }
+  }, [selectedCourse, form]);
+
   // Effect to populate form with existing student data when editing
   useEffect(() => {
     if (isEditMode && studentToEdit) {
@@ -185,59 +208,6 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
       setSelectedCourse(null);
     }
   }, [isEditMode, studentToEdit, form]);
-
-  // Update department options based on course selection
-  useEffect(() => {
-    if (selectedCourse) {
-      const courseData = courses.find((c) => c.course === selectedCourse);
-      if (courseData) {
-        // If there's only one department, auto-select it
-        if (courseData.department.length === 1) {
-          form.setValue("department", courseData.department[0]);
-        } else if (isEditMode && studentToEdit) {
-          // In edit mode, preserve the student's existing department if it belongs to the selected course
-          const existingDept = studentToEdit.department;
-          if (courseData.department.includes(existingDept)) {
-            form.setValue("department", existingDept);
-          } else {
-            // If department doesn't belong to the course, reset it
-            form.setValue("department", "");
-          }
-        } else {
-          // In add mode or if department doesn't match, reset it
-          form.setValue("department", "");
-        }
-
-        // Generate available years array based on the course's noOfYears
-        const years = Array.from(
-          { length: courseData.noOfYears },
-          (_, i) => i + 1
-        );
-        setAvailableYears(years);
-
-        // Handle year selection
-        if (isEditMode && studentToEdit) {
-          // In edit mode, preserve the student's year if it's valid for the course
-          const existingYear = studentToEdit.year || 1;
-          if (existingYear <= courseData.noOfYears) {
-            form.setValue("year", existingYear);
-          } else {
-            form.setValue("year", 1);
-          }
-        } else {
-          // Reset year if previously selected year is not valid for new course
-          const currentYear = form.getValues("year");
-          if (!years.includes(currentYear)) {
-            form.setValue("year", 1);
-          }
-        }
-      }
-    } else {
-      form.setValue("department", "");
-      form.setValue("year", 1);
-      setAvailableYears([]);
-    }
-  }, [selectedCourse, form, isEditMode, studentToEdit]);
 
   // Replace the handleAvatarUrlUpload with React Dropzone
   const onDrop = useCallback(
@@ -490,58 +460,12 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
                       {courses.map((course) => (
                         <SelectItem
                           className="cursor-pointer text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                          key={course.course}
-                          value={course.course}
+                          key={course.courseName}
+                          value={course.courseName}
                         >
-                          {course.course}
+                          {course.courseName}
                         </SelectItem>
                       ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage className="text-red-500 dark:text-red-400" />
-                </FormItem>
-              )}
-            />
-
-            {/* Department */}
-            <FormField
-              control={form.control}
-              name="department"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                    <BookOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />{" "}
-                    Department
-                  </FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    disabled={!selectedCourse}
-                  >
-                    <FormControl>
-                      <SelectTrigger
-                        className={`h-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white cursor-pointer focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
-                          !selectedCourse
-                            ? "opacity-70 cursor-not-allowed bg-gray-50 dark:bg-gray-800"
-                            : ""
-                        }`}
-                      >
-                        <SelectValue placeholder="Select department" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                      {selectedCourse &&
-                        courses
-                          .find((c) => c.course === selectedCourse)
-                          ?.department.map((dept) => (
-                            <SelectItem
-                              className="cursor-pointer text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                              key={dept}
-                              value={dept}
-                            >
-                              {dept}
-                            </SelectItem>
-                          ))}
                     </SelectContent>
                   </Select>
                   <FormMessage className="text-red-500 dark:text-red-400" />
@@ -562,12 +486,12 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
                   <Select
                     onValueChange={(value) => field.onChange(parseInt(value))}
                     value={field.value?.toString() || ""}
-                    disabled={!selectedCourse}
+                    disabled={!selectedCourse || availableYears.length === 0}
                   >
                     <FormControl>
                       <SelectTrigger
                         className={`h-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white cursor-pointer focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
-                          !selectedCourse
+                          !selectedCourse || availableYears.length === 0
                             ? "opacity-70 cursor-not-allowed bg-gray-50 dark:bg-gray-800"
                             : ""
                         }`}
@@ -582,11 +506,16 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
                           key={year}
                           value={year.toString()}
                         >
-                          Year {year}
+                          {year} {getOrdinalSuffix(year)} Year
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  {!selectedCourse && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                      Please select a course first
+                    </p>
+                  )}
                   <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
