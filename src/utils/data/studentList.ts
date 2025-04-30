@@ -5,7 +5,7 @@ export const students = [
     course: "BCA",
     email: "gdsc1234@gmail.com",
     phone: "+91 9876543210",
-    department: "Computer Applications",
+
     year: 2,
     rollno: "213456789123",
     avatarUrl: "/path/to/sourav-avatar.jpg",
@@ -16,7 +16,7 @@ export const students = [
     course: "MCA",
     email: "sanskaran5678@gmail.com",
     phone: "+91 9876543210",
-    department: "Computer Applications",
+
     year: 2,
     rollno: "123456789123",
     avatarUrl: "/path/to/rituparna-avatar.jpg",
@@ -27,7 +27,7 @@ export const students = [
     course: "BTech",
     email: "takshila7890@gmail.com",
     phone: "+91 9876543210",
-    department: "Computer Science and Engineering",
+
     year: 3,
     rollno: "745676746123",
     avatarUrl: "/path/to/ananya-avatar.jpg",
@@ -36,7 +36,7 @@ export const students = [
     id: "4",
     name: "Arindam Mukherjee",
     course: "BA-LLB",
-    department: "Law/Legal",
+
     year: 4,
     email: "vivarta1234@gmail.com",
     phone: "+91 9876543210",
@@ -49,7 +49,7 @@ export const students = [
     course: "MTech",
     email: "debate5678@gmail.com",
     phone: "+91 9876543210",
-    department: "Computer Science and Engineering",
+
     year: 2,
     rollno: "567389136123",
     avatarUrl: "/path/to/priyanka-avatar.jpg",

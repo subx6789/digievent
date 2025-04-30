@@ -34,7 +34,7 @@ export const organizerEvents: Event[] = [
     capacity: "300",
     status: "approved",
     course: ["BTech", "BCA", "MTech"],
-    department: ["Computer Science and Engineering", "IT", "ECE", "EE", "ME"],
+
     year: ["1st Year", "2nd Year", "3rd Year", "4th Year"],
 
     createdAt: "2024-01-15T10:30:00Z",
@@ -72,7 +72,7 @@ export const organizerEvents: Event[] = [
     capacity: "300",
     status: "approved",
     course: ["All Courses"],
-    department: ["All Departments"],
+
     year: ["All Years"],
 
     createdAt: "2024-01-20T14:45:00Z",
@@ -110,7 +110,7 @@ export const organizerEvents: Event[] = [
     capacity: "300",
     status: "approved",
     course: ["B.Tech", "BCA", "M.Tech", "MCA"],
-    department: ["Computer Science and Engineering", "IT", "ECE"],
+
     year: ["2nd Year", "3rd Year", "4th Year"],
 
     createdAt: "2024-02-05T09:15:00Z",
@@ -148,7 +148,7 @@ export const organizerEvents: Event[] = [
     capacity: "300",
     status: "approved",
     course: ["All Courses"],
-    department: ["All Departments"],
+
     year: ["All Years"],
 
     createdAt: "2024-02-15T16:30:00Z",
@@ -186,7 +186,7 @@ export const organizerEvents: Event[] = [
     capacity: "300",
     status: "approved",
     course: ["B.Tech", "BCA", "M.Tech", "MCA"],
-    department: ["Computer Science and Engineering", "IT", "ECE"],
+
     year: ["All Years"],
 
     createdAt: "2024-03-01T11:00:00Z",
@@ -224,7 +224,7 @@ export const organizerEvents: Event[] = [
     capacity: "300",
     status: "approved",
     course: ["All Courses"],
-    department: ["All Departments"],
+
     year: ["All Years"],
 
     createdAt: "2024-03-10T13:45:00Z",
@@ -262,7 +262,7 @@ export const organizerEvents: Event[] = [
     capacity: "200",
     status: "pending",
     course: ["B.Tech", "BCA", "BBA"],
-    department: ["All Departments"],
+
     year: ["3rd Year", "4th Year"],
 
     createdAt: "2024-03-15T18:30:00Z",
@@ -301,12 +301,7 @@ export const organizerEvents: Event[] = [
     capacity: "500",
     status: "rejected",
     course: ["B.Tech", "M.Tech", "BCA", "MCA"],
-    department: [
-      "Computer Science and Engineering",
-      "IT",
-      "ECE",
-      "Data Science",
-    ],
+
     year: ["All Years"],
 
     createdAt: "2024-03-20T09:15:00Z",
@@ -344,7 +339,7 @@ export const organizerEvents: Event[] = [
     capacity: "400",
     status: "rejected",
     course: ["B.Tech", "BCA", "M.Tech", "MCA"],
-    department: ["Computer Science and Engineering", "IT"],
+
     year: ["3rd Year", "4th Year"],
 
     createdAt: "2024-03-25T14:00:00Z",
@@ -381,7 +376,7 @@ export const organizerEvents: Event[] = [
     capacity: "250",
     status: "pending",
     course: ["B.Tech", "M.Tech", "MBA", "BBA"],
-    department: ["Computer Science and Engineering", "IT", "Finance"],
+
     year: ["All Years"],
 
     createdAt: "2024-04-01T10:30:00Z",
@@ -420,7 +415,7 @@ export const organizerEvents: Event[] = [
     capacity: "1000",
     status: "approved",
     course: ["All Courses"],
-    department: ["All Departments"],
+
     year: ["All Years"],
 
     createdAt: "2024-04-10T15:45:00Z",

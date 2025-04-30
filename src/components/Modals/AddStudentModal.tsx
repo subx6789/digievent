@@ -62,7 +62,6 @@ interface AddStudentModalProps {
 const baseSchema = {
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   course: z.string({ required_error: "Course is required" }),
-  department: z.string({ required_error: "Department is required" }),
   year: z.coerce.number({ required_error: "Year is required" }),
   rollno: z
     .string()
@@ -124,7 +123,6 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
     phone: "+91 ", // Always initialize with a string
     rollno: "",
     course: "",
-    department: "",
     year: 1,
     avatarUrl: "",
     password: isEditMode ? undefined : "", // Only include password for add mode
@@ -142,7 +140,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
             phone: studentToEdit.phone || "+91 ",
             rollno: studentToEdit.rollno || "",
             course: studentToEdit.course || "",
-            department: studentToEdit.department || "",
+
             year: studentToEdit.year || 1,
             avatarUrl: studentToEdit.avatarUrl || "",
           }
@@ -181,7 +179,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
         phone: studentToEdit.phone,
         rollno: studentToEdit.rollno,
         course: studentToEdit.course,
-        department: studentToEdit.department,
+
         year: studentToEdit.year || 1,
         avatarUrl: studentToEdit.avatarUrl || undefined,
       });
@@ -199,7 +197,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
         phone: "+91 ",
         rollno: "",
         course: "",
-        department: "",
+
         year: 1,
         avatarUrl: "",
         password: "",
@@ -241,7 +239,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
         ...studentToEdit,
         name: values.name,
         course: values.course,
-        department: values.department,
+
         year: values.year,
         avatarUrl: values.avatarUrl || studentToEdit.avatarUrl,
         rollno: values.rollno,
@@ -268,7 +266,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({
           email: values.email,
           phone: values.phone,
           course: values.course,
-          department: values.department,
+
           year: values.year,
           avatarUrl: values.avatarUrl || "/placeholder-avatar.jpg",
           rollno: values.rollno,

@@ -6,6 +6,5 @@ export interface Student {
   rollno: string;
   avatarUrl: string | undefined;
   course: string;
-  department: string;
   year: number;
 }

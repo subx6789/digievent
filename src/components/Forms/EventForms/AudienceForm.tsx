@@ -50,7 +50,7 @@ interface AudienceFormProps {
       canEdit: boolean;
     };
     course?: boolean;
-    department?: boolean;
+
     year?: boolean;
   };
 }

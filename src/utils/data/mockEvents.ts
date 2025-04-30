@@ -21,7 +21,7 @@ export const mockEvents: Event[] = [
     status: "approved",
     capacity: "200",
     course: ["B.Tech", "M.Tech", "BCA"],
-    department: ["CSE", "IT", "ECE"],
+
     year: ["2nd Year", "3rd Year", "4th Year"],
     createdAt: "2023-11-01T10:30:00Z",
     organizer: {
@@ -41,7 +41,7 @@ export const mockEvents: Event[] = [
         name: "Rahul Sharma",
         email: "rahul.s@college.edu",
         phone: "+91 87654 32109",
-        department: "Computer Science",
+
         course: "BCA",
         year: 3,
         rollno: "CS2021001",
@@ -52,7 +52,7 @@ export const mockEvents: Event[] = [
         name: "Priya Patel",
         email: "priya.p@college.edu",
         phone: "+91 76543 21098",
-        department: "Information Technology",
+
         course: "BCA",
         year: 3,
         rollno: "IT2022045",
@@ -79,7 +79,7 @@ export const mockEvents: Event[] = [
     status: "approved",
     capacity: "500",
     course: ["All Courses"],
-    department: ["All Departments"],
+
     year: ["All Years"],
     createdAt: "2023-10-15T09:00:00Z",
     organizer: {
@@ -99,7 +99,7 @@ export const mockEvents: Event[] = [
         name: "Rahul Sharma",
         email: "rahul.s@college.edu",
         phone: "+91 87654 32109",
-        department: "Computer Science",
+
         course: "BCA",
         year: 3,
         rollno: "CS2021001",
@@ -110,7 +110,7 @@ export const mockEvents: Event[] = [
         name: "Aditya Kumar",
         email: "aditya.k@college.edu",
         phone: "+91 98765 43210",
-        department: "Electronics",
+
         course: "BCA",
         year: 3,
         rollno: "EC2020033",
@@ -138,7 +138,7 @@ export const mockEvents: Event[] = [
     status: "approved",
     capacity: "100",
     course: ["B.Tech", "BCA", "MCA"],
-    department: ["CSE", "IT"],
+
     year: ["2nd Year", "3rd Year", "4th Year"],
     createdAt: "2023-09-20T08:30:00Z",
     organizer: {
@@ -158,7 +158,7 @@ export const mockEvents: Event[] = [
         name: "Priya Patel",
         email: "priya.p@college.edu",
         phone: "+91 76543 21098",
-        department: "Information Technology",
+
         course: "BCA",
         year: 3,
         rollno: "IT2022045",
@@ -169,7 +169,7 @@ export const mockEvents: Event[] = [
         name: "Arjun Reddy",
         email: "arjun.r@college.edu",
         phone: "+91 65432 10987",
-        department: "Computer Science",
+
         course: "BCA",
         year: 3,
         rollno: "CS2021022",
@@ -196,7 +196,7 @@ export const mockEvents: Event[] = [
     status: "approved",
     capacity: "80",
     course: ["B.Tech", "M.Tech"],
-    department: ["CSE", "IT", "ECE"],
+
     year: ["3rd Year", "4th Year"],
     createdAt: "2023-10-01T14:00:00Z",
     organizer: {
@@ -216,7 +216,7 @@ export const mockEvents: Event[] = [
         name: "Rahul Sharma",
         email: "rahul.s@college.edu",
         phone: "+91 87654 32109",
-        department: "Computer Science",
+
         course: "BCA",
         year: 3,
         rollno: "CS2021001",
@@ -227,7 +227,7 @@ export const mockEvents: Event[] = [
         name: "Neha Gupta",
         email: "neha.g@college.edu",
         phone: "+91 54321 09876",
-        department: "Electronics",
+
         course: "BCA",
         year: 3,
         rollno: "EC2020015",
@@ -254,7 +254,7 @@ export const mockEvents: Event[] = [
     status: "approved",
     capacity: "300",
     course: ["All Courses"],
-    department: ["All Departments"],
+
     year: ["All Years"],
     createdAt: "2023-11-10T11:30:00Z",
     organizer: {
@@ -274,7 +274,7 @@ export const mockEvents: Event[] = [
         name: "Karan Singh",
         email: "karan.s@college.edu",
         phone: "+91 43210 98765",
-        department: "Mechanical",
+
         course: "BCA",
         year: 3,
         rollno: "ME2022010",
@@ -285,7 +285,7 @@ export const mockEvents: Event[] = [
         name: "Divya Sharma",
         email: "divya.s@college.edu",
         phone: "+91 32109 87654",
-        department: "Civil",
+
         course: "BCA",
         year: 3,
         rollno: "CE2021007",
@@ -312,7 +312,7 @@ export const mockEvents: Event[] = [
     status: "approved",
     capacity: "400",
     course: ["All Courses"],
-    department: ["All Departments"],
+
     year: ["3rd Year", "4th Year"],
     createdAt: "2023-10-25T10:00:00Z",
     organizer: {
@@ -332,7 +332,7 @@ export const mockEvents: Event[] = [
         name: "Riya Jain",
         email: "riya.j@college.edu",
         phone: "+91 10987 65432",
-        department: "Computer Science",
+
         course: "BCA",
         year: 3,
         rollno: "CS2020005",
@@ -343,7 +343,7 @@ export const mockEvents: Event[] = [
         name: "Varun Malhotra",
         email: "varun.m@college.edu",
         phone: "+91 09876 54321",
-        department: "Electronics",
+
         course: "BCA",
         year: 3,
         rollno: "EC2020019",
@@ -371,7 +371,7 @@ export const mockEvents: Event[] = [
     status: "approved",
     capacity: "150",
     course: ["BBA", "MBA", "B.Tech", "M.Tech"],
-    department: ["All Departments"],
+
     year: ["3rd Year", "4th Year"],
     createdAt: "2023-10-10T09:45:00Z",
     organizer: {
@@ -391,7 +391,7 @@ export const mockEvents: Event[] = [
         name: "Rohit Khanna",
         email: "rohit.k@college.edu",
         phone: "+91 98765 43210",
-        department: "Business Administration",
+
         course: "BCA",
         year: 3,
         rollno: "BA2021012",
@@ -419,7 +419,7 @@ export const mockEvents: Event[] = [
     status: "approved",
     capacity: "120",
     course: ["All Courses"],
-    department: ["All Departments"],
+
     year: ["All Years"],
     createdAt: "2023-11-15T13:00:00Z",
     organizer: {
@@ -439,7 +439,7 @@ export const mockEvents: Event[] = [
         name: "Siddharth Roy",
         email: "siddharth.r@college.edu",
         phone: "+91 76543 21098",
-        department: "Fine Arts",
+
         course: "BCA",
         year: 3,
         rollno: "FA2022003",
@@ -450,7 +450,7 @@ export const mockEvents: Event[] = [
         name: "Tanvi Mehta",
         email: "tanvi.m@college.edu",
         phone: "+91 65432 10987",
-        department: "Design",
+
         course: "BCA",
         year: 3,
         rollno: "DS2021008",
@@ -478,7 +478,7 @@ export const mockEvents: Event[] = [
     status: "approved",
     capacity: "500",
     course: ["All Courses"],
-    department: ["CSE", "IT", "ECE"],
+
     year: ["All Years"],
     createdAt: "2023-11-25T15:30:00Z",
     organizer: {
@@ -498,7 +498,7 @@ export const mockEvents: Event[] = [
         name: "Aman Verma",
         email: "aman.v@college.edu",
         phone: "+91 54321 09876",
-        department: "Computer Science",
+
         year: 2,
         course: "B.Tech",
         rollno: "123456789012",

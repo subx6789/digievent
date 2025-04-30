@@ -770,27 +770,6 @@ const StudentProfile = () => {
                     </h3>
 
                     <div className="space-y-5">
-                      {/* Department */}
-                      <motion.div
-                        className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center"
-                        whileHover={{ x: 3 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 20,
-                        }}
-                      >
-                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                          <BookOpen size={18} />
-                          <span>Department</span>
-                        </div>
-                        <div className="md:col-span-2">
-                          <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-md text-gray-900 dark:text-white border border-gray-100 dark:border-gray-700">
-                            {student.department}
-                          </div>
-                        </div>
-                      </motion.div>
-
                       {/* Course */}
                       <motion.div
                         className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center"

@@ -10,7 +10,6 @@ export const mockAttendees: Student[] = [
     rollno: "CS2021001",
     avatarUrl: undefined,
     course: "Computer Science",
-    department: "Engineering",
     year: 3,
   },
   {
@@ -21,7 +20,7 @@ export const mockAttendees: Student[] = [
     rollno: "CS2021002",
     avatarUrl: undefined,
     course: "Information Technology",
-    department: "Engineering",
+
     year: 3,
   },
   {
@@ -32,7 +31,7 @@ export const mockAttendees: Student[] = [
     rollno: "EC2021003",
     avatarUrl: undefined,
     course: "Electronics",
-    department: "Engineering",
+
     year: 2,
   },
   {
@@ -43,7 +42,7 @@ export const mockAttendees: Student[] = [
     rollno: "ME2021004",
     avatarUrl: undefined,
     course: "Mechanical",
-    department: "Engineering",
+
     year: 4,
   },
   {
@@ -54,7 +53,7 @@ export const mockAttendees: Student[] = [
     rollno: "CE2021005",
     avatarUrl: undefined,
     course: "Civil Engineering",
-    department: "Engineering",
+
     year: 2,
   },
   {
@@ -65,7 +64,7 @@ export const mockAttendees: Student[] = [
     rollno: "BT2021006",
     avatarUrl: undefined,
     course: "Biotechnology",
-    department: "Science",
+
     year: 3,
   },
 ];

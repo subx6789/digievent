@@ -34,7 +34,7 @@ export const eventRequests: Event[] = [
     capacity: "300",
     status: "pending",
     course: ["B.Tech", "BCA", "BBA", "M.Tech"],
-    department: ["CSE", "IT", "ECE", "EE", "ME"],
+
     year: ["1st Year", "2nd Year", "3rd Year", "4th Year"],
 
     createdAt: "2024-05-15T10:30:00Z",
@@ -71,7 +71,6 @@ export const eventRequests: Event[] = [
     capacity: "300",
     status: "pending",
     course: ["All Courses"],
-    department: ["All Departments"],
     year: ["All Years"],
 
     createdAt: "2024-05-20T14:45:00Z",
@@ -108,7 +107,7 @@ export const eventRequests: Event[] = [
     capacity: "300",
     status: "pending",
     course: ["B.Tech", "BCA", "M.Tech", "MCA"],
-    department: ["CSE", "IT", "ECE"],
+
     year: ["2nd Year", "3rd Year", "4th Year"],
 
     createdAt: "2024-05-25T09:15:00Z",
@@ -145,7 +144,7 @@ export const eventRequests: Event[] = [
     capacity: "300",
     status: "pending",
     course: ["All Courses"],
-    department: ["All Departments"],
+
     year: ["All Years"],
 
     createdAt: "2024-05-28T16:30:00Z",
@@ -182,7 +181,7 @@ export const eventRequests: Event[] = [
     capacity: "300",
     status: "pending",
     course: ["B.Tech", "BCA", "M.Tech", "MCA"],
-    department: ["CSE", "IT", "ECE"],
+
     year: ["All Years"],
 
     createdAt: "2024-06-01T11:00:00Z",
@@ -219,7 +218,7 @@ export const eventRequests: Event[] = [
     capacity: "300",
     status: "pending",
     course: ["All Courses"],
-    department: ["All Departments"],
+
     year: ["All Years"],
 
     createdAt: "2024-06-10T13:45:00Z",
@@ -256,7 +255,7 @@ export const eventRequests: Event[] = [
     capacity: "500",
     status: "pending",
     course: ["B.Tech", "M.Tech", "BCA", "MCA"],
-    department: ["CSE", "IT", "ECE", "Data Science"],
+
     year: ["All Years"],
 
     createdAt: "2024-06-15T09:15:00Z",
@@ -293,7 +292,7 @@ export const eventRequests: Event[] = [
     capacity: "250",
     status: "pending",
     course: ["B.Tech", "M.Tech", "MBA", "BBA"],
-    department: ["CSE", "IT", "Finance"],
+
     year: ["All Years"],
     createdAt: "2024-06-20T10:30:00Z",
   },

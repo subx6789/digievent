@@ -28,7 +28,6 @@ const initialFormData: Partial<Event> = {
   eventType: "physical",
   clubName: "My Club",
   course: [],
-  department: [],
   year: [],
 };
 

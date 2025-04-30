@@ -170,8 +170,6 @@ const RequestEventPage = () => {
     const hasAudience =
       formData.course &&
       formData.course.length > 0 &&
-      formData.department &&
-      formData.department.length > 0 &&
       formData.year &&
       formData.year.length > 0;
 
@@ -242,7 +240,6 @@ const RequestEventPage = () => {
       status: "pending",
       capacity: formData.capacity || "0",
       course: formData.course || [],
-      department: formData.department || [],
       year: formData.year || [],
       createdAt: new Date().toISOString(),
       organizer: formData.organizer || {

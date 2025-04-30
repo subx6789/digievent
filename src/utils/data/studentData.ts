@@ -8,6 +8,6 @@ export const studentData = {
   rollno: "123456789012",
 
   course: "BCA",
-  department: "Computer Applications",
+
   year: 3,
 };
