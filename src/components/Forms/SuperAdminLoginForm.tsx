@@ -114,44 +114,61 @@ export function SuperAdminLoginForm({
     >
       <div className="grid gap-6">
         <div className="grid gap-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">
+            Email
+          </Label>
           <Input
             id="email"
             type="email"
             placeholder="m@example.com"
             {...register("email")}
-            className={cn(errors.email && "border-red-500")}
+            className={cn(
+              "bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-700",
+              errors.email && "border-red-500 dark:border-red-500"
+            )}
           />
           {errors.email && (
-            <p className="text-sm text-red-500">{errors.email.message}</p>
+            <p className="text-sm text-red-500 dark:text-red-400">
+              {errors.email.message}
+            </p>
           )}
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="password">Password</Label>
+          <Label
+            htmlFor="password"
+            className="text-gray-700 dark:text-gray-300"
+          >
+            Password
+          </Label>
           <div className="relative">
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
               {...register("password")}
-              className={cn(errors.password && "border-red-500")}
+              className={cn(
+                "bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-700",
+                errors.password && "border-red-500 dark:border-red-500"
+              )}
             />
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent dark:hover:bg-transparent dark:text-gray-400"
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? (
-                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                <EyeOff className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
               ) : (
-                <Eye className="h-4 w-4 text-muted-foreground" />
+                <Eye className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
               )}
             </Button>
           </div>
           {errors.password && (
-            <p className="text-sm text-red-500">{errors.password.message}</p>
+            <p className="text-sm text-red-500 dark:text-red-400">
+              {errors.password.message}
+            </p>
           )}
         </div>
 
@@ -159,13 +176,19 @@ export function SuperAdminLoginForm({
           <Checkbox
             id="remember"
             onCheckedChange={(checked) => setRememberMe(checked === true)}
+            className="border-gray-300 dark:border-gray-600"
           />
-          <Label htmlFor="remember">Remember Me</Label>
+          <Label
+            htmlFor="remember"
+            className="text-gray-700 dark:text-gray-300"
+          >
+            Remember Me
+          </Label>
         </div>
 
         <Button
           type="submit"
-          className="w-full hover:scale-105 transition-all duration-150 bg-blue-600 hover:bg-blue-800 text-white"
+          className="w-full hover:scale-105 transition-all duration-150 bg-blue-600 hover:bg-blue-800 text-white dark:bg-blue-700 dark:hover:bg-blue-900 dark:text-white"
           disabled={!isValid || loginMutation.isPending}
         >
           {loginMutation.isPending ? "Logging in..." : "Login"}

@@ -71,12 +71,12 @@ const Navbar = () => {
 
   // Handle view profile
   const handleViewProfile = () => {
-    router.push("/student/profile");
+    router.push(`/profile/${studentData.id}`);
   };
 
   // Handle booking history
   const handleBookingHistory = () => {
-    router.push("/student/bookings");
+    router.push("/booking-history");
   };
 
   return (
