@@ -54,11 +54,11 @@ const StudentEventBookingHistory = () => {
         // Filter events to only include those with studentsBooked
         const events = mockEvents.filter(
           (event: Event) =>
-            event.studentsBooked && event.studentsBooked.length > 0
+            event.studentsBooked && event.studentsBooked.length > 0,
         );
         setBookedEvents(events);
         setFilteredEvents(
-          events.filter((event) => event.progress !== "cancelled")
+          events.filter((event) => event.progress !== "cancelled"),
         );
         setIsLoading(false);
       }, 1000);
@@ -71,13 +71,20 @@ const StudentEventBookingHistory = () => {
   useEffect(() => {
     let filtered = [...bookedEvents];
 
+    // Filter by tab (active vs cancelled)
+    if (activeTab === "cancelled") {
+      filtered = filtered.filter((event) => event.progress === "cancelled");
+    } else {
+      filtered = filtered.filter((event) => event.progress !== "cancelled");
+    }
+
     // Filter by search query
     if (searchQuery) {
       filtered = filtered.filter(
         (event) =>
           event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           event.clubName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          event.category.toLowerCase().includes(searchQuery.toLowerCase())
+          event.category.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
@@ -255,8 +262,8 @@ const StudentEventBookingHistory = () => {
                   {searchQuery
                     ? "No events match your search criteria. Try a different search term."
                     : activeTab === "cancelled"
-                    ? "You don't have any cancelled event bookings."
-                    : "You haven't booked any events yet. Explore events and book your first one!"}
+                      ? "You don't have any cancelled event bookings."
+                      : "You haven't booked any events yet. Explore events and book your first one!"}
                 </p>
                 <Button
                   onClick={() => router.push("/events")}
